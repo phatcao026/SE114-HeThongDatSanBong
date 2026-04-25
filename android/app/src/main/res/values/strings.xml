@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TimSanBong</string>
+
+    <!-- Auth -->
+    <string name="login">Đăng nhập</string>
+    <string name="register">Đăng ký</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="email">Email</string>
+    <string name="password">Mật khẩu</string>
+    <string name="full_name">Họ và tên</string>
+    <string name="phone">Số điện thoại</string>
+    <string name="already_have_account">Đã có tài khoản?</string>
+    <string name="no_account">Chưa có tài khoản?</string>
+
+    <!-- Main -->
+    <string name="find_field">Tìm sân bóng</string>
+    <string name="search_hint">Tìm kiếm sân bóng...</string>
+    <string name="my_bookings">Lịch đặt của tôi</string>
+    <string name="profile">Hồ sơ</string>
+
+    <!-- Field -->
+    <string name="book_now">Đặt sân ngay</string>
+    <string name="field_detail">Chi tiết sân</string>
+    <string name="price_per_hour">đ/giờ</string>
+    <string name="available">Còn trống</string>
+    <string name="booked">Đã đặt</string>
+
+    <!-- Booking -->
+    <string name="select_date">Chọn ngày</string>
+    <string name="select_time">Chọn giờ</string>
+    <string name="confirm_booking">Xác nhận đặt sân</string>
+    <string name="booking_success">Đặt sân thành công!</string>
+    <string name="booking_cancelled">Đã hủy đặt sân</string>
+
+    <!-- Error -->
+    <string name="error_network">Lỗi kết nối. Vui lòng thử lại.</string>
+    <string name="error_login">Email hoặc mật khẩu không đúng.</string>
+    <string name="error_empty_fields">Vui lòng điền đầy đủ thông tin.</string>
+</resources>
