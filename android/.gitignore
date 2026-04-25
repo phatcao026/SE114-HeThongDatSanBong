@@ -13,3 +13,4 @@ CLAUDE.md
 build/
 app/build/
 .gradle/
+.idea/
