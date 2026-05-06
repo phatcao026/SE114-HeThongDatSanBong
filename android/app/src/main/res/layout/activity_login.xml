@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#f8faf8">
+    android:background="@color/background">
 
     <ImageView
         android:id="@+id/ivHeader"
@@ -12,17 +12,17 @@
         android:layout_height="0dp"
         android:contentDescription="@null"
         android:scaleType="centerCrop"
-        android:background="#d1ffd7"
+        android:background="@color/brand_light"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/bottomContainer"
-        android:layout_marginBottom="-32dp" />
+        android:layout_marginBottom="@dimen/overlap_wave" />
 
     <ImageView
         android:id="@+id/ivWave"
         android:layout_width="0dp"
-        android:layout_height="96dp"
+        android:layout_height="@dimen/spacing_96"
         android:contentDescription="@null"
         android:scaleType="fitXY"
         app:srcCompat="@drawable/bg_wave"
@@ -35,7 +35,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_rounded_top"
-        android:padding="28dp"
+        android:padding="@dimen/spacing_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -45,10 +45,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Đăng nhập"
-            android:textColor="#1a202c"
+            android:textColor="@color/text_title"
             android:textSize="28sp"
             android:textStyle="bold"
-            android:fontFamily="sans-serif-black"
+            android:fontFamily="@font/inter"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -57,7 +57,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="@dimen/spacing_24"
             android:hint="Email"
             app:layout_constraintTop_toBottomOf="@+id/tvTitle"
             app:layout_constraintStart_toStartOf="parent"
@@ -74,7 +74,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/spacing_16"
             android:hint="Mật khẩu"
             app:endIconMode="password_toggle"
             app:layout_constraintTop_toBottomOf="@+id/tilEmail"
@@ -91,23 +91,25 @@
             android:id="@+id/tvForgotPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/spacing_16"
             android:text="Quên mật khẩu?"
-            android:textColor="#4a5568"
+            android:textColor="@color/text_body"
             android:textSize="14sp"
+            android:fontFamily="@font/inter"
             app:layout_constraintTop_toBottomOf="@+id/tilPassword"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogin"
             android:layout_width="0dp"
-            android:layout_height="56dp"
-            android:layout_marginTop="24dp"
+            android:layout_height="@dimen/spacing_56"
+            android:layout_marginTop="@dimen/spacing_24"
             android:text="Đăng nhập"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textStyle="bold"
-            app:backgroundTint="#60D86E"
-            app:cornerRadius="50dp"
+            android:textColor="@color/btn_primary_text_color"
+            app:backgroundTint="@color/brand"
+            app:cornerRadius="@dimen/radius_pill"
             app:layout_constraintTop_toBottomOf="@+id/tvForgotPassword"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -116,11 +118,12 @@
             android:id="@+id/tvRegisterLink"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginTop="@dimen/spacing_24"
+            android:layout_marginBottom="@dimen/spacing_16"
             android:text="Chưa có tài khoản? Đăng ký ngay"
-            android:textColor="#4a5568"
+            android:textColor="@color/text_body"
             android:textSize="14sp"
+            android:fontFamily="@font/inter"
             app:layout_constraintTop_toBottomOf="@+id/btnLogin"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"

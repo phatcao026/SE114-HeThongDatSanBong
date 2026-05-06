@@ -9,4 +9,13 @@
     <color name="background">#f8faf8</color>
     <color name="divider">#e2e8f0</color>
     <color name="error">#e53e3e</color>
+    <color name="text_on_primary">#1A202C</color>
+
+    <!-- Canonical design-system token aliases (match 00_core.md) -->
+    <color name="primary">#60D86E</color>
+    <color name="primary_dark">#45C45A</color>
+    <color name="primary_light">#E8F9EB</color>
+    <color name="text_hint">#A0AEC0</color>
+    <color name="background_secondary">#F8FAF8</color>
+    <color name="border_gray">#F3F4F6</color>
 </resources>

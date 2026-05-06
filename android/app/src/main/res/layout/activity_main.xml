@@ -33,8 +33,9 @@
             android:id="@+id/ivProfile"
             android:layout_width="36dp"
             android:layout_height="36dp"
+            android:contentDescription="@string/cd_nav_profile"
             android:src="@android:drawable/ic_menu_myplaces"
-            android:tint="@color/white" />
+            app:tint="@color/white" />
     </LinearLayout>
 
     <!-- Search -->
@@ -69,11 +70,20 @@
         android:layout_height="0dp"
         android:layout_marginTop="12dp"
         android:paddingHorizontal="16dp"
-        android:paddingBottom="16dp"
+        android:paddingBottom="@dimen/nav_container_height"
         android:clipToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tilSearch" />
+
+    <include
+        android:id="@+id/bottomNav"
+        layout="@layout/layout_bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

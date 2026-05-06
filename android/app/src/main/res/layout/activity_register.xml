@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#f8faf8">
+    android:background="@color/background">
 
     <ImageView
         android:id="@+id/ivHeader"
@@ -12,16 +12,17 @@
         android:layout_height="0dp"
         android:contentDescription="@null"
         android:scaleType="centerCrop"
-        android:background="#d1ffd7"
+        android:background="@color/brand_light"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.46" />
+        app:layout_constraintBottom_toTopOf="@+id/bottomContainer"
+        android:layout_marginBottom="@dimen/overlap_wave" />
 
     <ImageView
         android:id="@+id/ivWave"
         android:layout_width="0dp"
-        android:layout_height="96dp"
+        android:layout_height="@dimen/spacing_96"
         android:contentDescription="@null"
         android:scaleType="fitXY"
         app:srcCompat="@drawable/bg_wave"
@@ -32,126 +33,124 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomContainer"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#FFFFFF"
-        android:paddingStart="28dp"
-        android:paddingTop="12dp"
-        android:paddingEnd="28dp"
-        android:paddingBottom="16dp"
-        app:layout_constraintTop_toBottomOf="@id/ivHeader"
-        android:layout_marginTop="-10dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_rounded_top"
+        android:padding="@dimen/spacing_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/registerScroll"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:fillViewport="true"
-            android:overScrollMode="ifContentScrolls"
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đăng ký"
+            android:textColor="@color/text_title"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/inter"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilName"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_16"
+            android:hint="Họ và tên"
+            app:layout_constraintTop_toBottomOf="@+id/tvTitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <LinearLayout
+            <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingBottom="8dp">
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-                <TextView
-                    android:id="@+id/tvTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Đăng ký"
-                    android:textColor="#1a202c"
-                    android:textSize="28sp"
-                    android:textStyle="bold"
-                    android:fontFamily="sans-serif-black" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilEmail"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_12"
+            android:hint="Email"
+            app:layout_constraintTop_toBottomOf="@+id/tilName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilName"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:hint="Họ và tên">
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPersonName" />
-                </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilPassword"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_12"
+            android:hint="Mật khẩu"
+            app:endIconMode="password_toggle"
+            app:layout_constraintTop_toBottomOf="@+id/tilEmail"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilEmail"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:hint="Email">
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textEmailAddress" />
-                </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilConfirmPassword"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_12"
+            android:hint="Xác nhận mật khẩu"
+            app:endIconMode="password_toggle"
+            app:layout_constraintTop_toBottomOf="@+id/tilPassword"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilPassword"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:hint="Mật khẩu"
-                    app:endIconMode="password_toggle">
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPassword" />
-                </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRegister"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/spacing_56"
+            android:layout_marginTop="@dimen/spacing_24"
+            android:text="Tạo tài khoản"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/btn_primary_text_color"
+            app:backgroundTint="@color/brand"
+            app:cornerRadius="@dimen/radius_pill"
+            app:layout_constraintTop_toBottomOf="@+id/tilConfirmPassword"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilConfirmPassword"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:hint="Xác nhận mật khẩu"
-                    app:endIconMode="password_toggle">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPassword" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnRegister"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_marginTop="24dp"
-                    android:text="Tạo tài khoản"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:backgroundTint="#60D86E"
-                    app:cornerRadius="50dp" />
-
-                <TextView
-                    android:id="@+id/tvLoginLink"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="12dp"
-                    android:text="Đã có tài khoản? Đăng nhập ngay"
-                    android:textColor="#4a5568"
-                    android:textSize="14sp" />
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
+        <TextView
+            android:id="@+id/tvLoginLink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_16"
+            android:layout_marginBottom="@dimen/spacing_12"
+            android:text="Đã có tài khoản? Đăng nhập ngay"
+            android:textColor="@color/text_body"
+            android:textSize="14sp"
+            android:fontFamily="@font/inter"
+            app:layout_constraintTop_toBottomOf="@+id/btnRegister"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
