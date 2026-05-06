@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Bottom App Bar with FAB cutout — 5-item layout.
+    Geometry (all measured from FrameLayout bottom, which = screen bottom when placed there):
+      navContainer: height=spacing_64(64dp), marginBottom=spacing_20(20dp)
+        → top edge is 84dp above screen bottom
+      FAB (normal, 56dp): marginBottom=spacing_56(56dp)
+        → FAB center = 56 + 28 = 84dp above screen bottom  ← sits exactly on nav top edge ✓
+        → bottom half of FAB (28dp) is inside the notch area of navContainer
+    Cutout: CircularEdgeTreatment radius = FAB_radius(28dp) + cradleMargin(8dp) = 36dp
+      → 8dp air-gap between FAB edge and notch wall all around
+    Z-order: FAB translationZ=shadow_lg adds on top of FAB natural elevation(~6dp),
+      total FAB Z ≈ 22dp > navContainer elevation(shadow_lg=16dp) → FAB always on top ✓
+    The OutlineProvider stays convex (pill) so Android draws a pill shadow, not a notch shadow.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!-- Background + notch shape applied programmatically in NavBarManager -->
+    <LinearLayout
+        android:id="@+id/navContainer"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/spacing_64"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginHorizontal="@dimen/spacing_16"
+        android:layout_marginBottom="@dimen/spacing_20"
+        android:orientation="horizontal">
+
+        <!-- Home -->
+        <LinearLayout
+            android:id="@+id/navHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/ripple_primary"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/ivNavHome"
+                android:layout_width="@dimen/spacing_24"
+                android:layout_height="@dimen/spacing_24"
+                android:src="@drawable/ic_home"
+                android:contentDescription="@string/cd_nav_home" />
+
+            <View
+                android:id="@+id/dotNavHome"
+                android:layout_width="@dimen/nav_dot_size"
+                android:layout_height="@dimen/nav_dot_size"
+                android:layout_marginTop="@dimen/spacing_4"
+                android:background="@drawable/shape_nav_dot"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- Explore -->
+        <LinearLayout
+            android:id="@+id/navExplore"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/ripple_primary"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/ivNavExplore"
+                android:layout_width="@dimen/spacing_24"
+                android:layout_height="@dimen/spacing_24"
+                android:src="@drawable/ic_explore"
+                android:contentDescription="@string/cd_nav_explore" />
+
+            <View
+                android:id="@+id/dotNavExplore"
+                android:layout_width="@dimen/nav_dot_size"
+                android:layout_height="@dimen/nav_dot_size"
+                android:layout_marginTop="@dimen/spacing_4"
+                android:background="@drawable/shape_nav_dot"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- Spacer for FAB footprint -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <!-- Bookings -->
+        <LinearLayout
+            android:id="@+id/navBookings"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/ripple_primary"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/ivNavBookings"
+                android:layout_width="@dimen/spacing_24"
+                android:layout_height="@dimen/spacing_24"
+                android:src="@drawable/ic_bookmark"
+                android:contentDescription="@string/cd_nav_bookings" />
+
+            <View
+                android:id="@+id/dotNavBookings"
+                android:layout_width="@dimen/nav_dot_size"
+                android:layout_height="@dimen/nav_dot_size"
+                android:layout_marginTop="@dimen/spacing_4"
+                android:background="@drawable/shape_nav_dot"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- Profile -->
+        <LinearLayout
+            android:id="@+id/navProfile"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/ripple_primary"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/ivNavProfile"
+                android:layout_width="@dimen/spacing_24"
+                android:layout_height="@dimen/spacing_24"
+                android:src="@drawable/ic_person"
+                android:contentDescription="@string/cd_nav_profile" />
+
+            <View
+                android:id="@+id/dotNavProfile"
+                android:layout_width="@dimen/nav_dot_size"
+                android:layout_height="@dimen/nav_dot_size"
+                android:layout_marginTop="@dimen/spacing_4"
+                android:background="@drawable/shape_nav_dot"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!--
+        FAB positioned with bottom margin to align center with nav bar's top edge.
+        TranslationZ will be set programmatically to ensure it renders above nav container.
+    -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabQuickBook"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="@dimen/spacing_56"
+        android:src="@drawable/ic_search"
+        android:contentDescription="@string/cd_quick_book"
+        app:backgroundTint="@color/primary"
+        app:tint="@color/text_on_primary"
+        app:fabSize="normal"
+        app:elevation="@dimen/shadow_lg"
+        app:borderWidth="0dp" />
+
+</FrameLayout>

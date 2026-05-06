@@ -37,4 +37,18 @@
     <string name="error_network">Lỗi kết nối. Vui lòng thử lại.</string>
     <string name="error_login">Email hoặc mật khẩu không đúng.</string>
     <string name="error_empty_fields">Vui lòng điền đầy đủ thông tin.</string>
+
+    <!-- Bottom nav labels -->
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_explore">Khám phá</string>
+    <string name="nav_bookings">Lịch đặt</string>
+    <string name="nav_profile">Hồ sơ</string>
+    <string name="action_quick_book">Đặt nhanh</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_nav_home">Trang chủ</string>
+    <string name="cd_nav_explore">Khám phá sân bóng</string>
+    <string name="cd_nav_bookings">Lịch đặt của tôi</string>
+    <string name="cd_nav_profile">Hồ sơ</string>
+    <string name="cd_quick_book">Tìm kiếm nhanh</string>
 </resources>

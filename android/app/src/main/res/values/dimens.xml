@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Radius -->
+    <dimen name="radius_pill">100dp</dimen>
+    <dimen name="radius_card">24dp</dimen>
+    <dimen name="radius_nav">16dp</dimen>
+    <dimen name="radius_badge">100dp</dimen>
+    <dimen name="radius_image">12dp</dimen>
+
+    <!-- Elevation -->
+    <dimen name="shadow_sm">2dp</dimen>
+    <dimen name="shadow_md">8dp</dimen>
+    <dimen name="shadow_lg">16dp</dimen>
+
+    <!-- Touch -->
+    <dimen name="touch_target_min">48dp</dimen>
+
+    <!-- Spacing scale -->
+    <dimen name="spacing_2">2dp</dimen>
+    <dimen name="spacing_4">4dp</dimen>
+    <dimen name="spacing_8">8dp</dimen>
+    <dimen name="spacing_12">12dp</dimen>
+    <dimen name="spacing_16">16dp</dimen>
+    <dimen name="spacing_20">20dp</dimen>
+    <dimen name="spacing_24">24dp</dimen>
+    <dimen name="spacing_32">32dp</dimen>
+    <dimen name="spacing_40">40dp</dimen>
+    <dimen name="spacing_48">48dp</dimen>
+    <dimen name="spacing_56">56dp</dimen>
+    <dimen name="spacing_64">64dp</dimen>
+    <dimen name="spacing_96">96dp</dimen>
+
+    <!-- Layout-specific -->
+    <dimen name="overlap_wave">-32dp</dimen>
+    <dimen name="overlap_container">-10dp</dimen>
+
+    <!-- Bottom nav -->
+    <dimen name="nav_container_height">112dp</dimen>
+    <dimen name="nav_dot_size">6dp</dimen>
+</resources>
