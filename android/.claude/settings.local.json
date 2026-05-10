@@ -6,7 +6,11 @@
       "Bash(Measure-Object -Line)",
       "Bash(./gradlew assembleDebug *)",
       "Bash(adb install *)",
-      "PowerShell(Get-Command *)"
+      "PowerShell(Get-Command *)",
+      "Bash(Get-ChildItem -Path \"design_system\" -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object FullName)",
+      "Bash(../../gradlew assembleDebug)",
+      "Bash(./gradlew clean *)"
     ]
   }
 }
