@@ -10,7 +10,9 @@
       "Bash(Get-ChildItem -Path \"design_system\" -ErrorAction SilentlyContinue)",
       "Bash(Select-Object FullName)",
       "Bash(../../gradlew assembleDebug)",
-      "Bash(./gradlew clean *)"
+      "Bash(./gradlew clean *)",
+      "Read(//d/TravisL/SE114-HeThongDatSanBong/**)",
+      "Bash(.\\\\gradlew assembleDebug)"
     ]
   }
 }
