@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#f8faf8"
-    tools:context=".activity.MyBookingsActivity">
+    tools:context=".ui.customer.MyBookingsActivity">
 
     <TextView
         android:id="@+id/tvTitle"
