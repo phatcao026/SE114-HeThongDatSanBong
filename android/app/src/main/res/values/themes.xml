@@ -19,6 +19,20 @@
         <item name="android:windowBackground">@color/background</item>
     </style>
 
+    <!-- BottomSheet -->
+    <style name="BottomSheet_Timsanbong" parent="Theme.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.BottomSheet.Timsanbong</item>
+    </style>
+    <style name="Widget.BottomSheet.Timsanbong" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.BottomSheet.Timsanbong</item>
+        <item name="android:background">@color/background_primary</item>
+    </style>
+    <style name="ShapeAppearance.BottomSheet.Timsanbong" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">@dimen/radius_card</item>
+        <item name="cornerSizeTopRight">@dimen/radius_card</item>
+    </style>
+
     <style name="Theme.TimSanBong.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/brand</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_bg</item>
