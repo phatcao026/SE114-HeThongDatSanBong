@@ -57,7 +57,7 @@
 
         </LinearLayout>
 
-        <!-- Explore -->
+        <!-- Explore / Matchmaking -->
         <LinearLayout
             android:id="@+id/navExplore"
             android:layout_width="0dp"
@@ -73,7 +73,7 @@
                 android:id="@+id/ivNavExplore"
                 android:layout_width="@dimen/spacing_24"
                 android:layout_height="@dimen/spacing_24"
-                android:src="@drawable/ic_explore"
+                android:src="@drawable/ic_group"
                 android:contentDescription="@string/cd_nav_explore" />
 
             <View
@@ -92,7 +92,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1" />
 
-        <!-- Bookings -->
+        <!-- Messages -->
         <LinearLayout
             android:id="@+id/navBookings"
             android:layout_width="0dp"
@@ -108,8 +108,8 @@
                 android:id="@+id/ivNavBookings"
                 android:layout_width="@dimen/spacing_24"
                 android:layout_height="@dimen/spacing_24"
-                android:src="@drawable/ic_bookmark"
-                android:contentDescription="@string/cd_nav_bookings" />
+                android:src="@drawable/ic_message"
+                android:contentDescription="@string/cd_nav_messages" />
 
             <View
                 android:id="@+id/dotNavBookings"

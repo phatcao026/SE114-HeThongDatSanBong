@@ -35,5 +35,18 @@ public class Field {
     public String getDescription() { return description; }
     public String getFieldType() { return fieldType; }
     public boolean isAvailable() { return available; }
+
+    public Field() {}
+
+    public Field(long id, String name, String address, double pricePerHour, String imageUrl, String description, String fieldType, boolean available) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.pricePerHour = pricePerHour;
+        this.imageUrl = imageUrl;
+        this.description = description;
+        this.fieldType = fieldType;
+        this.available = available;
+    }
 }
 

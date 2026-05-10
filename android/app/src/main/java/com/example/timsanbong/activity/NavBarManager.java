@@ -88,7 +88,7 @@ public class NavBarManager {
         float cradleMargin = activity.getResources().getDimension(R.dimen.spacing_8);
         float cradleRadius = fabRadius + cradleMargin;
         float cornerRadius = activity.getResources().getDimension(R.dimen.radius_nav);
-        float strokeWidthPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1f, dm);
+        float strokeWidthPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.5f, dm);
 
         ShapeAppearanceModel shapeModel = ShapeAppearanceModel.builder()
             .setTopEdge(new CircularEdgeTreatment(cradleRadius, true))
@@ -102,7 +102,7 @@ public class NavBarManager {
         shapeDrawable.setFillColor(ColorStateList.valueOf(
             ContextCompat.getColor(activity, R.color.background_secondary)));
         shapeDrawable.setStroke(strokeWidthPx,
-            ContextCompat.getColor(activity, R.color.border_gray));
+            ContextCompat.getColor(activity, R.color.primary));
 
         ViewCompat.setBackground(navContainer, shapeDrawable);
 

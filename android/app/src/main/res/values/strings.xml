@@ -15,7 +15,7 @@
 
     <!-- Main -->
     <string name="find_field">Tìm sân bóng</string>
-    <string name="search_hint">Tìm kiếm sân bóng...</string>
+    <string name="search_hint">Tìm kiếm theo vị trí địa lý...</string>
     <string name="my_bookings">Lịch đặt của tôi</string>
     <string name="profile">Hồ sơ</string>
 
@@ -40,15 +40,16 @@
 
     <!-- Bottom nav labels -->
     <string name="nav_home">Trang chủ</string>
-    <string name="nav_explore">Khám phá</string>
-    <string name="nav_bookings">Lịch đặt</string>
+    <string name="nav_explore">Ghép trận</string>
+    <string name="nav_bookings">Chat</string>
     <string name="nav_profile">Hồ sơ</string>
     <string name="action_quick_book">Đặt nhanh</string>
 
     <!-- Content descriptions -->
     <string name="cd_nav_home">Trang chủ</string>
-    <string name="cd_nav_explore">Khám phá sân bóng</string>
+    <string name="cd_nav_explore">Bảng tin ghép trận</string>
+    <string name="cd_nav_messages">Chat nội bộ</string>
     <string name="cd_nav_bookings">Lịch đặt của tôi</string>
-    <string name="cd_nav_profile">Hồ sơ</string>
-    <string name="cd_quick_book">Tìm kiếm nhanh</string>
+    <string name="cd_nav_profile">Hồ sơ cá nhân / Đội bóng</string>
+    <string name="cd_quick_book">Tìm kiếm sân theo vị trí địa lý</string>
 </resources>

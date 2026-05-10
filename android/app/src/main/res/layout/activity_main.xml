@@ -4,78 +4,144 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#f8faf8">
+    android:background="@color/background_secondary">
 
-    <!-- Top Bar -->
+    <!-- Greeting Header (Modern replacing old top bar) -->
+    <TextView
+        android:id="@+id/tvGreeting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Xin chào 👋"
+        android:textColor="@color/text_body"
+        android:textSize="14sp"
+        android:fontFamily="@font/inter"
+        android:layout_marginTop="@dimen/spacing_24"
+        android:layout_marginStart="@dimen/spacing_16"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/find_field"
+        android:textColor="@color/text_heading"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/inter"
+        android:layout_marginTop="@dimen/spacing_4"
+        android:layout_marginStart="@dimen/spacing_16"
+        android:layout_marginEnd="@dimen/spacing_16"
+        app:layout_constraintTop_toBottomOf="@id/tvGreeting"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/ivProfile" />
+
+    <ImageView
+        android:id="@+id/ivProfile"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="@dimen/spacing_16"
+        android:contentDescription="@string/cd_nav_profile"
+        android:src="@drawable/ic_person"
+        android:background="@drawable/ripple_primary"
+        android:padding="12dp"
+        app:tint="@color/primary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tvGreeting"
+        app:layout_constraintBottom_toBottomOf="@id/tvTitle" />
+
+    <!-- Search & Filter -->
     <LinearLayout
-        android:id="@+id/layoutTopBar"
+        android:id="@+id/layoutSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/brand"
         android:orientation="horizontal"
-        android:paddingHorizontal="20dp"
-        android:paddingVertical="16dp"
+        android:gravity="center_vertical"
+        android:layout_marginHorizontal="@dimen/spacing_16"
+        android:layout_marginTop="@dimen/spacing_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/tvTitle">
 
-        <TextView
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilSearch"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/find_field"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:fontFamily="sans-serif-black" />
+            android:layout_marginEnd="@dimen/spacing_12"
+            app:boxCornerRadiusBottomEnd="@dimen/radius_pill"
+            app:boxCornerRadiusBottomStart="@dimen/radius_pill"
+            app:boxCornerRadiusTopEnd="@dimen/radius_pill"
+            app:boxCornerRadiusTopStart="@dimen/radius_pill"
+            app:boxStrokeColor="@color/edittext_stroke_color"
+            app:boxStrokeWidth="1dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:hintTextColor="@color/primary"
+            app:startIconDrawable="@android:drawable/ic_menu_search">
 
-        <ImageView
-            android:id="@+id/ivProfile"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:contentDescription="@string/cd_nav_profile"
-            android:src="@android:drawable/ic_menu_myplaces"
-            app:tint="@color/white" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etSearch"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:hint="@string/search_hint"
+                android:inputType="text"
+                android:fontFamily="@font/inter"
+                android:textSize="14sp"
+                android:textColor="@color/text_heading"
+                android:paddingHorizontal="@dimen/spacing_20" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnFilter"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            app:cardCornerRadius="@dimen/radius_pill"
+            app:cardBackgroundColor="@color/primary"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@android:drawable/ic_menu_manage"
+                app:tint="@color/text_on_primary"
+                android:contentDescription="Filter Location" />
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
-    <!-- Search -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilSearch"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
+    <!-- Field List Section Title -->
+    <TextView
+        android:id="@+id/tvSectionFields"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp"
-        app:boxCornerRadiusBottomEnd="50dp"
-        app:boxCornerRadiusBottomStart="50dp"
-        app:boxCornerRadiusTopEnd="50dp"
-        app:boxCornerRadiusTopStart="50dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layoutTopBar"
-        app:startIconDrawable="@android:drawable/ic_menu_search">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etSearch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/search_hint"
-            android:inputType="text" />
-    </com.google.android.material.textfield.TextInputLayout>
+        android:text="Sân bóng nổi bật"
+        android:textColor="@color/text_heading"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/inter"
+        android:layout_marginStart="@dimen/spacing_16"
+        android:layout_marginTop="@dimen/spacing_24"
+        app:layout_constraintTop_toBottomOf="@id/layoutSearch"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <!-- Field List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvFields"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="12dp"
-        android:paddingHorizontal="16dp"
-        android:paddingBottom="@dimen/nav_container_height"
+        android:layout_marginTop="@dimen/spacing_12"
         android:clipToPadding="false"
+        android:paddingHorizontal="@dimen/spacing_16"
+        android:paddingBottom="@dimen/spacing_64"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tilSearch" />
+        app:layout_constraintTop_toBottomOf="@id/tvSectionFields"
+        app:layout_constraintVertical_bias="0.0" />
 
     <include
         android:id="@+id/bottomNav"

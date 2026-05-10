@@ -4,76 +4,93 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="16dp"
-    app:cardCornerRadius="24dp"
-    app:cardElevation="8dp">
+    android:layout_marginBottom="@dimen/spacing_12"
+    app:cardCornerRadius="@dimen/radius_card"
+    app:cardElevation="@dimen/shadow_sm"
+    app:cardBackgroundColor="@color/background_primary"
+    app:strokeWidth="1.5dp"
+    app:strokeColor="@color/primary">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="@dimen/spacing_16">
 
-        <ImageView
-            android:id="@+id/ivFieldImage"
-            android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:scaleType="centerCrop"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="100dp"
+            android:layout_height="120dp"
+            app:cardCornerRadius="@dimen/radius_image"
+            app:cardElevation="0dp">
+            <ImageView
+                android:id="@+id/ivFieldImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:background="@color/background_tertiary" />
+        </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="20dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ivFieldImage">
+            android:layout_marginStart="@dimen/spacing_16"
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/tvFieldName"
+                android:text="Ten san"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_title"
-                android:textSize="18sp"
+                android:textColor="@color/text_heading"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                android:fontFamily="sans-serif-medium" />
+                android:fontFamily="@font/inter"
+                android:maxLines="1"
+                android:ellipsize="end" />
 
             <TextView
                 android:id="@+id/tvFieldAddress"
+                android:text="Dia chi"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:drawableStart="@android:drawable/ic_menu_mylocation"
-                android:drawablePadding="4dp"
+                android:layout_marginTop="@dimen/spacing_4"
                 android:textColor="@color/text_body"
-                android:textSize="13sp" />
+                android:textSize="12sp"
+                android:fontFamily="@font/inter"
+                android:maxLines="1"
+                android:ellipsize="end" />
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/tvPrice"
+                android:text="100.000 VND"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:orientation="horizontal">
+                android:layout_marginTop="@dimen/spacing_4"
+                android:textColor="@color/primary_text"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/inter" />
 
-                <TextView
-                    android:id="@+id/tvPrice"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textColor="@color/brand_dark"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnBook"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_8"
+                android:minHeight="48dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/action_quick_book"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/inter"
+                app:cornerRadius="@dimen/radius_pill"
+                app:backgroundTint="@color/primary"
+                android:textColor="@color/text_on_primary"
+                app:rippleColor="@color/primary_dark" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnBook"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:text="@string/book_now"
-                    android:textSize="13sp"
-                    app:backgroundTint="@color/brand"
-                    app:cornerRadius="50dp" />
-            </LinearLayout>
         </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

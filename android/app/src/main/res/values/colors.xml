@@ -16,6 +16,11 @@
     <color name="primary_dark">#45C45A</color>
     <color name="primary_light">#E8F9EB</color>
     <color name="text_hint">#A0AEC0</color>
+    <color name="text_heading">#1A202C</color>
+    <color name="color_error">#E53E3E</color>
     <color name="background_secondary">#F8FAF8</color>
     <color name="border_gray">#F3F4F6</color>
+    <color name="background_primary">#FFFFFF</color>
+    <color name="background_tertiary">#F0F4F0</color>
+    <color name="primary_text">#2F855A</color>
 </resources>
