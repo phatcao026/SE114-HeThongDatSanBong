@@ -16,6 +16,11 @@
     <!-- Main -->
     <string name="find_field">Tìm sân bóng</string>
     <string name="search_hint">Tìm kiếm theo vị trí địa lý...</string>
+    <string name="greeting_label">Xin chào,</string>
+    <string name="greeting_fallback">bạn</string>
+    <string name="home_subtitle">Tìm sân bóng gần bạn nhất</string>
+    <string name="section_featured_fields">Sân bóng nổi bật</string>
+    <string name="section_results">Kết quả (%d sân)</string>
     <string name="my_bookings">Lịch đặt của tôi</string>
     <string name="profile">Hồ sơ</string>
 
@@ -45,7 +50,25 @@
     <string name="nav_profile">Hồ sơ</string>
     <string name="action_quick_book">Đặt nhanh</string>
 
+    <!-- Filter -->
+    <string name="filter_title">Bộ lọc</string>
+    <string name="filter_all">Tất cả</string>
+    <string name="filter_field_type">Loại sân</string>
+    <string name="filter_type_5">5 người</string>
+    <string name="filter_type_7">7 người</string>
+    <string name="filter_type_11">11 người</string>
+    <string name="filter_price_range">Khoảng giá</string>
+    <string name="filter_price_under_200">Dưới 200k</string>
+    <string name="filter_price_200_300">200k – 300k</string>
+    <string name="filter_price_over_300">Trên 300k</string>
+    <string name="filter_status">Trạng thái</string>
+    <string name="filter_available_only">Chỉ hiện sân còn trống</string>
+    <string name="filter_apply">Áp dụng</string>
+    <string name="filter_reset">Xóa bộ lọc</string>
+
     <!-- Content descriptions -->
+    <string name="cd_filter">Lọc sân bóng</string>
+    <string name="cd_close_filter">Đóng bộ lọc</string>
     <string name="cd_nav_home">Trang chủ</string>
     <string name="cd_nav_explore">Bảng tin ghép trận</string>
     <string name="cd_nav_messages">Chat nội bộ</string>

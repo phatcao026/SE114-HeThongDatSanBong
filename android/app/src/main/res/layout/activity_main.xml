@@ -2,66 +2,115 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_secondary">
+    android:background="@color/background_secondary"
+    tools:context=".activity.MainActivity">
 
-    <!-- Greeting Header (Modern replacing old top bar) -->
-    <TextView
-        android:id="@+id/tvGreeting"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Xin chào 👋"
-        android:textColor="@color/text_body"
-        android:textSize="14sp"
-        android:fontFamily="@font/inter"
-        android:layout_marginTop="@dimen/spacing_24"
-        android:layout_marginStart="@dimen/spacing_16"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/tvTitle"
+    <!-- ── Hero Banner ─────────────────────────────────────── -->
+    <LinearLayout
+        android:id="@+id/layoutHero"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/find_field"
-        android:textColor="@color/text_heading"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:fontFamily="@font/inter"
-        android:layout_marginTop="@dimen/spacing_4"
-        android:layout_marginStart="@dimen/spacing_16"
-        android:layout_marginEnd="@dimen/spacing_16"
-        app:layout_constraintTop_toBottomOf="@id/tvGreeting"
+        android:orientation="vertical"
+        android:background="@drawable/bg_header_hero"
+        android:paddingTop="@dimen/spacing_24"
+        android:paddingBottom="@dimen/spacing_32"
+        android:paddingHorizontal="@dimen/spacing_16"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/ivProfile" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <ImageView
-        android:id="@+id/ivProfile"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="@dimen/spacing_16"
-        android:contentDescription="@string/cd_nav_profile"
-        android:src="@drawable/ic_person"
-        android:background="@drawable/ripple_primary"
-        android:padding="12dp"
-        app:tint="@color/primary"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/tvGreeting"
-        app:layout_constraintBottom_toBottomOf="@id/tvTitle" />
+        <!-- Greeting row: text left, avatar right -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-    <!-- Search & Filter -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvGreeting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/greeting_label"
+                    android:textColor="@color/text_on_primary"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/inter"
+                    android:alpha="0.85" />
+
+                <TextView
+                    android:id="@+id/tvUserName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/greeting_fallback"
+                    android:textColor="@color/text_on_primary"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/inter"
+                    android:layout_marginTop="@dimen/spacing_2"
+                    tools:text="Long Travis" />
+
+            </LinearLayout>
+
+            <!-- Avatar button -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvAvatar"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_marginStart="@dimen/spacing_12"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardCornerRadius="@dimen/radius_pill"
+                app:cardBackgroundColor="@color/background_primary"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp"
+                app:rippleColor="@color/primary_light">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_person"
+                    app:tint="@color/primary_text"
+                    android:contentDescription="@string/cd_nav_profile" />
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+        <!-- Subtitle -->
+        <TextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/home_subtitle"
+            android:textColor="@color/text_on_primary"
+            android:textSize="14sp"
+            android:fontFamily="@font/inter"
+            android:alpha="0.7"
+            android:layout_marginTop="@dimen/spacing_8" />
+
+    </LinearLayout>
+
+    <!-- ── Search & Filter ─────────────────────────────────── -->
     <LinearLayout
         android:id="@+id/layoutSearch"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginHorizontal="@dimen/spacing_16"
-        android:layout_marginTop="@dimen/spacing_24"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="@dimen/spacing_16"
+        android:layout_marginEnd="@dimen/spacing_16"
+        android:layout_marginTop="@dimen/spacing_16"
+        app:layout_constraintTop_toBottomOf="@id/layoutHero"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvTitle">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilSearch"
@@ -78,7 +127,7 @@
             app:boxStrokeWidth="1dp"
             app:boxStrokeWidthFocused="2dp"
             app:hintTextColor="@color/primary"
-            app:startIconDrawable="@android:drawable/ic_menu_search">
+            app:startIconDrawable="@drawable/ic_search">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etSearch"
@@ -102,32 +151,36 @@
             app:strokeWidth="0dp"
             android:clickable="true"
             android:focusable="true">
+
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:src="@android:drawable/ic_menu_manage"
                 app:tint="@color/text_on_primary"
-                android:contentDescription="Filter Location" />
+                android:contentDescription="@string/cd_filter" />
         </com.google.android.material.card.MaterialCardView>
+
     </LinearLayout>
 
-    <!-- Field List Section Title -->
+    <!-- ── Section Title ───────────────────────────────────── -->
     <TextView
         android:id="@+id/tvSectionFields"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Sân bóng nổi bật"
+        android:text="@string/section_featured_fields"
         android:textColor="@color/text_heading"
         android:textSize="18sp"
         android:textStyle="bold"
         android:fontFamily="@font/inter"
         android:layout_marginStart="@dimen/spacing_16"
+        android:layout_marginEnd="@dimen/spacing_16"
         android:layout_marginTop="@dimen/spacing_24"
         app:layout_constraintTop_toBottomOf="@id/layoutSearch"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Field List -->
+    <!-- ── Field List ──────────────────────────────────────── -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvFields"
         android:layout_width="match_parent"
@@ -138,7 +191,6 @@
         android:paddingBottom="@dimen/spacing_64"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvSectionFields"
         app:layout_constraintVertical_bias="0.0" />
