@@ -11,10 +11,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface BookingRepository extends JpaRepository<Booking, String> {
-    List<Booking> findByFieldIdAndBookingDate(String fieldId, LocalDate bookingDate);
+public interface BookingRepository extends JpaRepository<Booking, Long> {
+    List<Booking> findByFieldIdAndBookingDate(Long fieldId, LocalDate bookingDate);
     List<Booking> findByStatusAndCreatedAtBefore(Enums.BookingStatus status, LocalDateTime deadline);
-    List<Booking> findByUserId(String userId);
+    List<Booking> findByUserId(Long userId);
     @Query("SELECT COALESCE(SUM(b.totalAmount), 0) FROM Booking b WHERE b.status = 'COMPLETED'")
     java.math.BigDecimal calculateTotalSystemRevenue();
 

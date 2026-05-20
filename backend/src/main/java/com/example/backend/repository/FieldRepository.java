@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
-public interface FieldRepository extends JpaRepository<Field, String> { // 👉 XÁC NHẬN LẠI ID LÀ STRING HAY LONG
+public interface FieldRepository extends JpaRepository<Field, Long> {
 
     @EntityGraph(attributePaths = {"timeSlots"})
     List<Field> findAll();

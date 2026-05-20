@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 @Table(name = "teams")
 public class Team {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String name;
 
@@ -17,7 +17,7 @@ public class Team {
     private String description;
 
     @Column(name = "captain_id")
-    private String captainId;
+    private Long captainId;
 
     @Enumerated(EnumType.STRING)
     private Enums.TeamLevel level;
@@ -32,8 +32,8 @@ public class Team {
     // getters & setters
     public Team() {}
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -41,8 +41,8 @@ public class Team {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    public String getCaptainId() { return captainId; }
-    public void setCaptainId(String captainId) { this.captainId = captainId; }
+    public Long getCaptainId() { return captainId; }
+    public void setCaptainId(Long captainId) { this.captainId = captainId; }
 
     public Enums.TeamLevel getLevel() { return level; }
     public void setLevel(Enums.TeamLevel level) { this.level = level; }

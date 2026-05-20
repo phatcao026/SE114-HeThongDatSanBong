@@ -10,20 +10,20 @@ import java.util.List;
 @Table(name = "match_posts")
 public class MatchPost {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "user_id")
-    private String userId;
+    private Long userId;
 
     @Column(name = "team_id")
-    private String teamId;
+    private Long teamId;
 
     @Column(name = "field_id")
-    private String fieldId;
+    private Long fieldId;
 
     @Column(name = "booking_id")
-    private String bookingId;
+    private Long bookingId;
 
     private LocalDate date;
     @Column(name = "time_start")
@@ -58,20 +58,20 @@ public class MatchPost {
 
     public MatchPost() {}
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
-    public String getTeamId() { return teamId; }
-    public void setTeamId(String teamId) { this.teamId = teamId; }
+    public Long getTeamId() { return teamId; }
+    public void setTeamId(Long teamId) { this.teamId = teamId; }
 
-    public String getFieldId() { return fieldId; }
-    public void setFieldId(String fieldId) { this.fieldId = fieldId; }
+    public Long getFieldId() { return fieldId; }
+    public void setFieldId(Long fieldId) { this.fieldId = fieldId; }
 
-    public String getBookingId() { return bookingId; }
-    public void setBookingId(String bookingId) { this.bookingId = bookingId; }
+    public Long getBookingId() { return bookingId; }
+    public void setBookingId(Long bookingId) { this.bookingId = bookingId; }
 
     public LocalDate getDate() { return date; }
     public void setDate(LocalDate date) { this.date = date; }

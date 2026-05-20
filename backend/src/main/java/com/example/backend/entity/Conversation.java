@@ -12,8 +12,8 @@ import java.util.List;
 @Data
 public class Conversation {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     private Enums.ConversationType type;

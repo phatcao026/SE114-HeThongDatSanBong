@@ -11,14 +11,14 @@ import java.math.BigDecimal;
 @Table(name = "payments")
 public class Payment {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "booking_id")
-    private String bookingId;
+    private Long bookingId;
 
     @Column(name = "user_id")
-    private String userId;
+    private Long userId;
 
     private BigDecimal amount;
 

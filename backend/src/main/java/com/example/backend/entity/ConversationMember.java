@@ -9,11 +9,11 @@ public class ConversationMember {
 
     @Id
     @Column(name = "conversation_id")
-    private String conversationId;
+    private Long conversationId;
 
     @Id
     @Column(name = "user_id")
-    private String userId;
+    private Long userId;
 
     @ManyToOne
     @JoinColumn(name = "conversation_id", insertable = false, updatable = false)
@@ -26,11 +26,11 @@ public class ConversationMember {
     // getters/setters
     public ConversationMember() {}
 
-    public String getConversationId() { return conversationId; }
-    public void setConversationId(String conversationId) { this.conversationId = conversationId; }
+    public Long getConversationId() { return conversationId; }
+    public void setConversationId(Long conversationId) { this.conversationId = conversationId; }
 
-    public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
     public Conversation getConversation() { return conversation; }
     public void setConversation(Conversation conversation) { this.conversation = conversation; }

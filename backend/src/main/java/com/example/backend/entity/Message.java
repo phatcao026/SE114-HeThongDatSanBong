@@ -7,14 +7,14 @@ import java.time.LocalDateTime;
 @Table(name = "messages")
 public class Message {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "conversation_id")
-    private String conversationId;
+    private Long conversationId;
 
     @Column(name = "sender_id")
-    private String senderId;
+    private Long senderId;
 
     @Column(columnDefinition = "TEXT")
     private String content;
@@ -33,14 +33,14 @@ public class Message {
     // getters/setters
     public Message() {}
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getConversationId() { return conversationId; }
-    public void setConversationId(String conversationId) { this.conversationId = conversationId; }
+    public Long getConversationId() { return conversationId; }
+    public void setConversationId(Long conversationId) { this.conversationId = conversationId; }
 
-    public String getSenderId() { return senderId; }
-    public void setSenderId(String senderId) { this.senderId = senderId; }
+    public Long getSenderId() { return senderId; }
+    public void setSenderId(Long senderId) { this.senderId = senderId; }
 
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }

@@ -10,17 +10,17 @@ import java.math.BigDecimal;
 @Table(name = "bookings")
 public class Booking {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "user_id")
-    private String userId;
+    private Long userId;
 
     @Column(name = "field_id")
-    private String fieldId;
+    private Long fieldId;
 
     @Column(name = "time_slot_id")
-    private String timeSlotId;
+    private Long timeSlotId;
 
     @Column(name = "booking_date")
     private LocalDate bookingDate;
@@ -61,17 +61,17 @@ public class Booking {
     // getters/setters
     public Booking() {}
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
-    public String getFieldId() { return fieldId; }
-    public void setFieldId(String fieldId) { this.fieldId = fieldId; }
+    public Long getFieldId() { return fieldId; }
+    public void setFieldId(Long fieldId) { this.fieldId = fieldId; }
 
-    public String getTimeSlotId() { return timeSlotId; }
-    public void setTimeSlotId(String timeSlotId) { this.timeSlotId = timeSlotId; }
+    public Long getTimeSlotId() { return timeSlotId; }
+    public void setTimeSlotId(Long timeSlotId) { this.timeSlotId = timeSlotId; }
 
     public LocalDate getBookingDate() { return bookingDate; }
     public void setBookingDate(LocalDate bookingDate) { this.bookingDate = bookingDate; }

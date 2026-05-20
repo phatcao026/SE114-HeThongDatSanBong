@@ -3,6 +3,7 @@ package com.example.backend.entity;
 import com.example.backend.utils.Enums;
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -10,32 +11,30 @@ import java.time.LocalDateTime;
 @Table(name = "reviews")
 public class Review {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    // Thay @JoinColumn bằng @Column
     @Column(name = "reviewer_id")
-    private String reviewerId; // Người viết đánh giá
+    private Long reviewerId;
 
     @Column(name = "reviewee_id")
-    private String revieweeId; // Người bị đánh giá
+    private Long revieweeId;
 
     @Column(name = "match_request_id")
-    private String matchRequestId; // Trận đấu nào
+    private Long matchRequestId;
 
     @Column(name = "score_change")
-    private Integer scoreChange; // Số điểm trừ CHÍNH THỨC (do Admin chốt)
+    private Integer scoreChange;
 
     @Column(columnDefinition = "TEXT")
-    private String reason; // Nội dung review người dùng viết
+    private String reason;
 
     @Column(name = "ai_suggested_penalty")
-    private Integer aiSuggestedPenalty; // Điểm trừ AI đề xuất (VD: -10)
+    private Integer aiSuggestedPenalty;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 50)
     private Enums.ReviewStatus status;
-    // AUTO_PASSED (Không lỗi), PENDING_ADMIN_REVIEW (Chờ duyệt), PENALIZED (Đã trừ chính thức)
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();

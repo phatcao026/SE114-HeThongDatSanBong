@@ -10,11 +10,11 @@ import java.util.List;
 @Table(name = "time_slots")
 public class TimeSlot {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "field_id")
-    private String fieldId;
+    private Long fieldId;
 
     @Column(name = "start_time")
     private LocalDateTime startTime;
@@ -37,12 +37,12 @@ public class TimeSlot {
     // getters/setters
     public TimeSlot() {}
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
 
-    public String getFieldId() { return fieldId; }
-    public void setFieldId(String fieldId) { this.fieldId = fieldId; }
+    public Long getFieldId() { return fieldId; }
+    public void setFieldId(Long fieldId) { this.fieldId = fieldId; }
 
     public LocalDateTime getStartTime() { return startTime; }
     public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }

@@ -11,7 +11,8 @@ import com.example.backend.utils.Enums.UserRole;
 public class User {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(unique = true)
     private String email;
@@ -63,7 +64,7 @@ public class User {
 
     public User() {}
 
-    public User(String id, String email, String password, UserRole role, String fullName, String phone) {
+    public User(Long id, String email, String password, UserRole role, String fullName, String phone) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -74,8 +75,8 @@ public class User {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }

@@ -8,14 +8,14 @@ import java.time.LocalDateTime;
 @Table(name = "match_requests")
 public class MatchRequest {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "post_id")
-    private String postId;
+    private Long postId;
 
     @Column(name = "requester_id")
-    private String requesterId;
+    private Long requesterId;
 
     @Column(columnDefinition = "TEXT")
     private String message;
@@ -37,14 +37,14 @@ public class MatchRequest {
     // getters/setters
     public MatchRequest() {}
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getPostId() { return postId; }
-    public void setPostId(String postId) { this.postId = postId; }
+    public Long getPostId() { return postId; }
+    public void setPostId(Long postId) { this.postId = postId; }
 
-    public String getRequesterId() { return requesterId; }
-    public void setRequesterId(String requesterId) { this.requesterId = requesterId; }
+    public Long getRequesterId() { return requesterId; }
+    public void setRequesterId(Long requesterId) { this.requesterId = requesterId; }
 
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }

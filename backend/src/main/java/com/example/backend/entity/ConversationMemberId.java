@@ -3,12 +3,12 @@ package com.example.backend.entity;
 import java.io.Serializable;
 
 public class ConversationMemberId implements Serializable {
-    private String conversationId;
-    private String userId;
+    private Long conversationId;
+    private Long userId;
 
     public ConversationMemberId() {}
 
-    public ConversationMemberId(String conversationId, String userId) {
+    public ConversationMemberId(Long conversationId, Long userId) {
         this.conversationId = conversationId;
         this.userId = userId;
     }
