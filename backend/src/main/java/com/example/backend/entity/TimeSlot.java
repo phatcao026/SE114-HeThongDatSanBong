@@ -2,6 +2,7 @@ package com.example.backend.entity;
 
 import com.example.backend.utils.Enums;
 import jakarta.persistence.*;
+import java.time.LocalTime;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,10 +18,10 @@ public class TimeSlot {
     private Long fieldId;
 
     @Column(name = "start_time")
-    private LocalDateTime startTime;
+    private LocalTime startTime;
 
     @Column(name = "end_time")
-    private LocalDateTime endTime;
+    private LocalTime endTime;
 
     private BigDecimal price;
 
@@ -44,11 +45,11 @@ public class TimeSlot {
     public Long getFieldId() { return fieldId; }
     public void setFieldId(Long fieldId) { this.fieldId = fieldId; }
 
-    public LocalDateTime getStartTime() { return startTime; }
-    public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
+    public LocalTime getStartTime() { return startTime; }
+    public void setStartTime(LocalTime startTime) { this.startTime = startTime; }
 
-    public LocalDateTime getEndTime() { return endTime; }
-    public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
+    public LocalTime getEndTime() { return endTime; }
+    public void setEndTime(LocalTime endTime) { this.endTime = endTime; }
 
     public BigDecimal getPrice() { return price; }
     public void setPrice(BigDecimal price) { this.price = price; }

@@ -41,6 +41,9 @@ public class User {
     @OneToMany(mappedBy = "captain")
     private List<Team> teams;
 
+    @OneToMany(mappedBy = "owner")
+    private List<Field> fields;
+
     @OneToMany(mappedBy = "user")
     private List<Booking> bookings;
 
@@ -104,6 +107,9 @@ public class User {
 
     public List<Team> getTeams() { return teams; }
     public void setTeams(List<Team> teams) { this.teams = teams; }
+
+    public List<Field> getFields() { return fields; }
+    public void setFields(List<Field> fields) { this.fields = fields; }
 
     public List<Booking> getBookings() { return bookings; }
     public void setBookings(List<Booking> bookings) { this.bookings = bookings; }

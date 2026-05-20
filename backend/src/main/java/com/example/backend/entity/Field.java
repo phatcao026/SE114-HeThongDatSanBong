@@ -15,10 +15,21 @@ public class Field {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "owner_id")
+    private Long ownerId;
+
     private String name;
+
+    private String address;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
     @Enumerated(EnumType.STRING)
     private Enums.FieldType type;
+
+    @Enumerated(EnumType.STRING)
+    private Enums.FieldStatus status;
 
     @Column(name = "cover_image")
     private String coverImage;
@@ -35,6 +46,10 @@ public class Field {
     @OneToMany(mappedBy = "field")
     private List<Booking> bookings;
 
+    @ManyToOne
+    @JoinColumn(name = "owner_id", insertable = false, updatable = false)
+    private User owner;
+
     public Field() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
@@ -43,11 +58,23 @@ public class Field {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
+    public Long getOwnerId() { return ownerId; }
+    public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
+
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
     public Enums.FieldType getType() { return type; }
     public void setType(Enums.FieldType type) { this.type = type; }
+
+    public Enums.FieldStatus getStatus() { return status; }
+    public void setStatus(Enums.FieldStatus status) { this.status = status; }
 
     public String getCoverImage() { return coverImage; }
     public void setCoverImage(String coverImage) { this.coverImage = coverImage; }
@@ -63,4 +90,7 @@ public class Field {
 
     public List<Booking> getBookings() { return bookings; }
     public void setBookings(List<Booking> bookings) { this.bookings = bookings; }
+
+    public User getOwner() { return owner; }
+    public void setOwner(User owner) { this.owner = owner; }
 }
