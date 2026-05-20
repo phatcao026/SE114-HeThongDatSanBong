@@ -4,6 +4,7 @@ import com.example.backend.utils.Enums;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Entity
@@ -27,9 +28,9 @@ public class MatchPost {
 
     private LocalDate date;
     @Column(name = "time_start")
-    private LocalDateTime timeStart;
+    private LocalTime timeStart;
     @Column(name = "time_end")
-    private LocalDateTime timeEnd;
+    private LocalTime timeEnd;
 
     @Enumerated(EnumType.STRING)
     private Enums.PostType postType;
@@ -52,6 +53,18 @@ public class MatchPost {
     @ManyToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "team_id", insertable = false, updatable = false)
+    private Team team;
+
+    @ManyToOne
+    @JoinColumn(name = "field_id", insertable = false, updatable = false)
+    private Field field;
+
+    @ManyToOne
+    @JoinColumn(name = "booking_id", insertable = false, updatable = false)
+    private Booking booking;
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<MatchRequest> requests;
@@ -76,11 +89,11 @@ public class MatchPost {
     public LocalDate getDate() { return date; }
     public void setDate(LocalDate date) { this.date = date; }
 
-    public LocalDateTime getTimeStart() { return timeStart; }
-    public void setTimeStart(LocalDateTime timeStart) { this.timeStart = timeStart; }
+    public LocalTime getTimeStart() { return timeStart; }
+    public void setTimeStart(LocalTime timeStart) { this.timeStart = timeStart; }
 
-    public LocalDateTime getTimeEnd() { return timeEnd; }
-    public void setTimeEnd(LocalDateTime timeEnd) { this.timeEnd = timeEnd; }
+    public LocalTime getTimeEnd() { return timeEnd; }
+    public void setTimeEnd(LocalTime timeEnd) { this.timeEnd = timeEnd; }
 
     public Enums.PostType getPostType() { return postType; }
     public void setPostType(Enums.PostType postType) { this.postType = postType; }
@@ -102,4 +115,13 @@ public class MatchPost {
 
     public List<MatchRequest> getRequests() { return requests; }
     public void setRequests(List<MatchRequest> requests) { this.requests = requests; }
+
+    public Team getTeam() { return team; }
+    public void setTeam(Team team) { this.team = team; }
+
+    public Field getField() { return field; }
+    public void setField(Field field) { this.field = field; }
+
+    public Booking getBooking() { return booking; }
+    public void setBooking(Booking booking) { this.booking = booking; }
 }
