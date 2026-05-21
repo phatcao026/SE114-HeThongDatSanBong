@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -17,6 +18,18 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     boolean existsByTimeSlotId(Long timeSlotId);
     List<Booking> findByStatusAndCreatedAtBefore(Enums.BookingStatus status, LocalDateTime deadline);
     List<Booking> findByUserId(Long userId);
+
+    List<Booking> findByUserIdOrderByCreatedAtDesc(Long userId);
+
+    List<Booking> findByFieldIdInOrderByBookingDateDescCreatedAtDesc(Collection<Long> fieldIds);
+
+    boolean existsByFieldIdAndTimeSlotIdAndBookingDateAndStatusIn(
+            Long fieldId,
+            Long timeSlotId,
+            LocalDate bookingDate,
+            Collection<Enums.BookingStatus> statuses
+    );
+
     @Query("SELECT COALESCE(SUM(b.totalAmount), 0) FROM Booking b WHERE b.status = 'COMPLETED'")
     java.math.BigDecimal calculateTotalSystemRevenue();
 
