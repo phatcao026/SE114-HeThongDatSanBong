@@ -10,12 +10,19 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface FieldRepository extends JpaRepository<Field, Long> {
 
     @EntityGraph(attributePaths = {"timeSlots"})
     List<Field> findAll();
+
+    List<Field> findByOwnerId(Long ownerId);
+
+    @EntityGraph(attributePaths = {"timeSlots"})
+    @Query("SELECT f FROM Field f WHERE f.id = :id")
+    Optional<Field> findByIdWithTimeSlots(@Param("id") Long id);
 
     // 👉 Đã tối ưu cú pháp IS NULL, thêm dấu cách sau WHERE
     @Query("SELECT DISTINCT f FROM Field f LEFT JOIN FETCH f.timeSlots ts WHERE " +
