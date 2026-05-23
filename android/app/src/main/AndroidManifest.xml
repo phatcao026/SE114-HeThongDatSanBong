@@ -54,6 +54,31 @@
             android:exported="false"
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
 
+        <activity
+            android:name=".ui.admin.AdminMainActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+
+        <activity
+            android:name=".ui.admin.AdminUserActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+
+        <activity
+            android:name=".ui.admin.AdminAuditActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+
+        <activity
+            android:name=".ui.admin.AdminTransactionActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+
+        <activity
+            android:name=".ui.admin.AdminProfileActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+
     </application>
 
 </manifest>
