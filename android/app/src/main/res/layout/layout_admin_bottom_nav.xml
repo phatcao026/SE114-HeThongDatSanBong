@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/adminNavContainer"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:layout_gravity="bottom"
+    android:layout_margin="16dp"
+    app:cardBackgroundColor="@color/admin_nav_bg"
+    app:cardCornerRadius="36dp"
+    app:cardElevation="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="8dp">
+
+        <!-- Overview -->
+        <LinearLayout
+            android:id="@+id/adminNavHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/ivNavHome"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_admin_dashboard"
+                app:tint="@color/admin_nav_unselected"
+                android:contentDescription="Overview icon" />
+            <TextView
+                android:id="@+id/tvNavHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tổng quan"
+                android:textColor="@color/admin_nav_unselected"
+                android:textSize="9sp" />
+        </LinearLayout>
+
+        <!-- Users -->
+        <LinearLayout
+            android:id="@+id/adminNavUsers"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/ivNavUsers"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_admin_users"
+                app:tint="@color/admin_nav_unselected"
+                android:contentDescription="Users icon" />
+            <TextView
+                android:id="@+id/tvNavUsers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Người dùng"
+                android:textColor="@color/admin_nav_unselected"
+                android:textSize="9sp" />
+        </LinearLayout>
+
+        <!-- Audit -->
+        <LinearLayout
+            android:id="@+id/adminNavAudit"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/ivNavAudit"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_admin_shield"
+                app:tint="@color/admin_nav_unselected"
+                android:contentDescription="Audit icon" />
+            <TextView
+                android:id="@+id/tvNavAudit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kiểm duyệt"
+                android:textColor="@color/admin_nav_unselected"
+                android:textSize="9sp" />
+        </LinearLayout>
+
+        <!-- Transactions -->
+        <LinearLayout
+            android:id="@+id/adminNavTransactions"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/ivNavTransactions"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_admin_wallet"
+                app:tint="@color/admin_nav_unselected"
+                android:contentDescription="Transactions icon" />
+            <TextView
+                android:id="@+id/tvNavTransactions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Giao dịch"
+                android:textColor="@color/admin_nav_unselected"
+                android:textSize="9sp" />
+        </LinearLayout>
+
+        <!-- Profile -->
+        <LinearLayout
+            android:id="@+id/adminNavProfile"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/ivNavProfile"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_admin_account"
+                app:tint="@color/admin_nav_unselected"
+                android:contentDescription="Account icon" />
+            <TextView
+                android:id="@+id/tvNavProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tài khoản"
+                android:textColor="@color/admin_nav_unselected"
+                android:textSize="9sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

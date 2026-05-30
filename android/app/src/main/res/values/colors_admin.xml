@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="admin_gmv_card_bg">#0D1B13</color>
+    <color name="admin_gmv_card_accent">#60D86E</color>
+    <color name="admin_alert_bg">#FFF5F5</color>
+    <color name="admin_alert_text">#C53030</color>
+    <color name="admin_trend_up">#60D86E</color>
+    <color name="admin_trend_down">#E53E3E</color>
+    <color name="admin_nav_bg">#2F855A</color>
+    <color name="admin_nav_unselected">#A0AEC0</color>
+    <color name="admin_surface">#FFFFFF</color>
+    <color name="admin_background">#F8FAF8</color>
+</resources>
