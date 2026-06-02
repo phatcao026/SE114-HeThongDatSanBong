@@ -58,7 +58,6 @@
     <dimen name="text_label">12sp</dimen>
 
     <!-- LINE HEIGHT (use with android:lineSpacingMultiplier="1.5") -->
-    <dimen name="line_height_multiplier">1.5</dimen>
 
     <!-- BUTTON SIZING -->
     <dimen name="button_height">44dp</dimen>
