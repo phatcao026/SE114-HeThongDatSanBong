@@ -35,11 +35,7 @@ public class PaymentViewModel extends AndroidViewModel {
 
     public PaymentViewModel(@NonNull Application application) {
         super(application);
-        if (Constants.MOCK_PAYMENT_MODE) {
-            repository = new MockPaymentRepository();
-        } else {
-            repository = new MockPaymentRepository();
-        }
+        repository = new MockPaymentRepository();
         _paymentState.setValue(new PaymentState(Status.INIT, null));
     }
 
