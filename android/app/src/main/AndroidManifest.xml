@@ -54,6 +54,41 @@
             android:exported="false"
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
 
+        <activity
+            android:name=".ui.customer.PaymentActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+
+        <activity
+            android:name=".ui.customer.PaymentResultActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+
+        <activity
+            android:name=".ui.customer.MatchmakingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+
+        <activity
+            android:name=".ui.customer.MessagesActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+
+        <activity
+            android:name=".ui.customer.ChatActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+
+        <activity
+            android:name=".ui.customer.MatchDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+
+        <activity
+            android:name=".ui.customer.NotificationsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+
     </application>
 
 </manifest>

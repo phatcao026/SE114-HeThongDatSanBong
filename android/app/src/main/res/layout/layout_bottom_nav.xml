@@ -1,18 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    Bottom App Bar with FAB cutout — 5-item layout.
-    Geometry (all measured from FrameLayout bottom, which = screen bottom when placed there):
-      navContainer: height=spacing_64(64dp), marginBottom=spacing_20(20dp)
-        → top edge is 84dp above screen bottom
-      FAB (normal, 56dp): marginBottom=spacing_56(56dp)
-        → FAB center = 56 + 28 = 84dp above screen bottom  ← sits exactly on nav top edge ✓
-        → bottom half of FAB (28dp) is inside the notch area of navContainer
-    Cutout: CircularEdgeTreatment radius = FAB_radius(28dp) + cradleMargin(8dp) = 36dp
-      → 8dp air-gap between FAB edge and notch wall all around
-    Z-order: FAB translationZ=shadow_lg adds on top of FAB natural elevation(~6dp),
-      total FAB Z ≈ 22dp > navContainer elevation(shadow_lg=16dp) → FAB always on top ✓
-    The OutlineProvider stays convex (pill) so Android draws a pill shadow, not a notch shadow.
--->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -20,17 +6,15 @@
     android:layout_height="wrap_content"
     tools:context=".activity.MainActivity">
 
-    <!-- Background + notch shape applied programmatically in NavBarManager -->
     <LinearLayout
         android:id="@+id/navContainer"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/spacing_64"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginHorizontal="@dimen/spacing_16"
-        android:layout_marginBottom="@dimen/spacing_20"
-        android:orientation="horizontal">
+        android:layout_height="@dimen/nav_container_height"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/spacing_3"
+        android:paddingBottom="@dimen/spacing_3">
 
-        <!-- Home -->
         <LinearLayout
             android:id="@+id/navHome"
             android:layout_width="0dp"
@@ -38,63 +22,111 @@
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center"
-            android:background="@drawable/ripple_primary"
             android:clickable="true"
             android:focusable="true">
 
-            <ImageView
-                android:id="@+id/ivNavHome"
-                android:layout_width="@dimen/spacing_24"
-                android:layout_height="@dimen/spacing_24"
-                android:src="@drawable/ic_home"
-                android:contentDescription="@string/cd_nav_home" />
+            <FrameLayout
+                android:id="@+id/wrapNavHome"
+                android:layout_width="@dimen/spacing_40"
+                android:layout_height="@dimen/spacing_40"
+                android:padding="@dimen/spacing_2">
 
-            <View
-                android:id="@+id/dotNavHome"
-                android:layout_width="@dimen/nav_dot_size"
-                android:layout_height="@dimen/nav_dot_size"
-                android:layout_marginTop="@dimen/spacing_4"
-                android:background="@drawable/shape_nav_dot"
-                android:visibility="gone" />
+                <ImageView
+                    android:id="@+id/ivNavHome"
+                    android:layout_width="@dimen/spacing_24"
+                    android:layout_height="@dimen/spacing_24"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_home"
+                    android:contentDescription="@string/cd_nav_home" />
+            </FrameLayout>
 
+            <TextView
+                android:id="@+id/tvNavHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_1"
+                android:text="@string/nav_home"
+                android:textColor="@color/text_on_primary"
+                android:textSize="@dimen/text_body_small"
+                android:textStyle="bold"
+                android:fontFamily="@font/inter" />
         </LinearLayout>
 
-        <!-- Explore / Matchmaking -->
         <LinearLayout
-            android:id="@+id/navExplore"
+            android:id="@+id/navSearch"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center"
-            android:background="@drawable/ripple_primary"
             android:clickable="true"
             android:focusable="true">
 
-            <ImageView
-                android:id="@+id/ivNavExplore"
-                android:layout_width="@dimen/spacing_24"
-                android:layout_height="@dimen/spacing_24"
-                android:src="@drawable/ic_group"
-                android:contentDescription="@string/cd_nav_explore" />
+            <FrameLayout
+                android:id="@+id/wrapNavSearch"
+                android:layout_width="@dimen/spacing_40"
+                android:layout_height="@dimen/spacing_40"
+                android:padding="@dimen/spacing_2">
 
-            <View
-                android:id="@+id/dotNavExplore"
-                android:layout_width="@dimen/nav_dot_size"
-                android:layout_height="@dimen/nav_dot_size"
-                android:layout_marginTop="@dimen/spacing_4"
-                android:background="@drawable/shape_nav_dot"
-                android:visibility="gone" />
+                <ImageView
+                    android:id="@+id/ivNavSearch"
+                    android:layout_width="@dimen/spacing_24"
+                    android:layout_height="@dimen/spacing_24"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_search"
+                    android:contentDescription="@string/cd_nav_search" />
+            </FrameLayout>
 
+            <TextView
+                android:id="@+id/tvNavSearch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_1"
+                android:text="@string/nav_search"
+                android:textColor="@color/text_on_primary"
+                android:textSize="@dimen/text_body_small"
+                android:textStyle="bold"
+                android:fontFamily="@font/inter" />
         </LinearLayout>
 
-        <!-- Spacer for FAB footprint -->
-        <View
+        <LinearLayout
+            android:id="@+id/navMatch"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
 
-        <!-- Messages -->
+            <FrameLayout
+                android:id="@+id/wrapNavMatch"
+                android:layout_width="@dimen/spacing_40"
+                android:layout_height="@dimen/spacing_40"
+                android:padding="@dimen/spacing_2">
+
+                <ImageView
+                    android:id="@+id/ivNavMatch"
+                    android:layout_width="@dimen/spacing_24"
+                    android:layout_height="@dimen/spacing_24"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_bolt"
+                    android:contentDescription="@string/cd_nav_match" />
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvNavMatch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_1"
+                android:text="@string/nav_match"
+                android:textColor="@color/text_on_primary"
+                android:textSize="@dimen/text_body_small"
+                android:textStyle="bold"
+                android:fontFamily="@font/inter" />
+        </LinearLayout>
+
         <LinearLayout
             android:id="@+id/navBookings"
             android:layout_width="0dp"
@@ -102,74 +134,73 @@
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center"
-            android:background="@drawable/ripple_primary"
             android:clickable="true"
             android:focusable="true">
 
-            <ImageView
-                android:id="@+id/ivNavBookings"
-                android:layout_width="@dimen/spacing_24"
-                android:layout_height="@dimen/spacing_24"
-                android:src="@drawable/ic_message"
-                android:contentDescription="@string/cd_nav_messages" />
+            <FrameLayout
+                android:id="@+id/wrapNavBookings"
+                android:layout_width="@dimen/spacing_40"
+                android:layout_height="@dimen/spacing_40"
+                android:padding="@dimen/spacing_2">
 
-            <View
-                android:id="@+id/dotNavBookings"
-                android:layout_width="@dimen/nav_dot_size"
-                android:layout_height="@dimen/nav_dot_size"
-                android:layout_marginTop="@dimen/spacing_4"
-                android:background="@drawable/shape_nav_dot"
-                android:visibility="gone" />
+                <ImageView
+                    android:id="@+id/ivNavBookings"
+                    android:layout_width="@dimen/spacing_24"
+                    android:layout_height="@dimen/spacing_24"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_calendar"
+                    android:contentDescription="@string/cd_nav_bookings" />
+            </FrameLayout>
 
+            <TextView
+                android:id="@+id/tvNavBookings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_1"
+                android:text="@string/nav_bookings_label"
+                android:textColor="@color/text_on_primary"
+                android:textSize="@dimen/text_body_small"
+                android:textStyle="bold"
+                android:fontFamily="@font/inter" />
         </LinearLayout>
 
-        <!-- Profile -->
         <LinearLayout
-            android:id="@+id/navProfile"
+            android:id="@+id/navMessages"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center"
-            android:background="@drawable/ripple_primary"
             android:clickable="true"
             android:focusable="true">
 
-            <ImageView
-                android:id="@+id/ivNavProfile"
-                android:layout_width="@dimen/spacing_24"
-                android:layout_height="@dimen/spacing_24"
-                android:src="@drawable/ic_person"
-                android:contentDescription="@string/cd_nav_profile" />
+            <FrameLayout
+                android:id="@+id/wrapNavMessages"
+                android:layout_width="@dimen/spacing_40"
+                android:layout_height="@dimen/spacing_40"
+                android:padding="@dimen/spacing_2">
 
-            <View
-                android:id="@+id/dotNavProfile"
-                android:layout_width="@dimen/nav_dot_size"
-                android:layout_height="@dimen/nav_dot_size"
-                android:layout_marginTop="@dimen/spacing_4"
-                android:background="@drawable/shape_nav_dot"
-                android:visibility="gone" />
+                <ImageView
+                    android:id="@+id/ivNavMessages"
+                    android:layout_width="@dimen/spacing_24"
+                    android:layout_height="@dimen/spacing_24"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_message"
+                    android:contentDescription="@string/cd_nav_messages" />
+            </FrameLayout>
 
+            <TextView
+                android:id="@+id/tvNavMessages"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_1"
+                android:text="@string/nav_messages_label"
+                android:textColor="@color/text_on_primary"
+                android:textSize="@dimen/text_body_small"
+                android:textStyle="bold"
+                android:fontFamily="@font/inter" />
         </LinearLayout>
 
     </LinearLayout>
-
-    <!--
-        FAB positioned with bottom margin to align center with nav bar's top edge.
-        TranslationZ will be set programmatically to ensure it renders above nav container.
-    -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabQuickBook"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="@dimen/spacing_56"
-        android:src="@drawable/ic_search"
-        android:contentDescription="@string/cd_quick_book"
-        app:backgroundTint="@color/primary"
-        app:tint="@color/text_on_primary"
-        app:fabSize="normal"
-        app:elevation="@dimen/shadow_lg"
-        app:borderWidth="0dp" />
 
 </FrameLayout>

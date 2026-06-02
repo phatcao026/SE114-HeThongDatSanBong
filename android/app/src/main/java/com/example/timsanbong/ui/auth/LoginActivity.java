@@ -2,6 +2,8 @@ package com.example.timsanbong.ui.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +20,10 @@ public class LoginActivity extends AppCompatActivity {
     private TextInputLayout tilPassword;
     private MaterialButton btnLogin;
     private AuthViewModel authViewModel;
+    private int debugTapCount = 0;
+    private static final int DEBUG_TAP_THRESHOLD = 3;
+    private static final long DEBUG_TAP_TIMEOUT = 1500; // 1.5 seconds
+    private Handler debugHandler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +37,10 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
 
         btnLogin.setOnClickListener(v -> attemptLogin());
+
+        // Debug: 3-tap bypass on title
+        TextView tvTitle = findViewById(R.id.tvTitle);
+        tvTitle.setOnClickListener(v -> handleDebugTap());
 
         TextView tvRegisterLink = findViewById(R.id.tvRegisterLink);
         tvRegisterLink.setOnClickListener(v -> {
@@ -83,5 +93,27 @@ public class LoginActivity extends AppCompatActivity {
     private void clearErrors() {
         tilEmail.setError(null);
         tilPassword.setError(null);
+    }
+
+    private void handleDebugTap() {
+        debugTapCount++;
+        debugHandler.removeCallbacksAndMessages(null);
+
+        if (debugTapCount == DEBUG_TAP_THRESHOLD) {
+            bypassLogin();
+            debugTapCount = 0;
+        } else {
+            // Reset counter after timeout
+            debugHandler.postDelayed(() -> debugTapCount = 0, DEBUG_TAP_TIMEOUT);
+        }
+    }
+
+    private void bypassLogin() {
+        // Auto-login with demo account
+        if (authViewModel.loginDemo("player_demo@test.com", "pass123")) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        }
     }
 }

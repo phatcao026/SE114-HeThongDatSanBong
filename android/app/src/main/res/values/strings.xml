@@ -32,16 +32,32 @@
     <string name="booked">Đã đặt</string>
 
     <!-- Booking -->
+    <string name="booking_title">Đặt sân</string>
     <string name="select_date">Chọn ngày</string>
     <string name="select_time">Chọn giờ</string>
     <string name="confirm_booking">Xác nhận đặt sân</string>
     <string name="booking_success">Đặt sân thành công!</string>
     <string name="booking_cancelled">Đã hủy đặt sân</string>
+    <string name="start_time_hint">Giờ bắt đầu (HH:mm)</string>
+    <string name="end_time_hint">Giờ kết thúc (HH:mm)</string>
+    <string name="estimated_total">Tạm tính: %s</string>
+    <string name="currency_vnd">đ</string>
+
+    <!-- Validation -->
+    <string name="error_invalid_date">Ngày đặt không được ở quá khứ.</string>
+    <string name="error_invalid_time_range">Giờ kết thúc phải sau giờ bắt đầu.</string>
 
     <!-- Error -->
     <string name="error_network">Lỗi kết nối. Vui lòng thử lại.</string>
     <string name="error_login">Email hoặc mật khẩu không đúng.</string>
     <string name="error_empty_fields">Vui lòng điền đầy đủ thông tin.</string>
+    <string name="error_unknown">Đã xảy ra lỗi. Vui lòng thử lại.</string>
+
+    <!-- Empty states -->
+    <string name="empty_fields">Không có sân phù hợp.</string>
+    <string name="empty_bookings">Chưa có lịch đặt nào.</string>
+    <string name="empty_field_detail">Không tìm thấy thông tin sân.</string>
+    <string name="empty_booking_info">Thiếu thông tin sân để đặt.</string>
 
     <!-- Bottom nav labels -->
     <string name="nav_home">Trang chủ</string>
@@ -49,6 +65,13 @@
     <string name="nav_bookings">Chat</string>
     <string name="nav_profile">Hồ sơ</string>
     <string name="action_quick_book">Đặt nhanh</string>
+    <string name="label_quick_book">Đặt sân ngay!</string>
+    <string name="nav_search">Tìm sân</string>
+    <string name="nav_match">Bắt kèo</string>
+    <string name="nav_bookings_label">Lịch đặt</string>
+    <string name="nav_messages_label">Tin nhắn</string>
+    <string name="cd_nav_search">Tìm sân</string>
+    <string name="cd_nav_match">Bắt kèo</string>
 
     <!-- Filter -->
     <string name="filter_title">Bộ lọc</string>
@@ -66,13 +89,145 @@
     <string name="filter_apply">Áp dụng</string>
     <string name="filter_reset">Xóa bộ lọc</string>
 
-    <!-- Content descriptions -->
+    <!-- My bookings filters -->
+    <string name="filter_pending">Đang chờ</string>
+    <string name="filter_confirmed">Đã xác nhận</string>
+    <string name="filter_cancelled">Đã hủy</string>
+    <string name="filter_status_label">Lọc theo trạng thái</string>
+    <string name="sort_latest">Mới nhất</string>
+    <string name="pull_to_refresh">Kéo để làm mới</string>
+    <string name="refreshing">Đang làm mới...</string>
+
+    <!-- Content descriptions (Accessibility) -->
     <string name="cd_filter">Lọc sân bóng</string>
     <string name="cd_close_filter">Đóng bộ lọc</string>
+    <string name="cd_back">Quay lại</string>
+    <string name="cd_menu">Menu</string>
+    <string name="cd_search">Tìm kiếm</string>
+    <string name="cd_close">Đóng</string>
+    <string name="cd_scroll_to_top">Cuộn lên đầu trang</string>
     <string name="cd_nav_home">Trang chủ</string>
     <string name="cd_nav_explore">Bảng tin ghép trận</string>
     <string name="cd_nav_messages">Chat nội bộ</string>
     <string name="cd_nav_bookings">Lịch đặt của tôi</string>
     <string name="cd_nav_profile">Hồ sơ cá nhân / Đội bóng</string>
     <string name="cd_quick_book">Tìm kiếm sân theo vị trí địa lý</string>
+    <string name="cd_field_image">Hình ảnh sân bóng</string>
+    <string name="cd_field_rating">Đánh giá sân</string>
+    <string name="cd_booking_confirm">Xác nhận đặt sân</string>
+    <string name="cd_booking_cancel">Hủy bỏ đặt sân</string>
+
+    <!-- Booking status labels -->
+    <string name="status_pending">Đang chờ</string>
+    <string name="status_confirmed">Đã xác nhận</string>
+    <string name="status_cancelled">Đã hủy</string>
+    <string name="status_unknown">Không rõ</string>
+
+    <!-- Booking actions -->
+    <string name="action_cancel_booking">Hủy đặt sân</string>
+    <string name="cancel_booking_title">Xác nhận hủy</string>
+    <string name="cancel_booking_message">Bạn có chắc chắn muốn hủy đặt sân này?</string>
+    <string name="action_keep">Giữ lại</string>
+    <string name="action_confirm_cancel">Hủy đặt</string>
+    <string name="action_view_bookings">Xem lịch sử đặt sân</string>
+
+    <!-- Matchmaking (Bắt kèo) -->
+    <string name="matchmaking_title">Bắt kèo</string>
+    <string name="tab_all">Tất cả</string>
+    <string name="tab_find_opponent">Tìm đối</string>
+    <string name="tab_find_member">Tìm cầu thủ</string>
+    <string name="tab_suggested">Gợi ý</string>
+    <string name="match_hot_badge">LIVE</string>
+    <string name="match_action_accept">Bắt kèo</string>
+    <string name="match_action_chat">Nhắn</string>
+    <string name="match_accepted">✓ Đã bắt kèo, đợi xác nhận</string>
+    <string name="match_count">%d kèo đang mở</string>
+    <string name="match_updated">Cập nhật vừa xong</string>
+    <string name="empty_matches">Không có kèo nào phù hợp.</string>
+    <string name="match_label_members_slot">cầu thủ</string>
+
+    <!-- Match detail -->
+    <string name="match_detail_title">Chi tiết kèo</string>
+    <string name="match_detail_captain_message">Lời nhắn từ đội trưởng</string>
+    <string name="match_detail_trust_profile">Hồ sơ uy tín</string>
+    <string name="match_detail_matches_played">Trận đã đá</string>
+    <string name="match_detail_no_bail">Lần bùng kèo</string>
+    <string name="match_detail_rating">Đánh giá</string>
+    <string name="action_report">Báo cáo</string>
+    <string name="action_share">Chia sẻ</string>
+    <string name="match_cta_accept">Bắt kèo này</string>
+    <string name="match_cta_accepted">Đã bắt kèo, đợi xác nhận</string>
+    <string name="match_cta_chat">Nhắn</string>
+
+    <!-- Messages (Tin nhắn) -->
+    <string name="messages_title">Tin nhắn</string>
+    <string name="search_conversations_hint">Tìm cuộc trò chuyện…</string>
+    <string name="empty_messages">Chưa có tin nhắn nào.</string>
+
+    <!-- Chat thread -->
+    <string name="chat_input_hint">Nhắn tin…</string>
+    <string name="chat_status_online">Đang online</string>
+    <string name="chat_status_recent">Hoạt động gần đây</string>
+    <string name="cd_send_message">Gửi tin nhắn</string>
+    <string name="cd_attach_file">Đính kèm</string>
+    <string name="cd_call">Gọi điện</string>
+    <string name="cd_more_options">Tùy chọn khác</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">Thông báo</string>
+    <string name="empty_notifications">Không có thông báo.</string>
+    <string name="cd_notifications">Thông báo</string>
+    <string name="cd_mark_all_read">Đánh dấu đã đọc</string>
+    <string name="cd_avatar">Ảnh đại diện</string>
+
+    <!-- Payment -->
+    <string name="payment_title">Thanh toán</string>
+    <string name="action_pay_now">Thanh toán ngay</string>
+    <string name="payment_processing">Đang xử lý thanh toán...</string>
+    <string name="payment_success_title">Thanh toán thành công</string>
+    <string name="payment_failed_title">Thanh toán thất bại</string>
+    <string name="payment_success_message">Giao dịch đã được xác nhận.</string>
+    <string name="payment_failed_message">Giao dịch không thành công. Vui lòng thử lại.</string>
+    <string name="action_back_home">Về trang chủ</string>
+    <string name="empty_payment">Thiếu thông tin đặt sân để thanh toán.</string>
+
+    <!-- Home screen strings -->
+    <string name="home_title">Timsanbong</string>
+    <string name="home_greeting_prefix">Chào buổi tối, đội trưởng</string>
+    <string name="home_greeting_question">Khoa ơi,\ntối nay đá đâu?</string>
+    <string name="action_search_nearby">Tìm sân quanh đây</string>
+    <string name="action_matchmaking">Bắt kèo</string>
+    <string name="stat_upcoming_label">Lịch sắp tới</string>
+    <string name="stat_trust_label">Uy tín · Vàng</string>
+    <string name="stat_messages_label">Tin nhắn</string>
+    <string name="label_new">mới</string>
+    <string name="trust_score_suffix">/100</string>
+    <string name="section_hot_matches">Kèo nóng quanh bạn</string>
+    <string name="action_view_all">Xem tất cả</string>
+    <string name="hot_match_team_name">Bão Đông FC</string>
+    <string name="hot_match_time">Th. 7, 23/05 · 19:30</string>
+    <string name="hot_match_level">Trung cấp</string>
+    <string name="hot_match_location">Sân Trần Bình</string>
+    <string name="match_live">LIVE</string>
+    <string name="action_accept_match">Bắt</string>
+    <string name="section_suggested_fields">Sân gợi ý gần bạn</string>
+    <string name="action_view_more">Xem thêm</string>
+    <string name="suggested_field_type_5">Sân 5</string>
+    <string name="suggested_field_type_7">Sân 7</string>
+    <string name="mock_avatar_initials">TDK</string>
+    <string name="mock_hot_match_initials">NHL</string>
+    <string name="mock_hot_match_score">92</string>
+    <string name="mock_upcoming_count">2</string>
+    <string name="mock_trust_score">92</string>
+    <string name="mock_message_count">3</string>
+    <string name="mock_field_name_1">Sân Trần Bình</string>
+    <string name="mock_field_name_2">Cỏ Nhân Tạo Phú Nhuận</string>
+    <string name="mock_field_name_3">Sân Gò Vấp Center</string>
+    <string name="toast_select_field">Chọn sân để đặt</string>
+
+    <!-- Content descriptions (Home) -->
+    <string name="cd_map_pin">Vị trí sân</string>
+
+    <string name="badge_hot">Hot</string>
+    <string name="rating_distance_format">%1$.1f • %2$s</string>
 </resources>

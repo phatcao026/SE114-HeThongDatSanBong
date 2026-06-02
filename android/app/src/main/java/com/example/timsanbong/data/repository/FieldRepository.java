@@ -16,6 +16,10 @@ import retrofit2.Response;
 public class FieldRepository {
 
     public void getFields(Context context, RepositoryCallback<List<Field>> callback) {
+        if (com.example.timsanbong.utils.Constants.MOCK_MODE) {
+            callback.onSuccess(getMockFields());
+            return;
+        }
         ApiClient.getService(context).getFields().enqueue(new Callback<List<Field>>() {
             @Override
             public void onResponse(Call<List<Field>> call, Response<List<Field>> response) {
@@ -34,6 +38,16 @@ public class FieldRepository {
     }
 
     public void getFieldById(Context context, long id, RepositoryCallback<Field> callback) {
+        if (com.example.timsanbong.utils.Constants.MOCK_MODE) {
+            for (Field field : getMockFields()) {
+                if (field.getId() == id) {
+                    callback.onSuccess(field);
+                    return;
+                }
+            }
+            callback.onError("Không thể tải thông tin sân.");
+            return;
+        }
         ApiClient.getService(context).getFieldById(id).enqueue(new Callback<Field>() {
             @Override
             public void onResponse(Call<Field> call, Response<Field> response) {

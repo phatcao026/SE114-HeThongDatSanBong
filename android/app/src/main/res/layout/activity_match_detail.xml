@@ -1,0 +1,662 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_secondary"
+    tools:context=".ui.customer.MatchDetailActivity">
+
+    <!-- App bar -->
+    <LinearLayout
+        android:id="@+id/layoutDetailBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/spacing_2"
+        android:paddingVertical="@dimen/spacing_2"
+        android:background="@color/background_secondary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/ivDetailBack"
+            android:layout_width="@dimen/spacing_8"
+            android:layout_height="@dimen/spacing_8"
+            android:padding="@dimen/spacing_2"
+            android:src="@android:drawable/ic_media_previous"
+            app:tint="@color/text_secondary"
+            android:background="@drawable/ripple_primary"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/cd_back" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/ivDetailReport"
+            android:layout_width="@dimen/spacing_8"
+            android:layout_height="@dimen/spacing_8"
+            android:padding="@dimen/spacing_2"
+            android:src="@drawable/ic_flag"
+            app:tint="@color/text_secondary"
+            android:background="@drawable/ripple_primary"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/action_report" />
+
+        <ImageView
+            android:id="@+id/ivDetailShare"
+            android:layout_width="@dimen/spacing_8"
+            android:layout_height="@dimen/spacing_8"
+            android:padding="@dimen/spacing_2"
+            android:src="@drawable/ic_share"
+            app:tint="@color/text_secondary"
+            android:background="@drawable/ripple_primary"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/action_share" />
+    </LinearLayout>
+
+    <!-- Scrollable content -->
+    <ScrollView
+        android:id="@+id/scrollDetail"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/layoutDetailBar"
+        app:layout_constraintBottom_toTopOf="@id/layoutDetailCta"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/spacing_4"
+            android:paddingBottom="@dimen/spacing_4">
+
+            <!-- Captain card (centered) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingVertical="@dimen/spacing_5">
+
+                <!-- Avatar -->
+                <FrameLayout
+                    android:layout_width="80dp"
+                    android:layout_height="80dp">
+
+                    <View
+                        android:id="@+id/viewDetailAvatarBg"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:background="@drawable/shape_oval" />
+
+                    <TextView
+                        android:id="@+id/tvDetailInitials"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:textColor="@color/text_on_primary"
+                        android:textSize="26sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/inter" />
+
+                    <TextView
+                        android:id="@+id/tvDetailTrust"
+                        android:layout_width="wrap_content"
+                        android:layout_height="22dp"
+                        android:layout_gravity="bottom|end"
+                        android:minWidth="22dp"
+                        android:paddingHorizontal="5dp"
+                        android:gravity="center"
+                        android:textColor="@color/text_on_primary"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/inter"
+                        android:background="@drawable/bg_trust_badge" />
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/tvDetailTeam"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_4"
+                    android:textColor="@color/text_primary"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/inter"
+                    android:gravity="center" />
+
+                <TextView
+                    android:id="@+id/tvDetailCaptain"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="@color/text_hint"
+                    android:textSize="13sp"
+                    android:fontFamily="@font/inter" />
+
+                <!-- Badges row -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="@dimen/spacing_3"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/tvDetailLiveBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/match_hot_badge"
+                        android:textColor="@color/text_on_primary"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/inter"
+                        android:paddingHorizontal="@dimen/spacing_2"
+                        android:paddingVertical="4dp"
+                        android:background="@drawable/bg_badge_orange_solid"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/tvDetailTypeBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/spacing_1"
+                        android:textSize="11sp"
+                        android:fontFamily="@font/inter"
+                        android:paddingHorizontal="@dimen/spacing_2"
+                        android:paddingVertical="4dp"
+                        android:background="@drawable/bg_badge_green" />
+
+                    <TextView
+                        android:id="@+id/tvDetailLevelBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/spacing_1"
+                        android:textColor="@color/badge_neutral_text"
+                        android:textSize="11sp"
+                        android:fontFamily="@font/inter"
+                        android:paddingHorizontal="@dimen/spacing_2"
+                        android:paddingVertical="4dp"
+                        android:background="@drawable/bg_badge_neutral" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Match details card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardMatchDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/background_primary"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/border">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Date -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="@dimen/spacing_4">
+
+                        <FrameLayout
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_badge_green">
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_calendar"
+                                app:tint="@color/badge_green_text"
+                                android:contentDescription="@null" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="@dimen/spacing_3"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Ngày"
+                                android:textColor="@color/text_hint"
+                                android:textSize="11sp"
+                                android:fontFamily="@font/inter" />
+                            <TextView
+                                android:id="@+id/tvDetailDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textColor="@color/text_primary"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/inter" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                    <!-- Time -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="@dimen/spacing_4">
+
+                        <FrameLayout
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_badge_green">
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_clock"
+                                app:tint="@color/badge_green_text"
+                                android:contentDescription="@null" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="@dimen/spacing_3"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Giờ đá"
+                                android:textColor="@color/text_hint"
+                                android:textSize="11sp"
+                                android:fontFamily="@font/inter" />
+                            <TextView
+                                android:id="@+id/tvDetailTime"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textColor="@color/text_primary"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/inter" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                    <!-- Field -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="@dimen/spacing_4">
+
+                        <FrameLayout
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_badge_green">
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_map_pin"
+                                app:tint="@color/badge_green_text"
+                                android:contentDescription="@null" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="@dimen/spacing_3"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Sân"
+                                android:textColor="@color/text_hint"
+                                android:textSize="11sp"
+                                android:fontFamily="@font/inter" />
+                            <TextView
+                                android:id="@+id/tvDetailField"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textColor="@color/text_primary"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/inter" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                    <!-- Members + Cost (side by side) -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="@dimen/spacing_4">
+
+                            <FrameLayout
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:background="@drawable/bg_badge_green">
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_group"
+                                    app:tint="@color/badge_green_text"
+                                    android:contentDescription="@null" />
+                            </FrameLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="@dimen/spacing_3"
+                                android:orientation="vertical">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Sĩ số"
+                                    android:textColor="@color/text_hint"
+                                    android:textSize="11sp"
+                                    android:fontFamily="@font/inter" />
+                                <TextView
+                                    android:id="@+id/tvDetailMembers"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold"
+                                    android:fontFamily="@font/inter" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="@dimen/spacing_4">
+
+                            <FrameLayout
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:background="@drawable/bg_badge_green">
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_wallet"
+                                    app:tint="@color/badge_green_text"
+                                    android:contentDescription="@null" />
+                            </FrameLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="@dimen/spacing_3"
+                                android:orientation="vertical">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Chi phí"
+                                    android:textColor="@color/text_hint"
+                                    android:textSize="11sp"
+                                    android:fontFamily="@font/inter" />
+                                <TextView
+                                    android:id="@+id/tvDetailCost"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold"
+                                    android:fontFamily="@font/inter" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Captain message card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_4"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/background_primary"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/border">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_4">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/match_detail_captain_message"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/inter" />
+
+                    <TextView
+                        android:id="@+id/tvDetailMessage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_2"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/inter"
+                        android:lineSpacingMultiplier="1.6"
+                        android:textStyle="italic" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Trust profile card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_4"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/background_primary"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/border">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_4">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/match_detail_trust_profile"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/inter"
+                        android:layout_marginBottom="@dimen/spacing_3" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <!-- Matches played -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+                            <TextView
+                                android:id="@+id/tvTrustMatches"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/text_primary"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/inter" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/match_detail_matches_played"
+                                android:textColor="@color/text_hint"
+                                android:textSize="11sp"
+                                android:fontFamily="@font/inter"
+                                android:gravity="center"
+                                android:layout_marginTop="2dp" />
+                        </LinearLayout>
+
+                        <!-- No bail -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+                            <TextView
+                                android:id="@+id/tvTrustNoBail"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/text_primary"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/inter" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/match_detail_no_bail"
+                                android:textColor="@color/text_hint"
+                                android:textSize="11sp"
+                                android:fontFamily="@font/inter"
+                                android:gravity="center"
+                                android:layout_marginTop="2dp" />
+                        </LinearLayout>
+
+                        <!-- Rating -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+                            <TextView
+                                android:id="@+id/tvTrustRating"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/text_primary"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/inter" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/match_detail_rating"
+                                android:textColor="@color/text_hint"
+                                android:textSize="11sp"
+                                android:fontFamily="@font/inter"
+                                android:gravity="center"
+                                android:layout_marginTop="2dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Bottom CTA -->
+    <LinearLayout
+        android:id="@+id/layoutDetailCta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="@dimen/spacing_4"
+        android:background="@color/background_primary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDetailChat"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height"
+            android:text="@string/match_cta_chat"
+            android:textColor="@color/primary_dark"
+            android:fontFamily="@font/inter"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:layout_marginEnd="@dimen/spacing_3"
+            app:strokeColor="@color/primary_dark"
+            app:cornerRadius="@dimen/radius_button" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDetailAccept"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/button_height"
+            android:layout_weight="1"
+            android:text="@string/match_cta_accept"
+            android:textColor="@color/text_on_primary"
+            android:fontFamily="@font/inter"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:backgroundTint="@color/accent_orange"
+            app:cornerRadius="@dimen/radius_button"
+            app:rippleColor="@color/accent_orange_dark" />
+    </LinearLayout>
+
+    <!-- Top divider for CTA -->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/border"
+        app:layout_constraintBottom_toTopOf="@id/layoutDetailCta"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

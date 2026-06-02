@@ -22,12 +22,17 @@ public class FieldAdapter extends RecyclerView.Adapter<FieldAdapter.FieldViewHol
         void onBook(Field field);
     }
 
-    private final List<Field> fields;
+    private List<Field> fields;
     private final OnFieldClickListener listener;
 
     public FieldAdapter(List<Field> fields, OnFieldClickListener listener) {
         this.fields = fields;
         this.listener = listener;
+    }
+
+    public void updateFields(List<Field> newFields) {
+        this.fields = newFields;
+        notifyDataSetChanged();
     }
 
     @NonNull

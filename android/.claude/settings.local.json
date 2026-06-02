@@ -12,7 +12,13 @@
       "Bash(../../gradlew assembleDebug)",
       "Bash(./gradlew clean *)",
       "Read(//d/TravisL/SE114-HeThongDatSanBong/**)",
-      "Bash(.\\\\gradlew assembleDebug)"
+      "Bash(.\\\\gradlew assembleDebug)",
+      "PowerShell(.\\\\gradlew clean assembleDebug 2>&1 | Select-Object -Last 50)",
+      "PowerShell(head *)",
+      "PowerShell(ls \"D:\\\\TravisL\\\\SE114-HeThongDatSanBong\\\\android\\\\app\\\\src\\\\main\\\\res\\\\drawable\\\\\" | grep \"shape_\\\\|ripple_\")",
+      "Bash(mkdir -p /tmp/design_extracted)",
+      "Bash(tar -xf /mnt/c/Users/TraVisL/AppData/Local/Temp/design_extracted/archive_decompressed -C /tmp/design_extracted)",
+      "Read(//tmp/**)"
     ]
   }
 }
