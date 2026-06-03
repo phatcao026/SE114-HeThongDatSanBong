@@ -13,7 +13,6 @@ import com.example.timsanbong.utils.RepositoryCallback;
 import com.example.timsanbong.utils.Resource;
 
 import java.util.List;
-import java.util.Map;
 
 public class BookingViewModel extends AndroidViewModel {
 
@@ -47,19 +46,20 @@ public class BookingViewModel extends AndroidViewModel {
         });
     }
 
-    public void createBooking(Map<String, Object> body) {
+    public void createBooking(long fieldId, String bookingDate, String startTime, String endTime) {
         _bookingCreateState.setValue(Resource.loading(null));
-        bookingRepository.createBooking(getApplication(), body, new RepositoryCallback<Booking>() {
-            @Override
-            public void onSuccess(Booking data) {
-                _bookingCreateState.postValue(Resource.success(data));
-            }
+        bookingRepository.createBooking(getApplication(), fieldId, bookingDate, startTime, endTime,
+                new RepositoryCallback<Booking>() {
+                    @Override
+                    public void onSuccess(Booking data) {
+                        _bookingCreateState.postValue(Resource.success(data));
+                    }
 
-            @Override
-            public void onError(String message) {
-                _bookingCreateState.postValue(Resource.error(message, null));
-            }
-        });
+                    @Override
+                    public void onError(String message) {
+                        _bookingCreateState.postValue(Resource.error(message, null));
+                    }
+                });
     }
 
     public void cancelBooking(long bookingId) {

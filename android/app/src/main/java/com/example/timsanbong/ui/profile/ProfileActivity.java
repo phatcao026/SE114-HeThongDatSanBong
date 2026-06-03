@@ -36,7 +36,7 @@ public class ProfileActivity extends AppCompatActivity {
         btnMyBookings.setOnClickListener(v -> startActivity(new Intent(this, MyBookingsActivity.class)));
         btnLogout.setOnClickListener(v -> profileViewModel.logout());
 
-        navBarManager = new NavBarManager(this, NavBarManager.ITEM_PROFILE);
+        navBarManager = new NavBarManager(this, NavBarManager.ITEM_HOME);
         navBarManager.setup();
 
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);

@@ -16,9 +16,15 @@
     <dimen name="touch_target_min">48dp</dimen>
 
     <!-- Spacing scale -->
-    <dimen name="spacing_2">2dp</dimen>
-    <dimen name="spacing_4">4dp</dimen>
-    <dimen name="spacing_8">8dp</dimen>
+    <dimen name="spacing_1">4dp</dimen>
+    <dimen name="spacing_2">8dp</dimen>
+    <dimen name="spacing_3">12dp</dimen>
+    <dimen name="spacing_4">16dp</dimen>
+    <dimen name="spacing_5">20dp</dimen>
+    <dimen name="spacing_6">24dp</dimen>
+    <dimen name="spacing_7">32dp</dimen>
+    <dimen name="spacing_8">40dp</dimen>
+    <!-- Legacy names (for backwards compatibility) -->
     <dimen name="spacing_12">12dp</dimen>
     <dimen name="spacing_16">16dp</dimen>
     <dimen name="spacing_20">20dp</dimen>
@@ -37,4 +43,57 @@
     <!-- Bottom nav -->
     <dimen name="nav_container_height">112dp</dimen>
     <dimen name="nav_dot_size">6dp</dimen>
+
+    <!-- TYPOGRAPHY SIZES -->
+    <dimen name="text_display">32sp</dimen>
+    <dimen name="text_heading1">28sp</dimen>
+    <dimen name="text_heading2">24sp</dimen>
+    <dimen name="text_heading3">20sp</dimen>
+    <dimen name="text_heading4">18sp</dimen>
+    <dimen name="text_subtitle">16sp</dimen>
+    <dimen name="text_body_large">16sp</dimen>
+    <dimen name="text_body_medium">14sp</dimen>
+    <dimen name="text_body_small">12sp</dimen>
+    <dimen name="text_caption">12sp</dimen>
+    <dimen name="text_label">12sp</dimen>
+
+    <!-- LINE HEIGHT (use with android:lineSpacingMultiplier="1.5") -->
+    <dimen name="line_height_multiplier">1.5</dimen>
+
+    <!-- BUTTON SIZING -->
+    <dimen name="button_height">44dp</dimen>
+    <dimen name="button_height_small">40dp</dimen>
+    <dimen name="button_padding_horizontal">16dp</dimen>
+    <dimen name="button_padding_vertical">12dp</dimen>
+
+    <!-- INPUT / TEXTFIELD SIZING -->
+    <dimen name="input_height">48dp</dimen>
+    <dimen name="input_padding_horizontal">16dp</dimen>
+    <dimen name="input_padding_vertical">12dp</dimen>
+
+    <!-- RADIUS ALIASES -->
+    <dimen name="radius_button">999dp</dimen>
+    <dimen name="radius_small">8dp</dimen>
+
+    <!-- SCREEN PADDING -->
+    <dimen name="screen_padding_horizontal">16dp</dimen>
+    <dimen name="screen_padding_vertical">24dp</dimen>
+
+    <!-- CARD / ELEVATION SHADOWS -->
+    <dimen name="shadow_elevation_sm">2dp</dimen>
+    <dimen name="shadow_elevation_md">4dp</dimen>
+    <dimen name="shadow_elevation_lg">8dp</dimen>
+
+    <!-- PULL TO REFRESH -->
+    <dimen name="pull_refresh_threshold">80dp</dimen>
+
+    <!-- HOME SCREEN-SPECIFIC -->
+    <dimen name="home_suggested_card_width">220dp</dimen>
+    <dimen name="home_suggested_image_height">120dp</dimen>
+    <dimen name="home_badge_overlap">-2dp</dimen>
+    <dimen name="home_hero_title_min">20sp</dimen>
+    <dimen name="home_hero_title_max">24sp</dimen>
+    <dimen name="home_button_text_min">12sp</dimen>
+    <dimen name="home_button_text_max">14sp</dimen>
+    <dimen name="home_auto_size_step">1sp</dimen>
 </resources>

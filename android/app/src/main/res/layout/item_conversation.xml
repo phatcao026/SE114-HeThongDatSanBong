@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="@dimen/spacing_4"
+    android:paddingVertical="@dimen/spacing_3"
+    android:background="@drawable/ripple_primary"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- Avatar with online indicator -->
+    <FrameLayout
+        android:layout_width="48dp"
+        android:layout_height="48dp">
+
+        <View
+            android:id="@+id/viewConvAvatarBg"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/shape_oval" />
+
+        <TextView
+            android:id="@+id/tvConvInitials"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textColor="@color/text_on_primary"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/inter" />
+
+        <!-- Online dot -->
+        <View
+            android:id="@+id/viewOnlineDot"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_gravity="bottom|end"
+            android:background="@drawable/shape_oval"
+            android:backgroundTint="@color/success"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- Content -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="@dimen/spacing_3"
+        android:orientation="vertical">
+
+        <!-- Name + time -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvConvName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/inter"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/tvConvTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_2"
+                android:textColor="@color/text_hint"
+                android:textSize="11sp"
+                android:fontFamily="@font/inter" />
+        </LinearLayout>
+
+        <!-- Last message + unread badge -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="3dp">
+
+            <TextView
+                android:id="@+id/tvLastMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                android:fontFamily="@font/inter"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/tvUnreadBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:layout_marginStart="@dimen/spacing_2"
+                android:minWidth="20dp"
+                android:paddingHorizontal="6dp"
+                android:gravity="center"
+                android:textColor="@color/text_on_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/inter"
+                android:background="@drawable/bg_badge_orange_solid"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- Match context tag -->
+        <TextView
+            android:id="@+id/tvMatchContext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/badge_green_text"
+            android:textSize="11sp"
+            android:fontFamily="@font/inter"
+            android:paddingHorizontal="@dimen/spacing_2"
+            android:paddingVertical="2dp"
+            android:background="@drawable/bg_match_context_tag" />
+    </LinearLayout>
+
+</LinearLayout>

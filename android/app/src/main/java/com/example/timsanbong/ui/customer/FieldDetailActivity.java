@@ -22,6 +22,10 @@ public class FieldDetailActivity extends AppCompatActivity {
     private MaterialButton btnBook, btnMyBookings;
     private FieldViewModel fieldViewModel;
     private long fieldId;
+    private androidx.core.widget.NestedScrollView scrollContent;
+    private android.widget.ProgressBar pbLoading;
+    private TextView tvEmptyState;
+    private TextView tvErrorState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +42,10 @@ public class FieldDetailActivity extends AppCompatActivity {
         tvFieldType = findViewById(R.id.tvFieldType);
         btnBook = findViewById(R.id.btnBook);
         btnMyBookings = findViewById(R.id.btnMyBookings);
+        scrollContent = findViewById(R.id.scrollContent);
+        pbLoading = findViewById(R.id.pbLoading);
+        tvEmptyState = findViewById(R.id.tvEmptyState);
+        tvErrorState = findViewById(R.id.tvErrorState);
 
         btnMyBookings.setOnClickListener(v -> startActivity(new Intent(this, MyBookingsActivity.class)));
 
@@ -45,16 +53,25 @@ public class FieldDetailActivity extends AppCompatActivity {
 
         fieldViewModel.fieldDetailState.observe(this, resource -> {
             if (resource.status == Resource.Status.LOADING) {
-                // Show loading state if desired
+                showLoadingState();
             } else if (resource.status == Resource.Status.SUCCESS) {
-                bindField(resource.data);
+                if (resource.data == null) {
+                    showEmptyState();
+                } else {
+                    showContentState();
+                    bindField(resource.data);
+                }
             } else {
-                Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
+                String message = getSafeMessage(resource.message);
+                showErrorState(message);
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
             }
         });
 
         if (fieldId != -1) {
             fieldViewModel.loadFieldDetail(fieldId);
+        } else {
+            showEmptyState();
         }
     }
 
@@ -67,11 +84,17 @@ public class FieldDetailActivity extends AppCompatActivity {
         String priceText = String.format("%,.0f %s", field.getPricePerHour(), getString(R.string.price_per_hour));
         tvPrice.setText(priceText);
 
-        Glide.with(this)
-                .load(field.getImageUrl())
-                .placeholder(android.R.drawable.ic_menu_gallery)
-                .centerCrop()
-                .into(ivFieldImage);
+        String imageUrl = field.getImageUrl();
+        if (imageUrl == null || imageUrl.trim().isEmpty()) {
+            ivFieldImage.setImageResource(android.R.drawable.ic_menu_gallery);
+        } else {
+            Glide.with(this)
+                    .load(imageUrl)
+                    .placeholder(android.R.drawable.ic_menu_gallery)
+                    .error(android.R.drawable.ic_menu_gallery)
+                    .centerCrop()
+                    .into(ivFieldImage);
+        }
 
         btnBook.setOnClickListener(v -> {
             Intent intent = new Intent(this, BookingActivity.class);
@@ -80,5 +103,41 @@ public class FieldDetailActivity extends AppCompatActivity {
             intent.putExtra("pricePerHour", field.getPricePerHour());
             startActivity(intent);
         });
+    }
+
+    private void showLoadingState() {
+        pbLoading.setVisibility(android.view.View.VISIBLE);
+        scrollContent.setVisibility(android.view.View.GONE);
+        tvEmptyState.setVisibility(android.view.View.GONE);
+        tvErrorState.setVisibility(android.view.View.GONE);
+    }
+
+    private void showContentState() {
+        pbLoading.setVisibility(android.view.View.GONE);
+        scrollContent.setVisibility(android.view.View.VISIBLE);
+        tvEmptyState.setVisibility(android.view.View.GONE);
+        tvErrorState.setVisibility(android.view.View.GONE);
+    }
+
+    private void showEmptyState() {
+        pbLoading.setVisibility(android.view.View.GONE);
+        scrollContent.setVisibility(android.view.View.GONE);
+        tvEmptyState.setVisibility(android.view.View.VISIBLE);
+        tvErrorState.setVisibility(android.view.View.GONE);
+    }
+
+    private void showErrorState(String message) {
+        pbLoading.setVisibility(android.view.View.GONE);
+        scrollContent.setVisibility(android.view.View.GONE);
+        tvEmptyState.setVisibility(android.view.View.GONE);
+        tvErrorState.setVisibility(android.view.View.VISIBLE);
+        tvErrorState.setText(message);
+    }
+
+    private String getSafeMessage(String message) {
+        if (message == null || message.trim().isEmpty()) {
+            return getString(R.string.error_unknown);
+        }
+        return message;
     }
 }

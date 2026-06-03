@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@color/background_secondary"
     tools:context=".ui.auth.RegisterActivity">
 
     <ImageView
@@ -14,7 +14,7 @@
         android:layout_height="0dp"
         android:contentDescription="@null"
         android:scaleType="centerCrop"
-        android:background="@color/brand_light"
+        android:background="@color/primary_light"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,7 +37,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_rounded_top"
-        android:padding="@dimen/spacing_24"
+        android:padding="@dimen/spacing_6"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -47,10 +47,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Đăng ký"
-            android:textColor="@color/text_title"
-            android:textSize="28sp"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_heading1"
             android:textStyle="bold"
             android:fontFamily="@font/inter"
+            android:layout_marginHorizontal="@dimen/spacing_4"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -59,8 +60,14 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_16"
+            android:layout_marginHorizontal="@dimen/spacing_4"
+            android:layout_marginTop="@dimen/spacing_4"
             android:hint="Họ và tên"
+            app:boxCornerRadiusBottomEnd="@dimen/radius_button"
+            app:boxCornerRadiusBottomStart="@dimen/radius_button"
+            app:boxCornerRadiusTopEnd="@dimen/radius_button"
+            app:boxCornerRadiusTopStart="@dimen/radius_button"
+            app:boxStrokeColor="@color/border"
             app:layout_constraintTop_toBottomOf="@+id/tvTitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -68,7 +75,9 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPersonName" />
+                android:inputType="textPersonName"
+                android:textSize="@dimen/text_body_medium"
+                android:textColor="@color/text_primary" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -76,8 +85,14 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_12"
+            android:layout_marginHorizontal="@dimen/spacing_4"
+            android:layout_marginTop="@dimen/spacing_3"
             android:hint="Email"
+            app:boxCornerRadiusBottomEnd="@dimen/radius_button"
+            app:boxCornerRadiusBottomStart="@dimen/radius_button"
+            app:boxCornerRadiusTopEnd="@dimen/radius_button"
+            app:boxCornerRadiusTopStart="@dimen/radius_button"
+            app:boxStrokeColor="@color/border"
             app:layout_constraintTop_toBottomOf="@+id/tilName"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -85,7 +100,9 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textEmailAddress" />
+                android:inputType="textEmailAddress"
+                android:textSize="@dimen/text_body_medium"
+                android:textColor="@color/text_primary" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -93,9 +110,15 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_12"
+            android:layout_marginHorizontal="@dimen/spacing_4"
+            android:layout_marginTop="@dimen/spacing_3"
             android:hint="Mật khẩu"
             app:endIconMode="password_toggle"
+            app:boxCornerRadiusBottomEnd="@dimen/radius_button"
+            app:boxCornerRadiusBottomStart="@dimen/radius_button"
+            app:boxCornerRadiusTopEnd="@dimen/radius_button"
+            app:boxCornerRadiusTopStart="@dimen/radius_button"
+            app:boxStrokeColor="@color/border"
             app:layout_constraintTop_toBottomOf="@+id/tilEmail"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -103,7 +126,9 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword" />
+                android:inputType="textPassword"
+                android:textSize="@dimen/text_body_medium"
+                android:textColor="@color/text_primary" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -111,9 +136,15 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_12"
+            android:layout_marginHorizontal="@dimen/spacing_4"
+            android:layout_marginTop="@dimen/spacing_3"
             android:hint="Xác nhận mật khẩu"
             app:endIconMode="password_toggle"
+            app:boxCornerRadiusBottomEnd="@dimen/radius_button"
+            app:boxCornerRadiusBottomStart="@dimen/radius_button"
+            app:boxCornerRadiusTopEnd="@dimen/radius_button"
+            app:boxCornerRadiusTopStart="@dimen/radius_button"
+            app:boxStrokeColor="@color/border"
             app:layout_constraintTop_toBottomOf="@+id/tilPassword"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -121,20 +152,24 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword" />
+                android:inputType="textPassword"
+                android:textSize="@dimen/text_body_medium"
+                android:textColor="@color/text_primary" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRegister"
             android:layout_width="0dp"
-            android:layout_height="@dimen/spacing_56"
-            android:layout_marginTop="@dimen/spacing_24"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginHorizontal="@dimen/spacing_4"
+            android:layout_marginTop="@dimen/spacing_5"
             android:text="Tạo tài khoản"
-            android:textSize="14sp"
+            android:textSize="@dimen/text_body_large"
             android:textStyle="bold"
-            android:textColor="@color/btn_primary_text_color"
-            app:backgroundTint="@color/brand"
-            app:cornerRadius="@dimen/radius_pill"
+            android:textColor="@color/text_on_primary"
+            app:backgroundTint="@color/primary"
+            app:cornerRadius="@dimen/radius_button"
+            app:elevation="@dimen/shadow_elevation_md"
             app:layout_constraintTop_toBottomOf="@+id/tilConfirmPassword"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -143,11 +178,11 @@
             android:id="@+id/tvLoginLink"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_16"
-            android:layout_marginBottom="@dimen/spacing_12"
+            android:layout_marginTop="@dimen/spacing_4"
+            android:layout_marginBottom="@dimen/spacing_4"
             android:text="Đã có tài khoản? Đăng nhập ngay"
-            android:textColor="@color/text_body"
-            android:textSize="14sp"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_body_medium"
             android:fontFamily="@font/inter"
             app:layout_constraintTop_toBottomOf="@+id/btnRegister"
             app:layout_constraintBottom_toBottomOf="parent"

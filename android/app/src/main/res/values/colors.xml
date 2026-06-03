@@ -1,26 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="brand">#60D86E</color>
-    <color name="brand_dark">#45c45a</color>
-    <color name="brand_light">#e8f9eb</color>
-    <color name="text_title">#1a202c</color>
-    <color name="text_body">#4a5568</color>
-    <color name="white">#FFFFFF</color>
-    <color name="background">#f8faf8</color>
-    <color name="divider">#e2e8f0</color>
-    <color name="error">#e53e3e</color>
-    <color name="text_on_primary">#1A202C</color>
-
-    <!-- Canonical design-system token aliases (match 00_core.md) -->
+    <!-- PRIMARY PALETTE (Brand) -->
     <color name="primary">#60D86E</color>
     <color name="primary_dark">#45C45A</color>
     <color name="primary_light">#E8F9EB</color>
+
+    <!-- TEXT COLORS -->
+    <color name="text_primary">#1A202C</color>
+    <color name="text_secondary">#4A5568</color>
+    <color name="text_on_primary">#FFFFFF</color>
     <color name="text_hint">#A0AEC0</color>
-    <color name="text_heading">#1A202C</color>
-    <color name="color_error">#E53E3E</color>
-    <color name="background_secondary">#F8FAF8</color>
-    <color name="border_gray">#F3F4F6</color>
+    <color name="neutral_gray">#6B7280</color>
+
+    <!-- BACKGROUND COLORS -->
     <color name="background_primary">#FFFFFF</color>
+    <color name="background_secondary">#F8FAF8</color>
     <color name="background_tertiary">#F0F4F0</color>
+
+    <!-- BORDER & DIVIDER -->
+    <color name="border">#E2E8F0</color>
+    <color name="border_gray">#F3F4F6</color>
+
+    <!-- SEMANTIC COLORS -->
+    <color name="error">#EF4444</color>
+    <color name="success">#10B981</color>
+    <color name="warning">#F59E0B</color>
+
+    <!-- LEGACY / ALIASES (for backwards compatibility) -->
+    <color name="brand">#60D86E</color>
+    <color name="brand_dark">#45C45A</color>
+    <color name="brand_light">#E8F9EB</color>
+    <color name="text_title">#1A202C</color>
+    <color name="text_body">#4A5568</color>
+    <color name="white">#FFFFFF</color>
+    <color name="background">#F8FAF8</color>
+    <color name="divider">#E2E8F0</color>
+    <color name="color_error">#EF4444</color>
     <color name="primary_text">#2F855A</color>
+    <color name="text_heading">#1A202C</color>
+
+    <!-- Booking status badge backgrounds -->
+    <color name="status_pending_bg">#FFF4D6</color>
+    <color name="status_confirmed_bg">#E6F7F0</color>
+    <color name="status_cancelled_bg">#FDE8E8</color>
+    <color name="status_default_bg">#E8F0FE</color>
+
+    <!-- Matchmaking / accent (orange floodlight) -->
+    <color name="accent_orange">#FF6A1A</color>
+    <color name="accent_orange_light">#FFF3EB</color>
+    <color name="accent_orange_dark">#E8540A</color>
+
+    <!-- Badges -->
+    <color name="badge_green_bg">#ECFBF1</color>
+    <color name="badge_green_text">#0B6E3F</color>
+    <color name="badge_orange_bg">#FFF3EB</color>
+    <color name="badge_orange_text">#B83E04</color>
+    <color name="badge_neutral_bg">#F0F4F0</color>
+    <color name="badge_neutral_text">#4A5568</color>
+
+    <!-- Trust score overlay badge -->
+    <color name="trust_high">#0E8A4F</color>
+    <color name="trust_mid">#F59E0B</color>
+    <color name="trust_low">#EF4444</color>
+
+    <!-- Chat bubbles -->
+    <color name="chat_system_bg">#ECFBF1</color>
+    <color name="chat_system_text">#0B6E3F</color>
+    <color name="chat_system_border">#D2F3DD</color>
 </resources>
