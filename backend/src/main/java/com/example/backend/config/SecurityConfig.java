@@ -59,6 +59,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/payments/webhook").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/fields/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/teams/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/match-posts/**").permitAll()
                         .anyRequest().authenticated()
                 );
 
