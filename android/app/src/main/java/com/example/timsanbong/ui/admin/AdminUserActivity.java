@@ -8,10 +8,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.timsanbong.R;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,15 +47,60 @@ public class AdminUserActivity extends AppCompatActivity {
 
         setupFilters();
 
+        findViewById(R.id.cvAdminAvatar).setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(this, AdminProfileActivity.class);
+            startActivity(intent);
+        });
+
         AdminNavBarManager navBarManager = new AdminNavBarManager(this, AdminNavBarManager.ITEM_USERS);
         navBarManager.setup();
     }
 
     private void setupFilters() {
-        findViewById(R.id.btnFilterAll).setOnClickListener(v -> filterUsers("Tất cả"));
-        findViewById(R.id.btnFilterPlayer).setOnClickListener(v -> filterUsers("Người chơi"));
-        findViewById(R.id.btnFilterOwner).setOnClickListener(v -> filterUsers("Chủ sân"));
-        findViewById(R.id.btnFilterLocked).setOnClickListener(v -> filterUsers("Đã khóa"));
+        MaterialButton btnAll = findViewById(R.id.btnFilterAll);
+        MaterialButton btnPlayer = findViewById(R.id.btnFilterPlayer);
+        MaterialButton btnOwner = findViewById(R.id.btnFilterOwner);
+        MaterialButton btnLocked = findViewById(R.id.btnFilterLocked);
+
+        btnAll.setOnClickListener(v -> {
+            updateFilterButtons(btnAll, btnPlayer, btnOwner, btnLocked);
+            filterUsers("Tất cả");
+        });
+        btnPlayer.setOnClickListener(v -> {
+            updateFilterButtons(btnPlayer, btnAll, btnOwner, btnLocked);
+            filterUsers("Người chơi");
+        });
+        btnOwner.setOnClickListener(v -> {
+            updateFilterButtons(btnOwner, btnAll, btnPlayer, btnLocked);
+            filterUsers("Chủ sân");
+        });
+        btnLocked.setOnClickListener(v -> {
+            updateFilterButtons(btnLocked, btnAll, btnPlayer, btnOwner);
+            filterUsers("Đã khóa");
+        });
+    }
+
+    private void updateFilterButtons(MaterialButton selected, MaterialButton... others) {
+        selected.setBackgroundTintList(android.content.res.ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primary_light)));
+        selected.setTextColor(ContextCompat.getColor(this, R.color.primary_dark));
+        selected.setStrokeWidth(0);
+
+        String text = selected.getText().toString();
+        if (!text.contains("✓")) {
+            selected.setText("✓ " + text);
+        }
+
+        for (MaterialButton btn : others) {
+            btn.setBackgroundTintList(android.content.res.ColorStateList.valueOf(ContextCompat.getColor(this, R.color.admin_background)));
+            btn.setTextColor(ContextCompat.getColor(this, R.color.text_heading));
+            btn.setStrokeWidth((int) (1 * getResources().getDisplayMetrics().density));
+            btn.setStrokeColor(android.content.res.ColorStateList.valueOf(ContextCompat.getColor(this, R.color.border_gray)));
+
+            String otherText = btn.getText().toString();
+            if (otherText.contains("✓")) {
+                btn.setText(otherText.replace("✓ ", "").replace("✓", "").trim());
+            }
+        }
     }
 
     private void filterUsers(String role) {

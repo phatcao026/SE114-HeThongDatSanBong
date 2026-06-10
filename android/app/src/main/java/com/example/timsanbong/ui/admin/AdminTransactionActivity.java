@@ -9,10 +9,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.timsanbong.R;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
@@ -31,6 +33,11 @@ public class AdminTransactionActivity extends AppCompatActivity {
         setupHeaderCards();
         initRecyclerView();
         setupFilters();
+
+        findViewById(R.id.cvAdminAvatar).setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(this, AdminProfileActivity.class);
+            startActivity(intent);
+        });
 
         AdminNavBarManager navBarManager = new AdminNavBarManager(this, AdminNavBarManager.ITEM_TRANSACTIONS);
         navBarManager.setup();
@@ -71,11 +78,55 @@ public class AdminTransactionActivity extends AppCompatActivity {
     }
 
     private void setupFilters() {
-        findViewById(R.id.btnFilterAll).setOnClickListener(v -> filter("Tất cả"));
-        findViewById(R.id.btnFilterMoMo).setOnClickListener(v -> filter("MoMo"));
-        findViewById(R.id.btnFilterStripe).setOnClickListener(v -> filter("Stripe"));
-        findViewById(R.id.btnFilterFailed).setOnClickListener(v -> filter("Lỗi"));
-        findViewById(R.id.btnFilterRefund).setOnClickListener(v -> filter("Hoàn"));
+        MaterialButton btnAll = findViewById(R.id.btnFilterAll);
+        MaterialButton btnMoMo = findViewById(R.id.btnFilterMoMo);
+        MaterialButton btnStripe = findViewById(R.id.btnFilterStripe);
+        MaterialButton btnFailed = findViewById(R.id.btnFilterFailed);
+        MaterialButton btnRefund = findViewById(R.id.btnFilterRefund);
+
+        btnAll.setOnClickListener(v -> {
+            updateFilterButtons(btnAll, btnMoMo, btnStripe, btnFailed, btnRefund);
+            filter("Tất cả");
+        });
+        btnMoMo.setOnClickListener(v -> {
+            updateFilterButtons(btnMoMo, btnAll, btnStripe, btnFailed, btnRefund);
+            filter("MoMo");
+        });
+        btnStripe.setOnClickListener(v -> {
+            updateFilterButtons(btnStripe, btnAll, btnMoMo, btnFailed, btnRefund);
+            filter("Stripe");
+        });
+        btnFailed.setOnClickListener(v -> {
+            updateFilterButtons(btnFailed, btnAll, btnMoMo, btnStripe, btnRefund);
+            filter("Lỗi");
+        });
+        btnRefund.setOnClickListener(v -> {
+            updateFilterButtons(btnRefund, btnAll, btnMoMo, btnStripe, btnFailed);
+            filter("Hoàn");
+        });
+    }
+
+    private void updateFilterButtons(MaterialButton selected, MaterialButton... others) {
+        selected.setBackgroundTintList(android.content.res.ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primary_light)));
+        selected.setTextColor(ContextCompat.getColor(this, R.color.primary_dark));
+        selected.setStrokeWidth(0);
+
+        String text = selected.getText().toString();
+        if (!text.contains("✓")) {
+            selected.setText("✓ " + text);
+        }
+
+        for (MaterialButton btn : others) {
+            btn.setBackgroundTintList(android.content.res.ColorStateList.valueOf(ContextCompat.getColor(this, R.color.admin_background)));
+            btn.setTextColor(ContextCompat.getColor(this, R.color.text_heading));
+            btn.setStrokeWidth((int) (1 * getResources().getDisplayMetrics().density));
+            btn.setStrokeColor(android.content.res.ColorStateList.valueOf(ContextCompat.getColor(this, R.color.border_gray)));
+
+            String otherText = btn.getText().toString();
+            if (otherText.contains("✓")) {
+                btn.setText(otherText.replace("✓ ", "").replace("✓", "").trim());
+            }
+        }
     }
 
     private void filter(String criteria) {
