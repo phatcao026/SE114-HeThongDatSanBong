@@ -37,6 +37,11 @@ public class AdminAuditActivity extends AppCompatActivity {
         setupTabs();
         loadData(true);
 
+        findViewById(R.id.cvAdminAvatar).setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(this, AdminProfileActivity.class);
+            startActivity(intent);
+        });
+
         AdminNavBarManager navBarManager = new AdminNavBarManager(this, AdminNavBarManager.ITEM_AUDIT);
         navBarManager.setup();
     }
