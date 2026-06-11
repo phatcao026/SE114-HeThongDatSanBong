@@ -20,6 +20,12 @@ public interface FieldRepository extends JpaRepository<Field, Long> {
 
     List<Field> findByOwnerId(Long ownerId);
 
+    List<Field> findAllByOrderByCreatedAtDesc();
+
+    List<Field> findByStatusOrderByCreatedAtDesc(Enums.FieldStatus status);
+
+    long countByStatus(Enums.FieldStatus status);
+
     @EntityGraph(attributePaths = {"timeSlots"})
     @Query("SELECT f FROM Field f WHERE f.id = :id")
     Optional<Field> findByIdWithTimeSlots(@Param("id") Long id);

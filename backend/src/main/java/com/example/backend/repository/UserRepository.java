@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import com.example.backend.utils.Enums;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -22,6 +23,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmailIgnoreCase(String email);
 
     boolean existsByPhone(String phone);
+
+    long countByRole(Enums.UserRole role);
+
+    List<User> findAllByOrderByCreatedAtDesc();
 
     @Query("SELECT u FROM User u WHERE " +
             "(:#{#role == null} = true OR u.role = :role) AND " +
