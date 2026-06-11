@@ -17,6 +17,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -34,28 +35,28 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final TeamRepository teamRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${app.seed.admin.email:admin@se114.local}")
+    @Value("${app.seed.admin.email}")
     private String adminEmail;
 
-    @Value("${app.seed.admin.password:admin123456}")
+    @Value("${app.seed.admin.password}")
     private String adminPassword;
 
-    @Value("${app.seed.owner.email:owner@se114.local}")
+    @Value("${app.seed.owner.email}")
     private String ownerEmail;
 
-    @Value("${app.seed.owner.password:owner123456}")
+    @Value("${app.seed.owner.password}")
     private String ownerPassword;
 
-    @Value("${app.seed.player.email:player@se114.local}")
+    @Value("${app.seed.player.email}")
     private String playerEmail;
 
-    @Value("${app.seed.player.password:player123456}")
+    @Value("${app.seed.player.password}")
     private String playerPassword;
 
-    @Value("${app.seed.opponent.email:opponent@se114.local}")
+    @Value("${app.seed.opponent.email}")
     private String opponentEmail;
 
-    @Value("${app.seed.opponent.password:opponent123456}")
+    @Value("${app.seed.opponent.password}")
     private String opponentPassword;
 
     public DatabaseSeeder(UserRepository userRepository,
@@ -73,6 +74,8 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
+        validateSeedCredentials();
+
         User admin = ensureUser(adminEmail, adminPassword, Enums.UserRole.ADMIN, "SE114 Admin");
         User owner = ensureUser(ownerEmail, ownerPassword, Enums.UserRole.OWNER, "SE114 Owner");
         User player = ensureUser(playerEmail, playerPassword, Enums.UserRole.PLAYER, "SE114 Player");
@@ -84,6 +87,23 @@ public class DatabaseSeeder implements CommandLineRunner {
 
         log.info("Seed data ready. admin={}, owner={}, player={}, opponent={}",
                 admin.getEmail(), owner.getEmail(), player.getEmail(), opponent.getEmail());
+    }
+
+    private void validateSeedCredentials() {
+        requireText(adminEmail, "APP_SEED_ADMIN_EMAIL");
+        requireText(adminPassword, "APP_SEED_ADMIN_PASSWORD");
+        requireText(ownerEmail, "APP_SEED_OWNER_EMAIL");
+        requireText(ownerPassword, "APP_SEED_OWNER_PASSWORD");
+        requireText(playerEmail, "APP_SEED_PLAYER_EMAIL");
+        requireText(playerPassword, "APP_SEED_PLAYER_PASSWORD");
+        requireText(opponentEmail, "APP_SEED_OPPONENT_EMAIL");
+        requireText(opponentPassword, "APP_SEED_OPPONENT_PASSWORD");
+    }
+
+    private void requireText(String value, String envName) {
+        if (!StringUtils.hasText(value)) {
+            throw new IllegalStateException(envName + " must be configured when app.seed.enabled=true");
+        }
     }
 
     private User ensureUser(String email, String password, Enums.UserRole role, String fullName) {

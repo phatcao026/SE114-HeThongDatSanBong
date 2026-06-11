@@ -14,6 +14,7 @@ public class AuthRequest {
     private String fullName;
     private String phone;
     private String role;
+    private String otp;
 
     public String getEmail() {
         return email;
@@ -53,5 +54,13 @@ public class AuthRequest {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getOtp() {
+        return otp;
+    }
+
+    public void setOtp(String otp) {
+        this.otp = otp;
     }
 }
