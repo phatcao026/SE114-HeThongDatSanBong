@@ -12,6 +12,7 @@ import com.example.backend.repository.MatchPostRepository;
 import com.example.backend.repository.MatchRequestRepository;
 import com.example.backend.repository.TeamRepository;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.service.ConversationService;
 import com.example.backend.service.MatchRequestService;
 import com.example.backend.service.NotificationService;
 import com.example.backend.utils.Enums;
@@ -36,17 +37,20 @@ public class MatchRequestServiceImpl implements MatchRequestService {
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final ConversationService conversationService;
 
     public MatchRequestServiceImpl(MatchRequestRepository matchRequestRepository,
                                    MatchPostRepository matchPostRepository,
                                    TeamRepository teamRepository,
                                    UserRepository userRepository,
-                                   NotificationService notificationService) {
+                                   NotificationService notificationService,
+                                   ConversationService conversationService) {
         this.matchRequestRepository = matchRequestRepository;
         this.matchPostRepository = matchPostRepository;
         this.teamRepository = teamRepository;
         this.userRepository = userRepository;
         this.notificationService = notificationService;
+        this.conversationService = conversationService;
     }
 
     @Override
@@ -145,6 +149,7 @@ public class MatchRequestServiceImpl implements MatchRequestService {
 
         post.setStatus(Enums.PostStatus.MATCHED);
         matchPostRepository.save(post);
+        conversationService.createMatchConversation(post.getUserId(), acceptedRequest.getRequesterId());
     }
 
     private void notifyNewMatchRequest(MatchPost post, MatchRequest request) {
