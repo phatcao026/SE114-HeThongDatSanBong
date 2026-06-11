@@ -1,10 +1,12 @@
 package com.example.backend.service.impl;
 
 import com.example.backend.dto.request.AuthRequest;
+import com.example.backend.dto.request.PasswordResetRequest;
 import com.example.backend.dto.response.AuthResponse;
 import com.example.backend.entity.User;
 import com.example.backend.exception.AppException;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.service.AuthOtpService;
 import com.example.backend.service.AuthService;
 import com.example.backend.utils.Enums.UserRole;
 import com.example.backend.utils.TokenUtils;
@@ -21,6 +23,7 @@ import java.util.Locale;
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthOtpService authOtpService;
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -28,9 +31,25 @@ public class AuthServiceImpl implements AuthService {
     @Value("${jwt.expiration-ms}")
     private long jwtExpirationMs;
 
-    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    @Value("${app.auth.registration-otp-required}")
+    private boolean registrationOtpRequired;
+
+    public AuthServiceImpl(UserRepository userRepository,
+                           PasswordEncoder passwordEncoder,
+                           AuthOtpService authOtpService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authOtpService = authOtpService;
+    }
+
+    @Override
+    public void sendRegisterOtp(String email) {
+        String normalizedEmail = normalizeEmail(email);
+        if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
+            throw new AppException(409, "Email already exists");
+        }
+
+        authOtpService.sendRegistrationOtp(normalizedEmail);
     }
 
     @Override
@@ -54,6 +73,8 @@ public class AuthServiceImpl implements AuthService {
             throw new AppException(409, "Phone already exists");
         }
 
+        verifyRegistrationOtpIfNeeded(email, request.getOtp());
+
         User user = new User();
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -65,6 +86,8 @@ public class AuthServiceImpl implements AuthService {
         user.setUpdatedAt(LocalDateTime.now());
 
         User savedUser = userRepository.save(user);
+        authOtpService.deleteRegistrationOtp(email);
+
         String token = TokenUtils.generateToken(savedUser, jwtSecret, jwtExpirationMs);
         return new AuthResponse(token, "Register successfully");
     }
@@ -81,6 +104,46 @@ public class AuthServiceImpl implements AuthService {
 
         String token = TokenUtils.generateToken(user, jwtSecret, jwtExpirationMs);
         return new AuthResponse(token, "Login successfully");
+    }
+
+    @Override
+    public void forgotPassword(String email) {
+        String normalizedEmail = normalizeEmail(email);
+        userRepository.findByEmailIgnoreCase(normalizedEmail)
+                .orElseThrow(() -> new AppException(404, "User not found"));
+
+        authOtpService.sendPasswordResetOtp(normalizedEmail);
+    }
+
+    @Override
+    public void verifyPasswordResetOtp(String email, String otp) {
+        authOtpService.verifyPasswordResetOtp(normalizeEmail(email), otp);
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(PasswordResetRequest request) {
+        String email = normalizeEmail(request.getEmail());
+        validatePassword(request.getNewPassword());
+        authOtpService.verifyPasswordResetOtp(email, request.getOtp());
+
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new AppException(404, "User not found"));
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+        authOtpService.deletePasswordResetOtp(email);
+    }
+
+    private void verifyRegistrationOtpIfNeeded(String email, String otp) {
+        if (!StringUtils.hasText(otp)) {
+            if (registrationOtpRequired) {
+                throw new AppException(400, "Registration OTP is required");
+            }
+            return;
+        }
+
+        authOtpService.verifyRegistrationOtp(email, otp);
     }
 
     private UserRole resolveRole(String role) {
