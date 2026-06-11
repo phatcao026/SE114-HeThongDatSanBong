@@ -10,6 +10,7 @@ import com.example.backend.repository.BookingRepository;
 import com.example.backend.repository.FieldRepository;
 import com.example.backend.repository.TimeSlotRepository;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.service.BookingLockService;
 import com.example.backend.service.BookingService;
 import com.example.backend.service.NotificationService;
 import com.example.backend.utils.Enums;
@@ -43,17 +44,20 @@ public class BookingServiceImpl implements BookingService {
     private final TimeSlotRepository timeSlotRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final BookingLockService bookingLockService;
 
     public BookingServiceImpl(BookingRepository bookingRepository,
                               FieldRepository fieldRepository,
                               TimeSlotRepository timeSlotRepository,
                               UserRepository userRepository,
-                              NotificationService notificationService) {
+                              NotificationService notificationService,
+                              BookingLockService bookingLockService) {
         this.bookingRepository = bookingRepository;
         this.fieldRepository = fieldRepository;
         this.timeSlotRepository = timeSlotRepository;
         this.userRepository = userRepository;
         this.notificationService = notificationService;
+        this.bookingLockService = bookingLockService;
     }
 
     @Override
@@ -101,29 +105,33 @@ public class BookingServiceImpl implements BookingService {
 
         validateBookingRequest(request, field, timeSlot);
 
-        if (hasActiveBooking(field.getId(), timeSlot.getId(), request.getBookingDate())) {
-            throw new AppException(409, "Time slot has already been booked for this date");
-        }
-
-        Booking booking = new Booking();
-        booking.setUserId(currentUserId);
-        booking.setFieldId(field.getId());
-        booking.setTimeSlotId(timeSlot.getId());
-        booking.setBookingDate(request.getBookingDate());
-        booking.setStatus(Enums.BookingStatus.PENDING);
-        booking.setTotalAmount(timeSlot.getPrice());
-        booking.setDepositAmount(calculateDeposit(timeSlot.getPrice()));
-        booking.setNote(cleanOptional(request.getNote()));
-        booking.setCreatedAt(LocalDateTime.now());
-        booking.setUpdatedAt(LocalDateTime.now());
+        String lockToken = bookingLockService.acquire(timeSlot.getId(), request.getBookingDate());
 
         try {
+            if (hasActiveBooking(field.getId(), timeSlot.getId(), request.getBookingDate())) {
+                throw new AppException(409, "Time slot has already been booked for this date");
+            }
+
+            Booking booking = new Booking();
+            booking.setUserId(currentUserId);
+            booking.setFieldId(field.getId());
+            booking.setTimeSlotId(timeSlot.getId());
+            booking.setBookingDate(request.getBookingDate());
+            booking.setStatus(Enums.BookingStatus.PENDING);
+            booking.setTotalAmount(timeSlot.getPrice());
+            booking.setDepositAmount(calculateDeposit(timeSlot.getPrice()));
+            booking.setNote(cleanOptional(request.getNote()));
+            booking.setCreatedAt(LocalDateTime.now());
+            booking.setUpdatedAt(LocalDateTime.now());
+
             Booking savedBooking = bookingRepository.save(booking);
             notifyBookingUpdate(savedBooking, "Booking created",
                     "Your booking #" + savedBooking.getId() + " was created. Please complete payment to confirm.");
             return toResponse(savedBooking, "Booking created. Please complete payment to confirm.");
         } catch (DataIntegrityViolationException ex) {
             throw new AppException(409, "Time slot has already been booked for this date");
+        } finally {
+            bookingLockService.release(timeSlot.getId(), request.getBookingDate(), lockToken);
         }
     }
 
