@@ -60,6 +60,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/fields/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/teams/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/match-posts/**").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 );
 

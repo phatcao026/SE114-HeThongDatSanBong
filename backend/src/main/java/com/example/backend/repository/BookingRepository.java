@@ -23,6 +23,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByFieldIdInOrderByBookingDateDescCreatedAtDesc(Collection<Long> fieldIds);
 
+    List<Booking> findAllByOrderByCreatedAtDesc();
+
+    List<Booking> findByStatusOrderByCreatedAtDesc(Enums.BookingStatus status);
+
+    long countByStatus(Enums.BookingStatus status);
+
     boolean existsByFieldIdAndTimeSlotIdAndBookingDateAndStatusIn(
             Long fieldId,
             Long timeSlotId,

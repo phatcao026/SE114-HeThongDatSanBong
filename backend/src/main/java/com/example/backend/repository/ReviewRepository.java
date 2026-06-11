@@ -20,4 +20,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByStatusOrderByCreatedAtDesc(Enums.ReviewStatus status);
 
     boolean existsByMatchRequestIdAndReviewerId(Long matchRequestId, Long reviewerId);
+
+    long countByStatus(Enums.ReviewStatus status);
 }
