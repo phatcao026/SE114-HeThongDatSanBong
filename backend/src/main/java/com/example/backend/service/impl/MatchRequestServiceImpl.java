@@ -13,6 +13,7 @@ import com.example.backend.repository.MatchRequestRepository;
 import com.example.backend.repository.TeamRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.service.MatchRequestService;
+import com.example.backend.service.NotificationService;
 import com.example.backend.utils.Enums;
 import com.example.backend.utils.TokenUtils;
 import org.springframework.stereotype.Service;
@@ -34,15 +35,18 @@ public class MatchRequestServiceImpl implements MatchRequestService {
     private final MatchPostRepository matchPostRepository;
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public MatchRequestServiceImpl(MatchRequestRepository matchRequestRepository,
                                    MatchPostRepository matchPostRepository,
                                    TeamRepository teamRepository,
-                                   UserRepository userRepository) {
+                                   UserRepository userRepository,
+                                   NotificationService notificationService) {
         this.matchRequestRepository = matchRequestRepository;
         this.matchPostRepository = matchPostRepository;
         this.teamRepository = teamRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -86,7 +90,9 @@ public class MatchRequestServiceImpl implements MatchRequestService {
         matchRequest.setStatus(Enums.RequestStatus.PENDING);
         matchRequest.setCreatedAt(LocalDateTime.now());
 
-        return toResponse(matchRequestRepository.save(matchRequest));
+        MatchRequest savedRequest = matchRequestRepository.save(matchRequest);
+        notifyNewMatchRequest(post, savedRequest);
+        return toResponse(savedRequest);
     }
 
     @Override
@@ -114,7 +120,9 @@ public class MatchRequestServiceImpl implements MatchRequestService {
         }
 
         matchRequest.setStatus(Enums.RequestStatus.REJECTED);
-        return toResponse(matchRequestRepository.save(matchRequest));
+        MatchRequest savedRequest = matchRequestRepository.save(matchRequest);
+        notifyMatchRequestStatus(savedRequest, Enums.RequestStatus.REJECTED);
+        return toResponse(savedRequest);
     }
 
     private void acceptRequest(MatchPost post, MatchRequest acceptedRequest) {
@@ -124,15 +132,52 @@ public class MatchRequestServiceImpl implements MatchRequestService {
 
         acceptedRequest.setStatus(Enums.RequestStatus.ACCEPTED);
         matchRequestRepository.save(acceptedRequest);
+        notifyMatchRequestStatus(acceptedRequest, Enums.RequestStatus.ACCEPTED);
 
         List<MatchRequest> pendingRequests = matchRequestRepository.findByPostIdAndStatus(post.getId(), Enums.RequestStatus.PENDING);
         pendingRequests.stream()
                 .filter(request -> !request.getId().equals(acceptedRequest.getId()))
                 .forEach(request -> request.setStatus(Enums.RequestStatus.REJECTED));
         matchRequestRepository.saveAll(pendingRequests);
+        pendingRequests.stream()
+                .filter(request -> !request.getId().equals(acceptedRequest.getId()))
+                .forEach(request -> notifyMatchRequestStatus(request, Enums.RequestStatus.REJECTED));
 
         post.setStatus(Enums.PostStatus.MATCHED);
         matchPostRepository.save(post);
+    }
+
+    private void notifyNewMatchRequest(MatchPost post, MatchRequest request) {
+        if (post.getUserId() == null) {
+            return;
+        }
+
+        notificationService.createNotification(
+                post.getUserId(),
+                "New match request",
+                "A player sent a request for your match post #" + post.getId(),
+                Enums.NotificationType.MATCH_REQUEST
+        );
+    }
+
+    private void notifyMatchRequestStatus(MatchRequest request, Enums.RequestStatus status) {
+        if (request.getRequesterId() == null) {
+            return;
+        }
+
+        String title = status == Enums.RequestStatus.ACCEPTED
+                ? "Match request accepted"
+                : "Match request rejected";
+        String content = status == Enums.RequestStatus.ACCEPTED
+                ? "Your request for match post #" + request.getPostId() + " was accepted"
+                : "Your request for match post #" + request.getPostId() + " was rejected";
+
+        notificationService.createNotification(
+                request.getRequesterId(),
+                title,
+                content,
+                Enums.NotificationType.MATCH_REQUEST
+        );
     }
 
     private MatchPost findPost(Long id) {
