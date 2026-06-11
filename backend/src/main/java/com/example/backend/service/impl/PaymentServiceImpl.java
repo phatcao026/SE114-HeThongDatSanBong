@@ -8,6 +8,7 @@ import com.example.backend.exception.AppException;
 import com.example.backend.repository.BookingRepository;
 import com.example.backend.repository.FieldRepository;
 import com.example.backend.repository.PaymentRepository;
+import com.example.backend.service.NotificationService;
 import com.example.backend.service.PaymentService;
 import com.example.backend.utils.Enums;
 import com.example.backend.utils.TokenUtils;
@@ -37,6 +38,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
     private final FieldRepository fieldRepository;
+    private final NotificationService notificationService;
 
     @Value("${stripe.api.key:}")
     private String stripeApiKey;
@@ -52,10 +54,12 @@ public class PaymentServiceImpl implements PaymentService {
 
     public PaymentServiceImpl(PaymentRepository paymentRepository,
                               BookingRepository bookingRepository,
-                              FieldRepository fieldRepository) {
+                              FieldRepository fieldRepository,
+                              NotificationService notificationService) {
         this.paymentRepository = paymentRepository;
         this.bookingRepository = bookingRepository;
         this.fieldRepository = fieldRepository;
+        this.notificationService = notificationService;
     }
 
     @PostConstruct
@@ -195,6 +199,13 @@ public class PaymentServiceImpl implements PaymentService {
             booking.setUpdatedAt(LocalDateTime.now());
             bookingRepository.save(booking);
         }
+
+        notificationService.createNotification(
+                booking.getUserId(),
+                "Payment successful",
+                "Your deposit payment for booking #" + booking.getId() + " was successful.",
+                Enums.NotificationType.PAYMENT_UPDATE
+        );
     }
 
     private Session extractCheckoutSession(Event event) {

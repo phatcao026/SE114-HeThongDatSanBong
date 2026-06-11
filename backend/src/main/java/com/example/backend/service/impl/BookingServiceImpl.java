@@ -11,6 +11,7 @@ import com.example.backend.repository.FieldRepository;
 import com.example.backend.repository.TimeSlotRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.service.BookingService;
+import com.example.backend.service.NotificationService;
 import com.example.backend.utils.Enums;
 import com.example.backend.utils.TokenUtils;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -41,15 +42,18 @@ public class BookingServiceImpl implements BookingService {
     private final FieldRepository fieldRepository;
     private final TimeSlotRepository timeSlotRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public BookingServiceImpl(BookingRepository bookingRepository,
                               FieldRepository fieldRepository,
                               TimeSlotRepository timeSlotRepository,
-                              UserRepository userRepository) {
+                              UserRepository userRepository,
+                              NotificationService notificationService) {
         this.bookingRepository = bookingRepository;
         this.fieldRepository = fieldRepository;
         this.timeSlotRepository = timeSlotRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -115,6 +119,8 @@ public class BookingServiceImpl implements BookingService {
 
         try {
             Booking savedBooking = bookingRepository.save(booking);
+            notifyBookingUpdate(savedBooking, "Booking created",
+                    "Your booking #" + savedBooking.getId() + " was created. Please complete payment to confirm.");
             return toResponse(savedBooking, "Booking created. Please complete payment to confirm.");
         } catch (DataIntegrityViolationException ex) {
             throw new AppException(409, "Time slot has already been booked for this date");
@@ -136,7 +142,10 @@ public class BookingServiceImpl implements BookingService {
 
         booking.setStatus(Enums.BookingStatus.CANCELLED);
         booking.setUpdatedAt(LocalDateTime.now());
-        return toResponse(bookingRepository.save(booking), "Booking cancelled successfully");
+        Booking savedBooking = bookingRepository.save(booking);
+        notifyBookingUpdate(savedBooking, "Booking cancelled",
+                "Your booking #" + savedBooking.getId() + " was cancelled.");
+        return toResponse(savedBooking, "Booking cancelled successfully");
     }
 
     @Override
@@ -152,7 +161,10 @@ public class BookingServiceImpl implements BookingService {
 
         booking.setStatus(Enums.BookingStatus.CONFIRMED);
         booking.setUpdatedAt(LocalDateTime.now());
-        return toResponse(bookingRepository.save(booking), "Booking confirmed successfully");
+        Booking savedBooking = bookingRepository.save(booking);
+        notifyBookingUpdate(savedBooking, "Booking confirmed",
+                "Your booking #" + savedBooking.getId() + " was confirmed.");
+        return toResponse(savedBooking, "Booking confirmed successfully");
     }
 
     @Override
@@ -168,7 +180,23 @@ public class BookingServiceImpl implements BookingService {
 
         booking.setStatus(Enums.BookingStatus.COMPLETED);
         booking.setUpdatedAt(LocalDateTime.now());
-        return toResponse(bookingRepository.save(booking), "Booking completed successfully");
+        Booking savedBooking = bookingRepository.save(booking);
+        notifyBookingUpdate(savedBooking, "Booking completed",
+                "Your booking #" + savedBooking.getId() + " was completed.");
+        return toResponse(savedBooking, "Booking completed successfully");
+    }
+
+    private void notifyBookingUpdate(Booking booking, String title, String content) {
+        if (booking.getUserId() == null) {
+            return;
+        }
+
+        notificationService.createNotification(
+                booking.getUserId(),
+                title,
+                content,
+                Enums.NotificationType.BOOKING_UPDATE
+        );
     }
 
     private void validateBookingRequest(BookingCreateRequest request, Field field, TimeSlot timeSlot) {
