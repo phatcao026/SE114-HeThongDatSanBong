@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,16 +15,24 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.timsanbong.R;
+import com.example.timsanbong.data.api.ApiClient;
+import com.example.timsanbong.data.model.PaymentResponse;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AdminTransactionActivity extends AppCompatActivity {
 
     private AdminTransactionAdapter adapter;
-    private List<Transaction> allTransactions;
+    private List<PaymentResponse> allTransactions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +41,7 @@ public class AdminTransactionActivity extends AppCompatActivity {
 
         setupHeaderCards();
         initRecyclerView();
+        fetchTransactions();
         setupFilters();
 
         findViewById(R.id.cvAdminAvatar).setOnClickListener(v -> {
@@ -43,18 +53,37 @@ public class AdminTransactionActivity extends AppCompatActivity {
         navBarManager.setup();
     }
 
+    private void fetchTransactions() {
+        ApiClient.getService(this).getAdminPayments().enqueue(new Callback<List<PaymentResponse>>() {
+            @Override
+            public void onResponse(Call<List<PaymentResponse>> call, Response<List<PaymentResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    allTransactions = response.body();
+                    adapter.updateList(allTransactions);
+                } else {
+                    Toast.makeText(AdminTransactionActivity.this, "Không thể tải danh sách giao dịch", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<PaymentResponse>> call, Throwable t) {
+                Toast.makeText(AdminTransactionActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void setupHeaderCards() {
         View cardGmv = findViewById(R.id.cardGmv);
-        ((TextView) cardGmv.findViewById(R.id.tvStatLabel)).setText("Tổng giao dịch hôm nay");
-        ((TextView) cardGmv.findViewById(R.id.tvStatValue)).setText("1,2tr đ");
-        ((TextView) cardGmv.findViewById(R.id.tvTrendValue)).setText("+18.6% so với ngày qua");
+        ((TextView) cardGmv.findViewById(R.id.tvStatLabel)).setText("Giao dịch gần đây");
+        ((TextView) cardGmv.findViewById(R.id.tvStatValue)).setText("Dữ liệu thực");
+        ((TextView) cardGmv.findViewById(R.id.tvTrendValue)).setText("Theo thời gian thực");
         ((TextView) cardGmv.findViewById(R.id.tvTrendValue)).setTextColor(Color.parseColor("#10B981"));
         cardGmv.findViewById(R.id.ivStatIcon).setVisibility(View.GONE);
 
         View cardFee = findViewById(R.id.cardFee);
-        ((TextView) cardFee.findViewById(R.id.tvStatLabel)).setText("Phí dịch vụ thu");
-        ((TextView) cardFee.findViewById(R.id.tvStatValue)).setText("60k đ");
-        ((TextView) cardFee.findViewById(R.id.tvTrendValue)).setText("5% mỗi cọc");
+        ((TextView) cardFee.findViewById(R.id.tvStatLabel)).setText("Cổng thanh toán");
+        ((TextView) cardFee.findViewById(R.id.tvStatValue)).setText("Stripe / Tiền mặt");
+        ((TextView) cardFee.findViewById(R.id.tvTrendValue)).setText("Phí dịch vụ 5%");
         ((TextView) cardFee.findViewById(R.id.tvTrendValue)).setTextColor(Color.parseColor("#64748B"));
         cardFee.findViewById(R.id.ivStatIcon).setVisibility(View.GONE);
         cardFee.findViewById(R.id.ivTrendIcon).setVisibility(View.GONE);
@@ -66,14 +95,7 @@ public class AdminTransactionActivity extends AppCompatActivity {
         rv.setNestedScrollingEnabled(false);
 
         allTransactions = new ArrayList<>();
-        allTransactions.add(new Transaction("Trần Đăng Khoa", "TSB-7C4F-2308 · 14:32", "150.000đ", "Thành công", "MoMo", "Mo", "#A855F7"));
-        allTransactions.add(new Transaction("Phạm Quốc Khánh", "TSB-A12B-2308 · 13:18", "100.000đ", "Thành công", "Stripe", "Vi", "#6366F1"));
-        allTransactions.add(new Transaction("Trần Đăng Khoa", "TSB-D99F-2308 · 12:44", "150.000đ", "Thành công", "MoMo", "Mo", "#A855F7"));
-        allTransactions.add(new Transaction("FC Hậu Vệ", "TSB-3F11-2308 · 12:21", "240.000đ", "Lỗi", "Stripe", "Vi", "#6366F1"));
-        allTransactions.add(new Transaction("Thủ Đức A-S", "TSB-5A22-2308 · 11:55", "150.000đ", "Thành công", "MoMo", "Mo", "#A855F7"));
-        allTransactions.add(new Transaction("Đội Bão Đông", "TSB-92AA-2208 · Hôm qua", "-300.000đ", "Hoàn", "MoMo", "Mo", "#A855F7"));
-
-        adapter = new AdminTransactionAdapter(new ArrayList<>(allTransactions));
+        adapter = new AdminTransactionAdapter(new ArrayList<>());
         rv.setAdapter(adapter);
     }
 
@@ -90,19 +112,19 @@ public class AdminTransactionActivity extends AppCompatActivity {
         });
         btnMoMo.setOnClickListener(v -> {
             updateFilterButtons(btnMoMo, btnAll, btnStripe, btnFailed, btnRefund);
-            filter("MoMo");
+            filter("CASH");
         });
         btnStripe.setOnClickListener(v -> {
             updateFilterButtons(btnStripe, btnAll, btnMoMo, btnFailed, btnRefund);
-            filter("Stripe");
+            filter("STRIPE");
         });
         btnFailed.setOnClickListener(v -> {
             updateFilterButtons(btnFailed, btnAll, btnMoMo, btnStripe, btnRefund);
-            filter("Lỗi");
+            filter("FAILED");
         });
         btnRefund.setOnClickListener(v -> {
             updateFilterButtons(btnRefund, btnAll, btnMoMo, btnStripe, btnFailed);
-            filter("Hoàn");
+            filter("REFUNDED");
         });
     }
 
@@ -130,12 +152,12 @@ public class AdminTransactionActivity extends AppCompatActivity {
     }
 
     private void filter(String criteria) {
-        List<Transaction> filtered = new ArrayList<>();
+        List<PaymentResponse> filtered = new ArrayList<>();
         if (criteria.equals("Tất cả")) {
             filtered.addAll(allTransactions);
         } else {
-            for (Transaction t : allTransactions) {
-                if (t.method.equals(criteria) || t.status.equals(criteria)) {
+            for (PaymentResponse t : allTransactions) {
+                if (criteria.equalsIgnoreCase(t.getPaymentMethod()) || criteria.equalsIgnoreCase(t.getStatus())) {
                     filtered.add(t);
                 }
             }
@@ -143,18 +165,11 @@ public class AdminTransactionActivity extends AppCompatActivity {
         adapter.updateList(filtered);
     }
 
-    static class Transaction {
-        String name, idTime, amount, status, method, iconText, iconColor;
-        Transaction(String n, String it, String a, String s, String m, String txt, String col) {
-            name = n; idTime = it; amount = a; status = s; method = m; iconText = txt; iconColor = col;
-        }
-    }
-
     static class AdminTransactionAdapter extends RecyclerView.Adapter<AdminTransactionAdapter.ViewHolder> {
-        private final List<Transaction> list;
-        AdminTransactionAdapter(List<Transaction> list) { this.list = list; }
+        private final List<PaymentResponse> list;
+        AdminTransactionAdapter(List<PaymentResponse> list) { this.list = list; }
 
-        public void updateList(List<Transaction> newList) {
+        public void updateList(List<PaymentResponse> newList) {
             list.clear();
             list.addAll(newList);
             notifyDataSetChanged();
@@ -169,18 +184,27 @@ public class AdminTransactionActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            Transaction t = list.get(position);
-            holder.tvName.setText(t.name);
-            holder.tvIdTime.setText(t.idTime);
-            holder.tvAmount.setText(t.amount);
-            holder.tvStatus.setText(t.status);
-            holder.tvIcon.setText(t.iconText);
-            holder.cvIcon.setCardBackgroundColor(Color.parseColor(t.iconColor));
+            PaymentResponse t = list.get(position);
+            holder.tvName.setText("User ID: " + t.getUserId());
+            holder.tvIdTime.setText("TXN-" + t.getId() + " · " + t.getCreatedAt());
+            
+            NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+            holder.tvAmount.setText(currencyFormat.format(t.getAmount()));
+            
+            String status = t.getStatus();
+            holder.tvStatus.setText(status);
+            
+            String method = t.getPaymentMethod();
+            holder.tvIcon.setText(method != null && method.length() >= 2 ? method.substring(0, 2) : "TX");
+            
+            if ("STRIPE".equalsIgnoreCase(method)) {
+                holder.cvIcon.setCardBackgroundColor(Color.parseColor("#6366F1"));
+            } else {
+                holder.cvIcon.setCardBackgroundColor(Color.parseColor("#A855F7"));
+            }
 
             // Amount color
-            if (t.amount.startsWith("-")) {
-                holder.tvAmount.setTextColor(Color.parseColor("#64748B"));
-            } else if (t.status.equals("Lỗi")) {
+            if ("FAILED".equalsIgnoreCase(status)) {
                 holder.tvAmount.setTextColor(Color.parseColor("#EF4444"));
             } else {
                 holder.tvAmount.setTextColor(Color.parseColor("#166534"));
@@ -189,11 +213,11 @@ public class AdminTransactionActivity extends AppCompatActivity {
             // Status Badge
             View badge = (View) holder.tvStatus.getParent();
             View dot = holder.itemView.findViewById(R.id.vStatusDot);
-            if (t.status.equals("Thành công")) {
+            if ("SUCCESS".equalsIgnoreCase(status)) {
                 badge.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#F0FDF4")));
                 holder.tvStatus.setTextColor(Color.parseColor("#166534"));
                 dot.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#10B981")));
-            } else if (t.status.equals("Lỗi")) {
+            } else if ("FAILED".equalsIgnoreCase(status)) {
                 badge.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#FEF2F2")));
                 holder.tvStatus.setTextColor(Color.parseColor("#EF4444"));
                 dot.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#EF4444")));

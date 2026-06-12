@@ -5,9 +5,20 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.timsanbong.R;
+import com.example.timsanbong.data.api.ApiClient;
+import com.example.timsanbong.data.model.AdminDashboardOverviewResponse;
+
+import java.text.NumberFormat;
+import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AdminMainActivity extends AppCompatActivity {
 
@@ -18,7 +29,7 @@ public class AdminMainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_main);
         
-        setupStats();
+        fetchStats();
         setupHealth();
         
         findViewById(R.id.cvAdminAvatar).setOnClickListener(v -> {
@@ -28,6 +39,59 @@ public class AdminMainActivity extends AppCompatActivity {
         
         navBarManager = new AdminNavBarManager(this, AdminNavBarManager.ITEM_OVERVIEW);
         navBarManager.setup();
+    }
+
+    private void fetchStats() {
+        ApiClient.getService(this).getAdminOverview().enqueue(new Callback<AdminDashboardOverviewResponse>() {
+            @Override
+            public void onResponse(Call<AdminDashboardOverviewResponse> call, Response<AdminDashboardOverviewResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    updateUI(response.body());
+                } else {
+                    Toast.makeText(AdminMainActivity.this, "Không thể tải dữ liệu thống kê", Toast.LENGTH_SHORT).show();
+                    setupDefaultStats();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AdminDashboardOverviewResponse> call, Throwable t) {
+                Toast.makeText(AdminMainActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                setupDefaultStats();
+            }
+        });
+    }
+
+    private void updateUI(AdminDashboardOverviewResponse stats) {
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+        
+        View gmv = findViewById(R.id.cardGmv);
+        ((ImageView) gmv.findViewById(R.id.ivStatIcon)).setImageResource(R.drawable.ic_admin_wallet);
+        ((TextView) gmv.findViewById(R.id.tvStatLabel)).setText("Doanh thu");
+        ((TextView) gmv.findViewById(R.id.tvStatValue)).setText(currencyFormat.format(stats.getTotalRevenue()));
+        ((TextView) gmv.findViewById(R.id.tvTrendValue)).setText("GMV");
+
+        View users = findViewById(R.id.cardUsers);
+        ((ImageView) users.findViewById(R.id.ivStatIcon)).setImageResource(R.drawable.ic_admin_users);
+        ((TextView) users.findViewById(R.id.tvStatLabel)).setText("Người dùng");
+        ((TextView) users.findViewById(R.id.tvStatValue)).setText(String.valueOf(stats.getTotalUsers()));
+        ((TextView) users.findViewById(R.id.tvTrendValue)).setText("Tổng số");
+
+        View fields = findViewById(R.id.cardFields);
+        ((ImageView) fields.findViewById(R.id.ivStatIcon)).setImageResource(R.drawable.ic_admin_dashboard);
+        ((TextView) fields.findViewById(R.id.tvStatLabel)).setText("Sân bóng");
+        ((TextView) fields.findViewById(R.id.tvStatValue)).setText(String.valueOf(stats.getTotalFields()));
+        ((TextView) fields.findViewById(R.id.tvTrendValue)).setText("Tổng số");
+
+        View bookings = findViewById(R.id.cardBookings);
+        ((ImageView) bookings.findViewById(R.id.ivStatIcon)).setImageResource(R.drawable.ic_bolt);
+        ((TextView) bookings.findViewById(R.id.tvStatLabel)).setText("Lượt đặt");
+        ((TextView) bookings.findViewById(R.id.tvStatValue)).setText(String.valueOf(stats.getTotalBookings()));
+        ((TextView) bookings.findViewById(R.id.tvTrendValue)).setText("Tổng số");
+    }
+
+    private void setupDefaultStats() {
+        // Keep original fake data if API fails
+        setupStats();
     }
 
     private void setupStats() {

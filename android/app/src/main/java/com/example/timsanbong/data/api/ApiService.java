@@ -1,8 +1,10 @@
 package com.example.timsanbong.data.api;
 
+import com.example.timsanbong.data.model.AdminDashboardOverviewResponse;
 import com.example.timsanbong.data.model.AuthResponse;
 import com.example.timsanbong.data.model.Booking;
 import com.example.timsanbong.data.model.Field;
+import com.example.timsanbong.data.model.PaymentResponse;
 import com.example.timsanbong.data.model.User;
 
 import java.util.List;
@@ -48,4 +50,14 @@ public interface ApiService {
     // Profile
     @GET("users/me")
     Call<User> getMyProfile();
+
+    // Admin
+    @GET("admin/overview")
+    Call<AdminDashboardOverviewResponse> getAdminOverview();
+
+    @GET("admin/users")
+    Call<List<User>> getAdminUsers();
+
+    @GET("admin/payments")
+    Call<List<PaymentResponse>> getAdminPayments();
 }
