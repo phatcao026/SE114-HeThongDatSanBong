@@ -53,7 +53,7 @@ public class FilterBottomSheetFragment extends BottomSheetDialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_filter_bottom_sheet, container, false);
+        return inflater.inflate(R.layout.fragment_customer_filter_bottom_sheet, container, false);
     }
 
     @Override

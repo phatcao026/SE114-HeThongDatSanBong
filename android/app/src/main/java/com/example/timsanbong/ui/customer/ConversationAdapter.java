@@ -34,7 +34,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_conversation, parent, false);
+                .inflate(R.layout.item_customer_conversation, parent, false);
         return new ViewHolder(view);
     }
 
@@ -58,7 +58,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
 
         // Name + time
         holder.tvConvName.setText(conv.getName());
-        holder.tvConvTime.setText(conv.getTime());
+        holder.tvConvTime.setText(conv.getTimeAgo());
 
         // Unread state
         boolean hasUnread = conv.getUnreadCount() > 0;

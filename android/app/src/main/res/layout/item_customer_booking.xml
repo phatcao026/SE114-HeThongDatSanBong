@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/spacing_3"
+    app:cardCornerRadius="@dimen/radius_card"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="@color/background_primary"
+    app:strokeColor="@color/border_gray"
+    app:strokeWidth="1dp"
+    tools:context=".ui.customer.MyBookingsActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Cover strip -->
+            <ImageView
+                android:id="@+id/ivCover"
+                android:layout_width="88dp"
+                android:layout_height="0dp"
+                android:background="@drawable/bg_pitch_cover"
+                android:scaleType="centerCrop"
+                android:contentDescription="@string/cd_field_image"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_4"
+                app:layout_constraintStart_toEndOf="@id/ivCover"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <!-- Name + ref + status -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvFieldName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:textColor="@color/text_primary"
+                            android:textSize="@dimen/text_subtitle"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/bricolage_grotesque"
+                            tools:text="Sân Trần Bình" />
+
+                        <TextView
+                            android:id="@+id/tvBookingRef"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textColor="@color/text_hint"
+                            android:textSize="@dimen/text_caption"
+                            android:fontFamily="monospace"
+                            tools:text="#BK-1024" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/spacing_2"
+                        android:background="@drawable/bg_status_badge"
+                        android:paddingHorizontal="@dimen/spacing_2"
+                        android:paddingVertical="@dimen/spacing_1"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        tools:text="Đã đặt cọc" />
+                </LinearLayout>
+
+                <!-- Date + time -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_2"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_calendar"
+                        app:tint="@color/text_hint"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:id="@+id/tvDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/spacing_1"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/text_body_small"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        tools:text="23/05/2026" />
+
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:layout_marginStart="@dimen/spacing_3"
+                        android:src="@drawable/ic_clock"
+                        app:tint="@color/text_hint"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:id="@+id/tvTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/spacing_1"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/text_body_small"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        tools:text="18:00 - 19:30" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvTotalPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_2"
+                    android:textColor="@color/primary"
+                    android:textSize="@dimen/text_body_large"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/bricolage_grotesque"
+                    tools:text="350.000 đ" />
+
+                <!-- Actions (upcoming only) -->
+                <LinearLayout
+                    android:id="@+id/layoutActions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_3"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnQr"
+                        style="@style/Widget.TimSanBong.Button.Filled"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_weight="1"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:minWidth="0dp"
+                        android:paddingHorizontal="@dimen/spacing_2"
+                        android:text="@string/action_qr_checkin"
+                        android:textSize="11sp"
+                        app:icon="@drawable/ic_qr_code"
+                        app:iconSize="14dp"
+                        app:iconPadding="@dimen/spacing_1"
+                        app:iconTint="@color/text_on_primary" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnDirections"
+                        style="@style/Widget.TimSanBong.Button.Outlined"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="@dimen/spacing_2"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:minWidth="0dp"
+                        android:paddingHorizontal="@dimen/spacing_2"
+                        android:text="@string/action_directions"
+                        android:textSize="11sp"
+                        android:textColor="@color/primary"
+                        app:icon="@drawable/ic_map_pin"
+                        app:iconSize="14dp"
+                        app:iconPadding="@dimen/spacing_1"
+                        app:iconTint="@color/primary"
+                        app:strokeColor="@color/primary" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCancel"
+                        style="@style/Widget.TimSanBong.Button.Outlined"
+                        android:layout_width="40dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="@dimen/spacing_2"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:minWidth="0dp"
+                        android:paddingHorizontal="0dp"
+                        android:contentDescription="@string/cd_cancel_booking"
+                        app:icon="@drawable/ic_cancel_circle"
+                        app:iconSize="16dp"
+                        app:iconGravity="textStart"
+                        app:iconPadding="0dp"
+                        app:iconTint="@color/error"
+                        app:strokeColor="@color/error" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Deposit footer (full width, prototype pitch-50 strip) -->
+        <LinearLayout
+            android:id="@+id/layoutDepositFooter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="@dimen/spacing_4"
+            android:paddingVertical="@dimen/spacing_3"
+            android:background="@color/pitch_50"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvDepositFooter"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/badge_green_text"
+                android:textSize="@dimen/text_caption"
+                android:fontFamily="@font/be_vietnam_pro"
+                tools:text="Đã cọc 105.000 đ · Còn lại tại sân" />
+
+            <TextView
+                android:id="@+id/tvRemainder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/badge_green_text"
+                android:textSize="@dimen/text_body_medium"
+                android:textStyle="bold"
+                android:fontFamily="@font/bricolage_grotesque"
+                tools:text="245.000 đ" />
+        </LinearLayout>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

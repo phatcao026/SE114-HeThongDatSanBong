@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_secondary"
+    tools:context=".ui.customer.BookingActivity">
+
+    <!-- Toolbar -->
+    <LinearLayout
+        android:id="@+id/layoutToolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/spacing_4"
+        android:paddingTop="@dimen/spacing_5"
+        android:paddingBottom="@dimen/spacing_3"
+        android:background="@color/background_secondary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="@dimen/spacing_40"
+            android:layout_height="@dimen/spacing_40"
+            android:padding="@dimen/spacing_2"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/text_primary"
+            android:background="@drawable/ripple_primary"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/cd_back" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/spacing_3"
+            android:text="Xác nhận đặt sân"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_heading3"
+            android:textStyle="bold"
+            android:fontFamily="@font/bricolage_grotesque" />
+    </LinearLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/spacing_8"
+        app:layout_constraintTop_toBottomOf="@id/layoutToolbar"
+        app:layout_constraintBottom_toTopOf="@id/layoutPayBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/spacing_4">
+
+            <!-- Booking Summary Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_3"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardBackgroundColor="@color/background_primary"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/border_gray">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_5">
+
+                    <!-- Field name -->
+                    <TextView
+                        android:id="@+id/tvFieldName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_heading4"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/bricolage_grotesque"
+                        tools:text="Sân Trần Bình" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="@dimen/spacing_4"
+                        android:background="@color/border" />
+
+                    <!-- Date row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_calendar"
+                            app:tint="@color/text_secondary"
+                            android:contentDescription="@null" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="@dimen/spacing_3"
+                            android:text="Ngày đặt"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="@dimen/text_body_medium"
+                            android:fontFamily="@font/be_vietnam_pro" />
+
+                        <TextView
+                            android:id="@+id/tvBookingDate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_primary"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/be_vietnam_pro"
+                            tools:text="23/05/2026" />
+                    </LinearLayout>
+
+                    <!-- Time row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_3"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_clock"
+                            app:tint="@color/text_secondary"
+                            android:contentDescription="@null" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="@dimen/spacing_3"
+                            android:text="Khung giờ"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="@dimen/text_body_medium"
+                            android:fontFamily="@font/be_vietnam_pro" />
+
+                        <TextView
+                            android:id="@+id/tvBookingTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_primary"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/be_vietnam_pro"
+                            tools:text="18:00 - 19:00" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Price Breakdown Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_3"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardBackgroundColor="@color/background_primary"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/border_gray">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_5">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Chi tiết thanh toán"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_body_large"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                    <!-- Total row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_4"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Tổng tiền sân"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="@dimen/text_body_medium"
+                            android:fontFamily="@font/be_vietnam_pro" />
+
+                        <TextView
+                            android:id="@+id/tvTotalAmount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_primary"
+                            android:textSize="@dimen/text_body_medium"
+                            android:fontFamily="@font/be_vietnam_pro"
+                            tools:text="350.000đ" />
+                    </LinearLayout>
+
+                    <!-- Deposit row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_2"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Đặt cọc (30%)"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="@dimen/text_body_medium"
+                            android:fontFamily="@font/be_vietnam_pro" />
+
+                        <TextView
+                            android:id="@+id/tvDepositAmount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/accent_orange"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/be_vietnam_pro"
+                            tools:text="105.000đ" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="@dimen/spacing_3"
+                        android:background="@color/border" />
+
+                    <!-- Amount to pay -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Thanh toán ngay"
+                            android:textColor="@color/text_primary"
+                            android:textSize="@dimen/text_body_large"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/be_vietnam_pro" />
+
+                        <TextView
+                            android:id="@+id/tvPayNowAmount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_heading3"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/bricolage_grotesque"
+                            tools:text="105.000đ" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Payment method selection -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_5"
+                android:text="@string/payment_method_title"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_body_large"
+                android:textStyle="bold"
+                android:fontFamily="@font/bricolage_grotesque" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardMethodMomo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_3"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardBackgroundColor="@color/background_primary"
+                app:cardElevation="0dp"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/primary">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/spacing_4">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="@dimen/spacing_2"
+                        android:src="@drawable/ic_wallet"
+                        android:background="@drawable/radius_badge"
+                        android:backgroundTint="@color/brand_momo"
+                        app:tint="@color/text_on_primary"
+                        android:contentDescription="@string/cd_payment_method_icon" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="@dimen/spacing_3"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/payment_momo"
+                            android:textColor="@color/text_primary"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/be_vietnam_pro" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/payment_momo_sub"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="@dimen/text_body_small"
+                            android:fontFamily="@font/be_vietnam_pro" />
+                    </LinearLayout>
+
+                    <RadioButton
+                        android:id="@+id/rbMomo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:checked="true"
+                        android:buttonTint="@color/primary" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardMethodStripe"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_3"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardBackgroundColor="@color/background_primary"
+                app:cardElevation="0dp"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/border_gray">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/spacing_4">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="@dimen/spacing_2"
+                        android:src="@drawable/ic_credit_card"
+                        android:background="@drawable/radius_badge"
+                        android:backgroundTint="@color/brand_stripe"
+                        app:tint="@color/text_on_primary"
+                        android:contentDescription="@string/cd_payment_method_icon" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="@dimen/spacing_3"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/payment_stripe"
+                            android:textColor="@color/text_primary"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/be_vietnam_pro" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/payment_stripe_sub"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="@dimen/text_body_small"
+                            android:fontFamily="@font/be_vietnam_pro" />
+                    </LinearLayout>
+
+                    <RadioButton
+                        android:id="@+id/rbStripe"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:buttonTint="@color/primary" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardMethodBank"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_3"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardBackgroundColor="@color/background_primary"
+                app:cardElevation="0dp"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/border_gray">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/spacing_4">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="@dimen/spacing_2"
+                        android:src="@drawable/ic_bank"
+                        android:background="@drawable/radius_badge"
+                        android:backgroundTint="@color/info"
+                        app:tint="@color/text_on_primary"
+                        android:contentDescription="@string/cd_payment_method_icon" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="@dimen/spacing_3"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/payment_bank"
+                            android:textColor="@color/text_primary"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/be_vietnam_pro" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/payment_bank_sub"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="@dimen/text_body_small"
+                            android:fontFamily="@font/be_vietnam_pro" />
+                    </LinearLayout>
+
+                    <RadioButton
+                        android:id="@+id/rbBank"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:buttonTint="@color/primary" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Cancellation policy banner -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_4"
+                android:orientation="horizontal"
+                android:padding="@dimen/spacing_3"
+                android:background="@drawable/bg_info_banner">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginTop="2dp"
+                    android:src="@drawable/ic_bell"
+                    app:tint="@color/info"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/spacing_2"
+                    android:text="@string/booking_policy"
+                    android:textColor="@color/info"
+                    android:textSize="@dimen/text_body_small"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:lineSpacingMultiplier="1.4" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom Pay Bar -->
+    <LinearLayout
+        android:id="@+id/layoutPayBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/spacing_4"
+        android:paddingVertical="@dimen/spacing_3"
+        android:background="@drawable/bg_bottom_bar"
+        android:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tổng đặt cọc"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_body_small"
+                android:fontFamily="@font/be_vietnam_pro" />
+
+            <TextView
+                android:id="@+id/tvBarAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/primary"
+                android:textSize="@dimen/text_heading3"
+                android:textStyle="bold"
+                android:fontFamily="@font/bricolage_grotesque"
+                tools:text="105.000đ" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnConfirm"
+            style="@style/Widget.TimSanBong.Button.Filled"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height_large"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/action_pay_now"
+            android:textSize="@dimen/text_body_large"
+            android:textStyle="bold"
+            android:textColor="@color/text_on_primary"
+            android:fontFamily="@font/be_vietnam_pro"
+            app:backgroundTint="@color/primary"
+            app:cornerRadius="@dimen/radius_button"
+            app:elevation="0dp" />
+    </LinearLayout>
+
+    <!-- Loading overlay -->
+    <FrameLayout
+        android:id="@+id/layoutLoading"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#80000000"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ProgressBar
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center" />
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

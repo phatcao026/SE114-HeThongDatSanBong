@@ -29,7 +29,7 @@ public class PaymentActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_payment);
+        setContentView(R.layout.activity_customer_payment);
 
         tvFieldName = findViewById(R.id.tvFieldName);
         tvAmount = findViewById(R.id.tvAmount);
@@ -66,7 +66,7 @@ public class PaymentActivity extends AppCompatActivity {
                 tvStateMessage.setText(getString(R.string.payment_processing));
                 btnPay.setEnabled(false);
             } else if (state.status == PaymentViewModel.Status.SUCCESS) {
-                navigateToResult(true, state.message);
+                navigateToResult(true, getString(R.string.payment_success_field_format, fieldName));
             } else if (state.status == PaymentViewModel.Status.FAILED) {
                 showErrorState(state.message);
                 btnPay.setEnabled(true);
@@ -83,6 +83,11 @@ public class PaymentActivity extends AppCompatActivity {
         Intent intent = new Intent(this, PaymentResultActivity.class);
         intent.putExtra(Constants.EXTRA_PAYMENT_SUCCESS, success);
         intent.putExtra(Constants.EXTRA_PAYMENT_MESSAGE, message);
+        intent.putExtra(Constants.EXTRA_BOOKING_ID, bookingId);
+        intent.putExtra(Constants.EXTRA_DEPOSIT_AMOUNT,
+                getIntent().getDoubleExtra(Constants.EXTRA_DEPOSIT_AMOUNT, -1));
+        intent.putExtra(Constants.EXTRA_REMAINDER_AMOUNT,
+                getIntent().getDoubleExtra(Constants.EXTRA_REMAINDER_AMOUNT, -1));
         startActivity(intent);
         finish();
     }

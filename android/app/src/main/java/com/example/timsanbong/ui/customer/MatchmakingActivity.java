@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,16 +26,19 @@ public class MatchmakingActivity extends AppCompatActivity {
     private TextView tvMatchCount;
     private RecyclerView rvMatches;
     private TextView tvEmptyMatches;
+    private View fabCreatePost;
+    private NavBarManager navBarManager;
 
     // ── Data ─────────────────────────────────────────────
     private MatchAdapter matchAdapter;
-    private List<MatchPost> allMatches;
+    private List<MatchPost> allMatches = new ArrayList<>();
     private int currentTab = 0;
+    private MatchViewModel matchViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_matchmaking);
+        setContentView(R.layout.activity_customer_matchmaking);
         initViews();
         setupListeners();
         loadData();
@@ -48,6 +52,16 @@ public class MatchmakingActivity extends AppCompatActivity {
         tvMatchCount = findViewById(R.id.tvMatchCount);
         rvMatches = findViewById(R.id.rvMatches);
         tvEmptyMatches = findViewById(R.id.tvEmptyMatches);
+        fabCreatePost = findViewById(R.id.fabCreatePost);
+
+        navBarManager = new NavBarManager(this, NavBarManager.ITEM_MATCH);
+        navBarManager.setup();
+
+        if (fabCreatePost != null) {
+            fabCreatePost.setOnClickListener(v -> {
+                startActivity(new Intent(this, CreateMatchPostActivity.class));
+            });
+        }
 
         rvMatches.setLayoutManager(new LinearLayoutManager(this));
         matchAdapter = new MatchAdapter(new ArrayList<>(), new MatchAdapter.OnMatchActionListener() {
@@ -60,7 +74,7 @@ public class MatchmakingActivity extends AppCompatActivity {
             @Override
             public void onChat(MatchPost match) {
                 Conversation conv = new Conversation(
-                        match.getId(),
+                        match.getIdString(),
                         match.getTeam(),
                         match.getCaptainInitials(),
                         "Bắt đầu cuộc trò chuyện…",
@@ -76,13 +90,12 @@ public class MatchmakingActivity extends AppCompatActivity {
             @Override
             public void onCardClick(MatchPost match) {
                 Intent intent = new Intent(MatchmakingActivity.this, MatchDetailActivity.class);
-                intent.putExtra(Constants.EXTRA_MATCH, match);
+                intent.putExtra(Constants.EXTRA_MATCH_POST, match);
+                intent.putExtra(Constants.EXTRA_MATCH_ID, match.getIdString());
                 startActivity(intent);
             }
         });
         rvMatches.setAdapter(matchAdapter);
-
-        new NavBarManager(this, NavBarManager.ITEM_MATCH).setup();
     }
 
     private void setupListeners() {
@@ -103,8 +116,24 @@ public class MatchmakingActivity extends AppCompatActivity {
     }
 
     private void loadData() {
-        allMatches = buildMockMatches();
-        selectTab(0);
+        matchViewModel = new ViewModelProvider(this).get(MatchViewModel.class);
+
+        matchViewModel.matchPostsState.observe(this, resource -> {
+            if (resource == null) return;
+            if (resource.status == com.example.timsanbong.utils.Resource.Status.SUCCESS && resource.data != null) {
+                allMatches = resource.data;
+                // Add mocked items as fallback since DB might be empty
+                if (allMatches.isEmpty()) {
+                    allMatches = buildMockMatches();
+                }
+                selectTab(currentTab);
+            } else if (resource.status == com.example.timsanbong.utils.Resource.Status.ERROR) {
+                allMatches = buildMockMatches(); // fallback
+                selectTab(currentTab);
+            }
+        });
+
+        matchViewModel.loadMatchPosts(0, 50, null);
     }
 
     private void selectTab(int tab) {
@@ -127,8 +156,8 @@ public class MatchmakingActivity extends AppCompatActivity {
         List<MatchPost> result = new ArrayList<>();
         for (MatchPost m : allMatches) {
             if (tab == 0) result.add(m);
-            else if (tab == 1 && m.getType().equals(MatchPost.TYPE_FIND_OPPONENT)) result.add(m);
-            else if (tab == 2 && m.getType().equals(MatchPost.TYPE_FIND_MEMBER)) result.add(m);
+            else if (tab == 1 && MatchPost.TYPE_FIND_OPPONENT.equals(m.getType())) result.add(m);
+            else if (tab == 2 && MatchPost.TYPE_FIND_MEMBER.equals(m.getType())) result.add(m);
             else if (tab == 3 && m.getTrustScore() >= 90) result.add(m);
         }
         return result;

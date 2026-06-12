@@ -18,14 +18,26 @@
         </activity>
         <activity
             android:name=".ui.auth.LoginActivity"
-            android:exported="false"
-            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.TimSanBong.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="timsanbong" android:host="auth" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.auth.RegisterActivity"
             android:exported="false"
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
         <activity
             android:name=".ui.customer.MainActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+        <activity
+            android:name=".ui.customer.FindPitchActivity"
             android:exported="false"
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
         <activity
@@ -72,6 +84,14 @@
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
         <activity
             android:name=".ui.customer.NotificationsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+        <activity
+            android:name=".ui.customer.CreateMatchPostActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+        <activity
+            android:name=".ui.customer.TeamManagementActivity"
             android:exported="false"
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
 

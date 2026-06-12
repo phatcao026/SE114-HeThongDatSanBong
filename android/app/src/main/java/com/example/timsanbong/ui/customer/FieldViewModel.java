@@ -34,6 +34,9 @@ public class FieldViewModel extends AndroidViewModel {
     private final MutableLiveData<List<Field>> _filteredFields = new MutableLiveData<>();
     public LiveData<List<Field>> filteredFields = _filteredFields;
 
+    private final MutableLiveData<Resource<List<com.example.timsanbong.data.model.TimeSlotResponse>>> _timeSlotsState = new MutableLiveData<>();
+    public LiveData<Resource<List<com.example.timsanbong.data.model.TimeSlotResponse>>> timeSlotsState = _timeSlotsState;
+
     private final MutableLiveData<String> _userDisplayName = new MutableLiveData<>();
     public LiveData<String> userDisplayName = _userDisplayName;
 
@@ -53,7 +56,7 @@ public class FieldViewModel extends AndroidViewModel {
             @Override
             public void onSuccess(List<Field> data) {
                 allFields = data;
-                _fieldsState.postValue(Resource.success(data));
+                _fieldsState.postValue(Resource.success(allFields));
                 applyFilters();
             }
 
@@ -75,6 +78,21 @@ public class FieldViewModel extends AndroidViewModel {
             @Override
             public void onError(String message) {
                 _fieldDetailState.postValue(Resource.error(message, null));
+            }
+        });
+    }
+
+    public void loadTimeSlots(long fieldId, String date) {
+        _timeSlotsState.setValue(Resource.loading(null));
+        fieldRepository.getTimeslots(getApplication(), fieldId, date, new RepositoryCallback<List<com.example.timsanbong.data.model.TimeSlotResponse>>() {
+            @Override
+            public void onSuccess(List<com.example.timsanbong.data.model.TimeSlotResponse> data) {
+                _timeSlotsState.postValue(Resource.success(data));
+            }
+
+            @Override
+            public void onError(String message) {
+                _timeSlotsState.postValue(Resource.error(message, null));
             }
         });
     }

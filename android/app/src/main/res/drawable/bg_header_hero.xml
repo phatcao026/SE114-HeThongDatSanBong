@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/primary" />
+    <gradient
+        android:angle="315"
+        android:startColor="@color/primary"
+        android:centerColor="@color/pitch_500"
+        android:endColor="@color/primary_dark"
+        android:type="linear" />
     <corners
         android:topLeftRadius="@dimen/radius_card"
         android:topRightRadius="@dimen/radius_card"

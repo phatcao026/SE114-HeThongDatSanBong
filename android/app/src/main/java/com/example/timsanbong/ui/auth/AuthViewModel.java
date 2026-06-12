@@ -35,20 +35,31 @@ public class AuthViewModel extends AndroidViewModel {
         this.sessionManager = new SessionManager(application);
     }
 
-    public boolean loginDemo(String email, String password) {
-        DemoAccount account = findDemoAccount(email, password);
-        if (account == null) {
-            _loginMessage.setValue("Tài khoản demo hoặc mật khẩu không đúng");
-            return false;
-        }
+    public void login(String email, String password) {
+        _registerState.setValue(Resource.loading(null));
 
-        String token = "DEBUG_TOKEN_" + account.role;
-        String userJson = buildUserJson(account);
+        Map<String, String> body = new HashMap<>();
+        body.put("email", email);
+        body.put("password", password);
 
-        sessionManager.saveToken(token);
-        sessionManager.saveUserJson(userJson);
+        authRepository.login(getApplication(), body, new RepositoryCallback<AuthResponse>() {
+            @Override
+            public void onSuccess(AuthResponse data) {
+                if (data.getAccessToken() != null) {
+                    sessionManager.saveToken(data.getAccessToken());
+                    sessionManager.saveUserId(data.getUserId());
+                    sessionManager.saveUserRole(data.getRole());
+                    sessionManager.saveUserEmail(data.getEmail());
+                }
+                _registerState.postValue(Resource.success(data));
+            }
 
-        return true;
+            @Override
+            public void onError(String message) {
+                _loginMessage.postValue(message);
+                _registerState.postValue(Resource.error(message, null));
+            }
+        });
     }
 
     public void register(String fullName, String email, String password) {
@@ -62,18 +73,11 @@ public class AuthViewModel extends AndroidViewModel {
         authRepository.register(getApplication(), body, new RepositoryCallback<AuthResponse>() {
             @Override
             public void onSuccess(AuthResponse data) {
-                if (data.getToken() != null && data.getUser() != null) {
-                    sessionManager.saveToken(data.getToken());
-                    try {
-                        JSONObject userJson = new JSONObject();
-                        userJson.put("id", data.getUser().getId());
-                        userJson.put("fullName", data.getUser().getFullName());
-                        userJson.put("email", data.getUser().getEmail());
-                        userJson.put("phone", data.getUser().getPhone());
-                        userJson.put("role", data.getUser().getRole());
-                        sessionManager.saveUserJson(userJson.toString());
-                    } catch (JSONException ignored) {
-                    }
+                if (data.getAccessToken() != null) {
+                    sessionManager.saveToken(data.getAccessToken());
+                    sessionManager.saveUserId(data.getUserId());
+                    sessionManager.saveUserRole(data.getRole());
+                    sessionManager.saveUserEmail(data.getEmail());
                 }
                 _registerState.postValue(Resource.success(data));
             }
@@ -85,46 +89,81 @@ public class AuthViewModel extends AndroidViewModel {
         });
     }
 
-    private DemoAccount findDemoAccount(String email, String password) {
-        DemoAccount[] demoAccounts = new DemoAccount[]{
-                new DemoAccount("player_demo@test.com", "pass123", "Long Travis", "PLAYER", "0901000101", 101),
-                new DemoAccount("owner_demo@test.com", "pass123", "Quản lý Sân A", "OWNER", "0902000202", 201),
-                new DemoAccount("admin_demo@test.com", "pass123", "Hệ thống Admin", "ADMIN", "0903000303", 301)
-        };
+    // OTP Flow
+    private final MutableLiveData<Resource<Void>> _forgotPasswordState = new MutableLiveData<>();
+    public LiveData<Resource<Void>> forgotPasswordState = _forgotPasswordState;
 
-        for (DemoAccount account : demoAccounts) {
-            if (account.email.equalsIgnoreCase(email) && account.password.equals(password)) {
-                return account;
+    public void forgotPassword(String email) {
+        _forgotPasswordState.setValue(Resource.loading(null));
+        Map<String, String> body = new HashMap<>();
+        body.put("email", email);
+        authRepository.forgotPassword(getApplication(), body, new RepositoryCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) { _forgotPasswordState.postValue(Resource.success(null)); }
+            @Override
+            public void onError(String msg) { _forgotPasswordState.postValue(Resource.error(msg, null)); }
+        });
+    }
+
+    public void verifyOtp(String email, String otp) {
+        _forgotPasswordState.setValue(Resource.loading(null));
+        Map<String, String> body = new HashMap<>();
+        body.put("email", email);
+        body.put("otp", otp);
+        authRepository.verifyOtp(getApplication(), body, new RepositoryCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) { _forgotPasswordState.postValue(Resource.success(null)); }
+            @Override
+            public void onError(String msg) { _forgotPasswordState.postValue(Resource.error(msg, null)); }
+        });
+    }
+
+    public void resetPassword(String email, String otp, String newPassword) {
+        _forgotPasswordState.setValue(Resource.loading(null));
+        Map<String, String> body = new HashMap<>();
+        body.put("email", email);
+        body.put("otp", otp);
+        body.put("newPassword", newPassword);
+        authRepository.resetPassword(getApplication(), body, new RepositoryCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) { _forgotPasswordState.postValue(Resource.success(null)); }
+            @Override
+            public void onError(String msg) { _forgotPasswordState.postValue(Resource.error(msg, null)); }
+        });
+    }
+
+    private final MutableLiveData<Resource<String>> _googleUrlState = new MutableLiveData<>();
+    public LiveData<Resource<String>> googleUrlState = _googleUrlState;
+
+    public void getGoogleUrl() {
+        _googleUrlState.setValue(Resource.loading(null));
+        authRepository.getGoogleUrl(getApplication(), new RepositoryCallback<String>() {
+            @Override
+            public void onSuccess(String data) { _googleUrlState.postValue(Resource.success(data)); }
+            @Override
+            public void onError(String msg) { _googleUrlState.postValue(Resource.error(msg, null)); }
+        });
+    }
+
+    public void googleSync(String idToken) {
+        _registerState.setValue(Resource.loading(null));
+        authRepository.googleSync(getApplication(), idToken, new RepositoryCallback<AuthResponse>() {
+            @Override
+            public void onSuccess(AuthResponse data) {
+                if (data.getAccessToken() != null) {
+                    sessionManager.saveToken(data.getAccessToken());
+                    sessionManager.saveUserId(data.getUserId());
+                    sessionManager.saveUserRole(data.getRole());
+                    sessionManager.saveUserEmail(data.getEmail());
+                }
+                _registerState.postValue(Resource.success(data));
             }
-        }
-        return null;
-    }
 
-    private String buildUserJson(DemoAccount account) {
-        try {
-            JSONObject json = new JSONObject();
-            json.put("id", account.id);
-            json.put("fullName", account.fullName);
-            json.put("email", account.email);
-            json.put("phone", account.phone);
-            json.put("role", account.role);
-            return json.toString();
-        } catch (JSONException e) {
-            return "{}";
-        }
-    }
-
-    private static class DemoAccount {
-        String email, password, fullName, role, phone;
-        long id;
-
-        DemoAccount(String email, String password, String fullName, String role, String phone, long id) {
-            this.email = email;
-            this.password = password;
-            this.fullName = fullName;
-            this.role = role;
-            this.phone = phone;
-            this.id = id;
-        }
+            @Override
+            public void onError(String msg) {
+                _loginMessage.postValue(msg);
+                _registerState.postValue(Resource.error(msg, null));
+            }
+        });
     }
 }

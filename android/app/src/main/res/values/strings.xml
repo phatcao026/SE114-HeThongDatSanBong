@@ -184,12 +184,63 @@
     <string name="payment_title">Thanh toán</string>
     <string name="action_pay_now">Thanh toán ngay</string>
     <string name="payment_processing">Đang xử lý thanh toán...</string>
-    <string name="payment_success_title">Thanh toán thành công</string>
+    <string name="payment_success_title">Đã giữ sân!</string>
     <string name="payment_failed_title">Thanh toán thất bại</string>
     <string name="payment_success_message">Giao dịch đã được xác nhận.</string>
     <string name="payment_failed_message">Giao dịch không thành công. Vui lòng thử lại.</string>
     <string name="action_back_home">Về trang chủ</string>
     <string name="empty_payment">Thiếu thông tin đặt sân để thanh toán.</string>
+
+    <!-- Field booking flow -->
+    <string name="action_select_slot">Chọn khung giờ</string>
+    <string name="action_hold_slot">Cọc giữ sân</string>
+    <string name="price_by_slot">Giá theo khung giờ</string>
+    <string name="status_deposit_paid">Đã đặt cọc</string>
+    <string name="status_completed">Hoàn thành</string>
+    <string name="payment_method_title">Phương thức cọc</string>
+    <string name="payment_momo">Ví MoMo</string>
+    <string name="payment_momo_sub">Xác nhận 1 chạm</string>
+    <string name="payment_stripe">Thẻ Visa / Mastercard</string>
+    <string name="payment_stripe_sub">Xử lý qua Stripe</string>
+    <string name="payment_bank">Chuyển khoản ngân hàng</string>
+    <string name="payment_bank_sub">Áp dụng VietQR</string>
+    <string name="booking_policy" formatted="false">Hủy trước 24h hoàn 100% cọc. Bùng kèo trừ điểm uy tín và mất cọc.</string>
+    <string name="booking_deposit_footer">Đã cọc %s · Còn lại tại sân</string>
+    <string name="cd_payment_method_icon">Biểu tượng phương thức thanh toán</string>
+
+    <!-- Find pitch (prototype parity) -->
+    <string name="location_current">Bình Thạnh, TP. HCM</string>
+    <string name="location_radius">· bán kính 5km</string>
+    <string name="action_change">Đổi</string>
+    <string name="find_result_count">%d sân quanh bạn</string>
+    <string name="action_book">Đặt</string>
+    <string name="suggested_field_type_11">Sân 11</string>
+    <string name="golden_hour_hint">Giờ vàng có thể cao hơn</string>
+
+    <!-- My bookings (prototype parity) -->
+    <string name="tab_upcoming">Sắp tới (%d)</string>
+    <string name="tab_past">Đã qua (%d)</string>
+    <string name="action_qr_checkin">QR check-in</string>
+    <string name="action_directions">Đường đi</string>
+    <string name="qr_dialog_title">QR check-in</string>
+    <string name="qr_dialog_message">Đưa mã đặt sân này cho chủ sân khi check-in:\n\n#BK-%d</string>
+    <string name="cd_cancel_booking">Hủy đặt sân</string>
+
+    <!-- Field detail (prototype parity) -->
+    <string name="amenities_title">Tiện ích</string>
+    <string name="amenity_light">Đèn chiếu sáng</string>
+    <string name="amenity_camera">Camera an ninh</string>
+    <string name="amenity_water">Nước uống</string>
+    <string name="amenity_locker">Phòng thay đồ</string>
+    <string name="amenity_parking">Bãi giữ xe</string>
+    <string name="amenity_cafe">Căng tin · cà phê</string>
+    <string name="reviews_title">Đánh giá (126)</string>
+    <string name="review_count_hint">126 đánh giá</string>
+
+    <!-- Payment result (prototype parity) -->
+    <string name="deposit_paid_row">Cọc đã thanh toán</string>
+    <string name="remainder_row">Còn lại trả tại sân</string>
+    <string name="payment_success_field_format">Hẹn bạn tại %s. Cọc giữ sân đã được xác nhận.</string>
 
     <!-- Home screen strings -->
     <string name="home_title">Timsanbong</string>

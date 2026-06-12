@@ -1,9 +1,13 @@
 package com.example.timsanbong.ui.customer;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,17 +19,17 @@ import com.example.timsanbong.R;
 import com.example.timsanbong.data.model.Booking;
 import com.example.timsanbong.utils.NavBarManager;
 import com.example.timsanbong.utils.Resource;
-import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public class MyBookingsActivity extends AppCompatActivity {
+public class MyBookingsActivity extends AppCompatActivity implements BookingAdapter.OnBookingActionListener {
 
     private RecyclerView rvBookings;
     private NavBarManager navBarManager;
@@ -35,31 +39,35 @@ public class MyBookingsActivity extends AppCompatActivity {
     private android.widget.TextView tvErrorState;
     private BookingAdapter bookingAdapter;
     private List<Booking> allBookings = new ArrayList<>();
-    private ChipGroup cgStatusFilter;
+    private TextView tvTabUpcoming, tvTabPast;
+    private View indicatorUpcoming, indicatorPast;
     private LinearLayout layoutRefresh;
     private android.widget.TextView tvRefreshLabel;
     private boolean isRefreshing;
     private float pullStartY = -1f;
     private int pullThresholdPx;
-    private String currentStatusFilter = "ALL";
+    private boolean showUpcoming = true;
     private long pendingCancelBookingId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my_bookings);
+        setContentView(R.layout.activity_customer_my_bookings);
 
         rvBookings = findViewById(R.id.rvBookings);
         rvBookings.setLayoutManager(new LinearLayoutManager(this));
         pbLoading = findViewById(R.id.pbLoading);
         tvEmptyState = findViewById(R.id.tvEmptyState);
         tvErrorState = findViewById(R.id.tvErrorState);
-        cgStatusFilter = findViewById(R.id.cgStatusFilter);
+        tvTabUpcoming = findViewById(R.id.tvTabUpcoming);
+        tvTabPast = findViewById(R.id.tvTabPast);
+        indicatorUpcoming = findViewById(R.id.indicatorUpcoming);
+        indicatorPast = findViewById(R.id.indicatorPast);
         layoutRefresh = findViewById(R.id.layoutRefresh);
         tvRefreshLabel = findViewById(R.id.tvRefreshLabel);
         pullThresholdPx = getResources().getDimensionPixelSize(R.dimen.pull_refresh_threshold);
 
-        bookingAdapter = new BookingAdapter(new ArrayList<>(), this::showCancelConfirmDialog);
+        bookingAdapter = new BookingAdapter(new ArrayList<>(), this);
         rvBookings.setAdapter(bookingAdapter);
 
         navBarManager = new NavBarManager(this, NavBarManager.ITEM_BOOKINGS);
@@ -100,25 +108,24 @@ public class MyBookingsActivity extends AppCompatActivity {
             }
         });
 
-        setupFilterChips();
+        setupTabs();
         setupPullToRefresh();
 
         bookingViewModel.loadMyBookings();
     }
 
-    private void setupFilterChips() {
-        cgStatusFilter.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == R.id.chipPending) {
-                currentStatusFilter = "PENDING";
-            } else if (checkedId == R.id.chipConfirmed) {
-                currentStatusFilter = "CONFIRMED";
-            } else if (checkedId == R.id.chipCancelled) {
-                currentStatusFilter = "CANCELLED";
-            } else {
-                currentStatusFilter = "ALL";
-            }
-            applyFilterAndSort();
-        });
+    private void setupTabs() {
+        findViewById(R.id.tabUpcoming).setOnClickListener(v -> selectTab(true));
+        findViewById(R.id.tabPast).setOnClickListener(v -> selectTab(false));
+    }
+
+    private void selectTab(boolean upcoming) {
+        showUpcoming = upcoming;
+        tvTabUpcoming.setTextColor(getColor(upcoming ? R.color.primary_dark : R.color.text_secondary));
+        tvTabPast.setTextColor(getColor(upcoming ? R.color.text_secondary : R.color.primary_dark));
+        indicatorUpcoming.setBackgroundColor(getColor(upcoming ? R.color.primary : android.R.color.transparent));
+        indicatorPast.setBackgroundColor(getColor(upcoming ? android.R.color.transparent : R.color.primary));
+        applyFilterAndSort();
     }
 
     private void setupPullToRefresh() {
@@ -158,30 +165,43 @@ public class MyBookingsActivity extends AppCompatActivity {
     }
 
     private void applyFilterAndSort() {
-        List<Booking> filtered = new ArrayList<>();
+        List<Booking> upcoming = new ArrayList<>();
+        List<Booking> past = new ArrayList<>();
         for (Booking booking : allBookings) {
-            if (matchesFilter(booking)) {
-                filtered.add(booking);
+            if (isUpcoming(booking)) {
+                upcoming.add(booking);
+            } else {
+                past.add(booking);
             }
         }
-        Collections.sort(filtered, (a, b) -> Long.compare(getBookingDateMillis(b), getBookingDateMillis(a)));
-        bookingAdapter.updateBookings(filtered);
-        if (filtered.isEmpty()) {
+        // Upcoming: soonest first; past: most recent first
+        Collections.sort(upcoming, (a, b) -> Long.compare(getBookingDateMillis(a), getBookingDateMillis(b)));
+        Collections.sort(past, (a, b) -> Long.compare(getBookingDateMillis(b), getBookingDateMillis(a)));
+
+        tvTabUpcoming.setText(getString(R.string.tab_upcoming, upcoming.size()));
+        tvTabPast.setText(getString(R.string.tab_past, past.size()));
+
+        List<Booking> visible = showUpcoming ? upcoming : past;
+        bookingAdapter.updateBookings(visible);
+        if (visible.isEmpty()) {
             showEmptyState();
         } else {
             showContentState();
         }
     }
 
-    private boolean matchesFilter(Booking booking) {
-        if ("ALL".equals(currentStatusFilter)) {
-            return true;
-        }
+    private boolean isUpcoming(Booking booking) {
         String status = booking.getStatus() == null ? "" : booking.getStatus().toUpperCase(Locale.US);
-        if ("CANCELLED".equals(currentStatusFilter)) {
-            return "CANCELLED".equals(status) || "CANCELED".equals(status);
+        boolean active = "PENDING".equals(status) || "DEPOSIT_PAID".equals(status) || "CONFIRMED".equals(status);
+        if (!active) {
+            return false;
         }
-        return currentStatusFilter.equals(status);
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+        return getBookingDateMillis(booking) >= today.getTimeInMillis();
     }
 
     private long getBookingDateMillis(Booking booking) {
@@ -197,7 +217,10 @@ public class MyBookingsActivity extends AppCompatActivity {
         }
     }
 
-    private void showCancelConfirmDialog(long bookingId) {
+    // ── BookingAdapter.OnBookingActionListener ──────────────
+
+    @Override
+    public void onCancel(long bookingId) {
         new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.cancel_booking_title)
                 .setMessage(R.string.cancel_booking_message)
@@ -207,6 +230,27 @@ public class MyBookingsActivity extends AppCompatActivity {
                     bookingViewModel.cancelBooking(bookingId);
                 })
                 .show();
+    }
+
+    @Override
+    public void onQrCheckin(Booking booking) {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.qr_dialog_title)
+                .setMessage(getString(R.string.qr_dialog_message, booking.getId()))
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
+    }
+
+    @Override
+    public void onDirections(Booking booking) {
+        String query = booking.getFieldName() != null ? booking.getFieldName() : "";
+        Intent intent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("geo:0,0?q=" + Uri.encode(query)));
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void removeBookingById(long bookingId) {

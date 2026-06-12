@@ -1,20 +1,27 @@
 package com.example.timsanbong.ui.customer;
 
 import android.os.Bundle;
+import android.content.Intent;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.timsanbong.R;
+import com.example.timsanbong.data.model.Field;
+import com.example.timsanbong.ui.profile.ProfileActivity;
 import com.example.timsanbong.utils.NavBarManager;
+import com.example.timsanbong.utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.lifecycle.ViewModelProvider;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,11 +41,13 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView rvSuggestedFields;
     private SuggestedFieldAdapter suggestedFieldAdapter;
     private NavBarManager navBarManager;
+    private FieldViewModel fieldViewModel;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_customer_main);
         initViews();
         setupListeners();
         loadData();
@@ -68,55 +77,69 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        btnNotifications.setOnClickListener(v -> showToast(R.string.notifications_title));
-        btnSearchNearby.setOnClickListener(v -> showToast(R.string.action_search_nearby));
-        btnMatchmaking.setOnClickListener(v -> showToast(R.string.matchmaking_title));
-        btnHotMatchAccept.setOnClickListener(v -> showToast(R.string.action_accept_match));
-        btnFloatingBook.setOnClickListener(v -> showToast(R.string.toast_select_field));
-        tvHotSeeAll.setOnClickListener(v -> showToast(R.string.action_view_all));
-        tvSuggestedMore.setOnClickListener(v -> showToast(R.string.action_view_more));
+        btnNotifications.setOnClickListener(v ->
+                startActivity(new Intent(this, NotificationsActivity.class)));
+        tvAvatar.setOnClickListener(v ->
+                startActivity(new Intent(this, ProfileActivity.class)));
+        btnSearchNearby.setOnClickListener(v ->
+                startActivity(new Intent(this, FindPitchActivity.class)));
+        btnMatchmaking.setOnClickListener(v ->
+                startActivity(new Intent(this, MatchmakingActivity.class)));
+        btnHotMatchAccept.setOnClickListener(v ->
+                startActivity(new Intent(this, MatchmakingActivity.class)));
+        btnFloatingBook.setOnClickListener(v ->
+                startActivity(new Intent(this, FindPitchActivity.class)));
+        tvHotSeeAll.setOnClickListener(v ->
+                startActivity(new Intent(this, MatchmakingActivity.class)));
+        tvSuggestedMore.setOnClickListener(v ->
+                startActivity(new Intent(this, FindPitchActivity.class)));
     }
 
     private void loadData() {
-        tvAvatar.setText(getString(R.string.mock_avatar_initials));
-        tvUpcomingCount.setText(getString(R.string.mock_upcoming_count));
-        tvTrustScore.setText(getString(R.string.mock_trust_score));
-        tvMessageCount.setText(getString(R.string.mock_message_count));
-        tvHotMatchAvatar.setText(getString(R.string.mock_hot_match_initials));
-        tvHotMatchScore.setText(getString(R.string.mock_hot_match_score));
+        sessionManager = new SessionManager(this);
+        fieldViewModel = new ViewModelProvider(this).get(FieldViewModel.class);
 
-        List<SuggestedFieldItem> suggestedFields = new ArrayList<>();
-        suggestedFields.add(new SuggestedFieldItem(
-                1,
-                getString(R.string.mock_field_name_1),
-                "https://via.placeholder.com/300",
-                getString(R.string.suggested_field_type_7),
-                4.8f,
-                "2.3km",
-                true));
-        suggestedFields.add(new SuggestedFieldItem(
-                2,
-                getString(R.string.mock_field_name_2),
-                "https://via.placeholder.com/300",
-                getString(R.string.suggested_field_type_5),
-                4.6f,
-                "3.1km",
-                false));
-        suggestedFields.add(new SuggestedFieldItem(
-                3,
-                getString(R.string.mock_field_name_3),
-                "https://via.placeholder.com/300",
-                getString(R.string.suggested_field_type_7),
-                4.9f,
-                "1.2km",
-                true));
+        // Load Avatar initials and info from session
+        try {
+            JSONObject userJson = new JSONObject(sessionManager.getUserJson());
+            String fullName = userJson.optString("fullName", "User");
+            if (!fullName.isEmpty()) {
+                tvAvatar.setText(fullName.substring(0, 1).toUpperCase());
+            }
+        } catch (Exception e) {
+            tvAvatar.setText("U");
+        }
 
-        suggestedFieldAdapter = new SuggestedFieldAdapter(suggestedFields, item ->
-                showToast(R.string.toast_select_field));
-        rvSuggestedFields.setAdapter(suggestedFieldAdapter);
+        // TODO: Real API for UpcomingCount, TrustScore, Hot Matches
+        tvUpcomingCount.setText("2");
+        tvTrustScore.setText("98");
+        tvMessageCount.setText("1");
+        tvHotMatchAvatar.setText("A");
+        tvHotMatchScore.setText("4.5");
+
+        fieldViewModel.filteredFields.observe(this, fields -> {
+            if (fields == null) return;
+            List<SuggestedFieldItem> suggestedFields = new ArrayList<>();
+            for (Field field : fields) {
+                suggestedFields.add(new SuggestedFieldItem(
+                        field.getId(),
+                        field.getName(),
+                        field.getImageUrl(),
+                        field.getFieldType() != null ? field.getFieldType() : "Sân 5",
+                        4.5f, // Mock rating
+                        "2.0km", // Mock distance
+                        field.isAvailable()
+                ));
+            }
+            suggestedFieldAdapter = new SuggestedFieldAdapter(suggestedFields, item -> {
+                android.content.Intent intent = new android.content.Intent(MainActivity.this, FieldDetailActivity.class);
+                intent.putExtra("fieldId", item.getId());
+                startActivity(intent);
+            });
+            rvSuggestedFields.setAdapter(suggestedFieldAdapter);
+        });
+
+        fieldViewModel.loadFields();
     }
 
-    private void showToast(int messageResId) {
-        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
-    }
 }

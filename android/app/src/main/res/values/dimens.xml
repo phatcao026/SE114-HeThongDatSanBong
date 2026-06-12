@@ -2,10 +2,16 @@
 <resources>
     <!-- Radius -->
     <dimen name="radius_pill">100dp</dimen>
-    <dimen name="radius_card">24dp</dimen>
-    <dimen name="radius_nav">16dp</dimen>
+    <dimen name="radius_card">20dp</dimen>
+    <dimen name="radius_nav">14dp</dimen>
     <dimen name="radius_badge">100dp</dimen>
     <dimen name="radius_image">12dp</dimen>
+    <dimen name="radius_xs">4dp</dimen>
+    <dimen name="radius_sm">6dp</dimen>
+    <dimen name="radius_md">10dp</dimen>
+    <dimen name="radius_lg">14dp</dimen>
+    <dimen name="radius_xl">20dp</dimen>
+    <dimen name="radius_2xl">28dp</dimen>
 
     <!-- Elevation -->
     <dimen name="shadow_sm">2dp</dimen>
@@ -41,7 +47,9 @@
     <dimen name="overlap_container">-10dp</dimen>
 
     <!-- Bottom nav -->
-    <dimen name="nav_container_height">112dp</dimen>
+    <dimen name="nav_container_height">88dp</dimen>
+    <dimen name="nav_active_pill_width">64dp</dimen>
+    <dimen name="nav_active_pill_height">32dp</dimen>
     <dimen name="nav_dot_size">6dp</dimen>
 
     <!-- TYPOGRAPHY SIZES -->
@@ -62,6 +70,7 @@
 
     <!-- BUTTON SIZING -->
     <dimen name="button_height">44dp</dimen>
+    <dimen name="button_height_large">52dp</dimen>
     <dimen name="button_height_small">40dp</dimen>
     <dimen name="button_padding_horizontal">16dp</dimen>
     <dimen name="button_padding_vertical">12dp</dimen>
@@ -90,6 +99,8 @@
     <!-- HOME SCREEN-SPECIFIC -->
     <dimen name="home_suggested_card_width">220dp</dimen>
     <dimen name="home_suggested_image_height">120dp</dimen>
+    <dimen name="find_field_cover_height">128dp</dimen>
+    <dimen name="field_detail_cover_height">240dp</dimen>
     <dimen name="home_badge_overlap">-2dp</dimen>
     <dimen name="home_hero_title_min">20sp</dimen>
     <dimen name="home_hero_title_max">24sp</dimen>

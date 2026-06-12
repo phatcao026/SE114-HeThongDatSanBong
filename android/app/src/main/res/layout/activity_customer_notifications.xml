@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_secondary"
+    tools:context=".ui.customer.NotificationsActivity">
+
+    <!-- App bar -->
+    <LinearLayout
+        android:id="@+id/layoutNotifBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/spacing_2"
+        android:paddingVertical="@dimen/spacing_2"
+        android:background="@color/background_secondary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/ivNotifBack"
+            android:layout_width="@dimen/spacing_8"
+            android:layout_height="@dimen/spacing_8"
+            android:padding="@dimen/spacing_2"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/text_primary"
+            android:background="@drawable/bg_icon_button_light"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/cd_back" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/spacing_2"
+            android:text="@string/notifications_title"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_heading3"
+            android:textStyle="bold"
+            android:fontFamily="@font/bricolage_grotesque" />
+
+        <ImageView
+            android:id="@+id/ivMarkAllRead"
+            android:layout_width="@dimen/spacing_8"
+            android:layout_height="@dimen/spacing_8"
+            android:padding="@dimen/spacing_2"
+            android:src="@drawable/ic_check"
+            app:tint="@color/text_primary"
+            android:background="@drawable/bg_icon_button_light"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/cd_mark_all_read" />
+    </LinearLayout>
+
+    <!-- Notifications list -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvNotifications"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/spacing_3"
+        android:clipToPadding="false"
+        android:paddingHorizontal="@dimen/spacing_4"
+        android:paddingBottom="@dimen/spacing_8"
+        app:layout_constraintTop_toBottomOf="@id/layoutNotifBar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tvEmptyNotifications"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:gravity="center"
+        android:text="@string/empty_notifications"
+        android:textColor="@color/text_secondary"
+        android:textSize="@dimen/text_body_large"
+        android:fontFamily="@font/be_vietnam_pro"
+        android:layout_marginHorizontal="@dimen/spacing_6"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

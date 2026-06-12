@@ -25,7 +25,7 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
+        setContentView(R.layout.activity_auth_register);
 
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
 
@@ -45,11 +45,10 @@ public class RegisterActivity extends AppCompatActivity {
                 btnRegister.setEnabled(false);
             } else if (resource.status == Resource.Status.SUCCESS) {
                 btnRegister.setEnabled(true);
-                Toast.makeText(RegisterActivity.this, "Đăng ký thành công. Vui lòng đăng nhập.", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                Toast.makeText(RegisterActivity.this, "Đăng ký thành công.", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(RegisterActivity.this, com.example.timsanbong.ui.customer.MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
-                finish();
             } else {
                 btnRegister.setEnabled(true);
                 Toast.makeText(RegisterActivity.this, resource.message, Toast.LENGTH_SHORT).show();

@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_secondary"
+    tools:context=".ui.auth.LoginActivity">
+
+    <ImageView
+        android:id="@+id/ivHeader"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="@null"
+        android:scaleType="centerCrop"
+        android:background="@color/primary_light"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/scrollContainer"
+        android:layout_marginBottom="@dimen/overlap_wave" />
+
+    <ImageView
+        android:id="@+id/ivWave"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/spacing_96"
+        android:contentDescription="@null"
+        android:scaleType="fitXY"
+        app:srcCompat="@drawable/bg_wave"
+        app:layout_constraintBottom_toTopOf="@id/scrollContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ScrollView
+        android:id="@+id/scrollContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_rounded_top"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- ViewFlipper: 0=Login, 1=ForgotEmail, 2=VerifyOTP, 3=ResetPassword -->
+        <ViewFlipper
+            android:id="@+id/viewFlipper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Page 0: Login Form -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_6">
+
+                <TextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/login"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_heading1"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/bricolage_grotesque" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilEmail"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_5"
+                    android:hint="@string/email"
+                    app:boxCornerRadiusBottomEnd="@dimen/radius_button"
+                    app:boxCornerRadiusBottomStart="@dimen/radius_button"
+                    app:boxCornerRadiusTopEnd="@dimen/radius_button"
+                    app:boxCornerRadiusTopStart="@dimen/radius_button"
+                    app:boxStrokeColor="@color/border">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textEmailAddress"
+                        android:textSize="@dimen/text_body_medium"
+                        android:textColor="@color/text_primary" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilPassword"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_3"
+                    android:hint="@string/password"
+                    app:endIconMode="password_toggle"
+                    app:boxCornerRadiusBottomEnd="@dimen/radius_button"
+                    app:boxCornerRadiusBottomStart="@dimen/radius_button"
+                    app:boxCornerRadiusTopEnd="@dimen/radius_button"
+                    app:boxCornerRadiusTopStart="@dimen/radius_button"
+                    app:boxStrokeColor="@color/border">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:textSize="@dimen/text_body_medium"
+                        android:textColor="@color/text_primary" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/tvForgotPassword"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_2"
+                    android:layout_gravity="end"
+                    android:text="Quên mật khẩu?"
+                    android:textColor="@color/primary"
+                    android:textSize="@dimen/text_body_small"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnLogin"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_marginTop="@dimen/spacing_5"
+                    android:text="@string/login"
+                    android:textSize="@dimen/text_body_large"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_on_primary"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    app:backgroundTint="@color/primary"
+                    app:cornerRadius="@dimen/radius_button"
+                    app:elevation="0dp" />
+
+                <!-- Divider with OR -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_5"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"
+                        android:background="@color/border" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/spacing_4"
+                        android:text="hoặc"
+                        android:textColor="@color/text_hint"
+                        android:textSize="@dimen/text_body_small"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"
+                        android:background="@color/border" />
+                </LinearLayout>
+
+                <!-- Google Sign In Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnGoogle"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_marginTop="@dimen/spacing_4"
+                    android:text="Đăng nhập với Google"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textColor="@color/text_primary"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    app:cornerRadius="@dimen/radius_button"
+                    app:icon="@drawable/ic_google"
+                    app:iconGravity="textStart"
+                    app:iconPadding="@dimen/spacing_2"
+                    app:iconTint="@null"
+                    app:strokeColor="@color/border"
+                    app:elevation="0dp" />
+
+                <TextView
+                    android:id="@+id/tvRegisterLink"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_5"
+                    android:layout_marginBottom="@dimen/spacing_4"
+                    android:gravity="center"
+                    android:text="Chưa có tài khoản? Đăng ký ngay"
+                    android:textColor="@color/primary"
+                    android:textSize="@dimen/text_body_medium"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+            </LinearLayout>
+
+            <!-- Page 1: Forgot Password - Enter Email -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_6">
+
+                <ImageView
+                    android:id="@+id/btnBackFromForgot"
+                    android:layout_width="@dimen/spacing_40"
+                    android:layout_height="@dimen/spacing_40"
+                    android:padding="@dimen/spacing_2"
+                    android:src="@drawable/ic_arrow_back"
+                    app:tint="@color/text_primary"
+                    android:contentDescription="@string/cd_back"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_4"
+                    android:text="Quên mật khẩu"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_heading1"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/bricolage_grotesque" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_2"
+                    android:text="Nhập email của bạn để nhận mã OTP"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="@dimen/text_body_medium"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilForgotEmail"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_5"
+                    android:hint="@string/email"
+                    app:boxCornerRadiusBottomEnd="@dimen/radius_button"
+                    app:boxCornerRadiusBottomStart="@dimen/radius_button"
+                    app:boxCornerRadiusTopEnd="@dimen/radius_button"
+                    app:boxCornerRadiusTopStart="@dimen/radius_button"
+                    app:boxStrokeColor="@color/border">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textEmailAddress"
+                        android:textSize="@dimen/text_body_medium"
+                        android:textColor="@color/text_primary" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSendOtp"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_marginTop="@dimen/spacing_5"
+                    android:text="Gửi mã OTP"
+                    android:textSize="@dimen/text_body_large"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_on_primary"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    app:backgroundTint="@color/primary"
+                    app:cornerRadius="@dimen/radius_button"
+                    app:elevation="0dp" />
+
+            </LinearLayout>
+
+            <!-- Page 2: Verify OTP -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_6">
+
+                <ImageView
+                    android:id="@+id/btnBackFromOtp"
+                    android:layout_width="@dimen/spacing_40"
+                    android:layout_height="@dimen/spacing_40"
+                    android:padding="@dimen/spacing_2"
+                    android:src="@drawable/ic_arrow_back"
+                    app:tint="@color/text_primary"
+                    android:contentDescription="@string/cd_back"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_4"
+                    android:text="Nhập mã OTP"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_heading1"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/bricolage_grotesque" />
+
+                <TextView
+                    android:id="@+id/tvOtpHint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_2"
+                    android:text="Mã OTP đã được gửi đến email của bạn"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="@dimen/text_body_medium"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilOtp"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_5"
+                    android:hint="Mã OTP"
+                    app:boxCornerRadiusBottomEnd="@dimen/radius_button"
+                    app:boxCornerRadiusBottomStart="@dimen/radius_button"
+                    app:boxCornerRadiusTopEnd="@dimen/radius_button"
+                    app:boxCornerRadiusTopStart="@dimen/radius_button"
+                    app:boxStrokeColor="@color/border">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textSize="@dimen/text_body_medium"
+                        android:textColor="@color/text_primary" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnVerifyOtp"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_marginTop="@dimen/spacing_5"
+                    android:text="Xác nhận OTP"
+                    android:textSize="@dimen/text_body_large"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_on_primary"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    app:backgroundTint="@color/primary"
+                    app:cornerRadius="@dimen/radius_button"
+                    app:elevation="0dp" />
+
+            </LinearLayout>
+
+            <!-- Page 3: Reset Password -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_6">
+
+                <ImageView
+                    android:id="@+id/btnBackFromReset"
+                    android:layout_width="@dimen/spacing_40"
+                    android:layout_height="@dimen/spacing_40"
+                    android:padding="@dimen/spacing_2"
+                    android:src="@drawable/ic_arrow_back"
+                    app:tint="@color/text_primary"
+                    android:contentDescription="@string/cd_back"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_4"
+                    android:text="Đặt mật khẩu mới"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_heading1"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/bricolage_grotesque" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilNewPassword"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_5"
+                    android:hint="Mật khẩu mới"
+                    app:endIconMode="password_toggle"
+                    app:boxCornerRadiusBottomEnd="@dimen/radius_button"
+                    app:boxCornerRadiusBottomStart="@dimen/radius_button"
+                    app:boxCornerRadiusTopEnd="@dimen/radius_button"
+                    app:boxCornerRadiusTopStart="@dimen/radius_button"
+                    app:boxStrokeColor="@color/border">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:textSize="@dimen/text_body_medium"
+                        android:textColor="@color/text_primary" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilConfirmPassword"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_3"
+                    android:hint="Xác nhận mật khẩu"
+                    app:endIconMode="password_toggle"
+                    app:boxCornerRadiusBottomEnd="@dimen/radius_button"
+                    app:boxCornerRadiusBottomStart="@dimen/radius_button"
+                    app:boxCornerRadiusTopEnd="@dimen/radius_button"
+                    app:boxCornerRadiusTopStart="@dimen/radius_button"
+                    app:boxStrokeColor="@color/border">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:textSize="@dimen/text_body_medium"
+                        android:textColor="@color/text_primary" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnResetPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_marginTop="@dimen/spacing_5"
+                    android:text="Đặt lại mật khẩu"
+                    android:textSize="@dimen/text_body_large"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_on_primary"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    app:backgroundTint="@color/primary"
+                    app:cornerRadius="@dimen/radius_button"
+                    app:elevation="0dp" />
+
+            </LinearLayout>
+
+        </ViewFlipper>
+    </ScrollView>
+
+    <!-- Loading overlay -->
+    <FrameLayout
+        android:id="@+id/layoutLoading"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#80000000"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ProgressBar
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center" />
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

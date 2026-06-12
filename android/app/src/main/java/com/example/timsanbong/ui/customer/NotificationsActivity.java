@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,12 +22,13 @@ public class NotificationsActivity extends AppCompatActivity {
     private TextView tvEmptyNotifications;
 
     // ── Data ─────────────────────────────────────────────
-    private NotificationAdapter notificationAdapter;
+    private NotificationAdapter adapter;
+    private NotificationViewModel notificationViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_notifications);
+        setContentView(R.layout.activity_customer_notifications);
         initViews();
         setupListeners();
         loadData();
@@ -37,8 +39,8 @@ public class NotificationsActivity extends AppCompatActivity {
         tvEmptyNotifications = findViewById(R.id.tvEmptyNotifications);
 
         rvNotifications.setLayoutManager(new LinearLayoutManager(this));
-        notificationAdapter = new NotificationAdapter(new ArrayList<>());
-        rvNotifications.setAdapter(notificationAdapter);
+        adapter = new NotificationAdapter(new ArrayList<>());
+        rvNotifications.setAdapter(adapter);
     }
 
     private void setupListeners() {
@@ -49,10 +51,27 @@ public class NotificationsActivity extends AppCompatActivity {
     }
 
     private void loadData() {
-        List<AppNotification> list = buildMockNotifications();
-        notificationAdapter.updateNotifications(list);
-        tvEmptyNotifications.setVisibility(list.isEmpty() ? View.VISIBLE : View.GONE);
-        rvNotifications.setVisibility(list.isEmpty() ? View.GONE : View.VISIBLE);
+        notificationViewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
+        
+        notificationViewModel.notificationsState.observe(this, resource -> {
+            if (resource == null) return;
+            if (resource.status == com.example.timsanbong.utils.Resource.Status.SUCCESS && resource.data != null) {
+                List<AppNotification> list = resource.data;
+                if (list.isEmpty()) {
+                    list = buildMockNotifications();
+                }
+                adapter.updateNotifications(list);
+                tvEmptyNotifications.setVisibility(list.isEmpty() ? View.VISIBLE : View.GONE);
+                rvNotifications.setVisibility(list.isEmpty() ? View.GONE : View.VISIBLE);
+            } else if (resource.status == com.example.timsanbong.utils.Resource.Status.ERROR) {
+                List<AppNotification> list = buildMockNotifications();
+                adapter.updateNotifications(list);
+                tvEmptyNotifications.setVisibility(list.isEmpty() ? View.VISIBLE : View.GONE);
+                rvNotifications.setVisibility(list.isEmpty() ? View.GONE : View.VISIBLE);
+            }
+        });
+        
+        notificationViewModel.loadNotifications(0, 50);
     }
 
     private List<AppNotification> buildMockNotifications() {

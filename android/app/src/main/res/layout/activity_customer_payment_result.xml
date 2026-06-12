@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_secondary"
+    tools:context=".ui.customer.PaymentResultActivity">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:paddingHorizontal="@dimen/spacing_6"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Success/Cancel Icon -->
+        <ImageView
+            android:id="@+id/ivResultIcon"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:src="@drawable/ic_check_circle"
+            app:tint="@color/primary"
+            android:contentDescription="@null" />
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/tvResultTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_6"
+            android:gravity="center"
+            android:text="@string/payment_success_title"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_heading2"
+            android:textStyle="bold"
+            android:fontFamily="@font/bricolage_grotesque" />
+
+        <!-- Message -->
+        <TextView
+            android:id="@+id/tvResultMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_3"
+            android:gravity="center"
+            android:text="@string/payment_success_message"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_body_large"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:lineSpacingMultiplier="1.4" />
+
+        <!-- Booking Info Card (shown on success) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardBookingInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_6"
+            app:cardCornerRadius="@dimen/radius_card"
+            app:cardBackgroundColor="@color/background_primary"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/border_gray">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_4">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Mã đặt sân"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/text_body_small"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                    <TextView
+                        android:id="@+id/tvBookingId"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_body_medium"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        tools:text="#BK-12345" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_2"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Trạng thái"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/text_body_small"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                    <TextView
+                        android:id="@+id/tvStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="@dimen/spacing_2"
+                        android:paddingVertical="2dp"
+                        android:background="@drawable/bg_badge_green"
+                        android:text="Đã đặt cọc"
+                        android:textColor="@color/badge_green_text"
+                        android:textSize="@dimen/text_caption"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                </LinearLayout>
+
+                <!-- Deposit paid row -->
+                <LinearLayout
+                    android:id="@+id/rowDeposit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_2"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/deposit_paid_row"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/text_body_small"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                    <TextView
+                        android:id="@+id/tvDepositPaid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/primary_dark"
+                        android:textSize="@dimen/text_body_medium"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        tools:text="105.000 đ" />
+                </LinearLayout>
+
+                <!-- Remainder row -->
+                <LinearLayout
+                    android:id="@+id/rowRemainder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_2"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/remainder_row"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/text_body_small"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                    <TextView
+                        android:id="@+id/tvRemainderAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_body_medium"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        tools:text="245.000 đ" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Primary CTA -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPrimary"
+            style="@style/Widget.TimSanBong.Button.Filled"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height_large"
+            android:layout_marginTop="@dimen/spacing_6"
+            android:text="@string/action_back_home"
+            android:textSize="@dimen/text_body_large"
+            android:textStyle="bold"
+            android:textColor="@color/text_on_primary"
+            android:fontFamily="@font/be_vietnam_pro"
+            app:backgroundTint="@color/primary"
+            app:cornerRadius="@dimen/radius_button"
+            app:elevation="0dp" />
+
+        <!-- Secondary CTA -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSecondary"
+            style="@style/Widget.TimSanBong.Button.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginTop="@dimen/spacing_3"
+            android:text="@string/action_view_bookings"
+            android:textSize="@dimen/text_body_large"
+            android:textColor="@color/primary"
+            android:fontFamily="@font/be_vietnam_pro"
+            app:cornerRadius="@dimen/radius_button"
+            app:strokeColor="@color/primary" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

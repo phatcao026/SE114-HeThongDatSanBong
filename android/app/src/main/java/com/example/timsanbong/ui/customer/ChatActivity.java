@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -40,11 +41,12 @@ public class ChatActivity extends AppCompatActivity {
     // ── Data ─────────────────────────────────────────────
     private ChatMessageAdapter chatAdapter;
     private Conversation conversation;
+    private ChatViewModel chatViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
+        setContentView(R.layout.activity_customer_chat);
         conversation = (Conversation) getIntent().getSerializableExtra(Constants.EXTRA_CONVERSATION);
         initViews();
         setupListeners();
@@ -102,21 +104,57 @@ public class ChatActivity extends AppCompatActivity {
                 (android.graphics.drawable.GradientDrawable) viewChatAvatarBg.getBackground().mutate();
         avatarBg.setColor(ContextCompat.getColor(this, R.color.primary));
 
-        List<ChatMessage> messages = buildMockMessages();
-        for (ChatMessage msg : messages) {
-            chatAdapter.addMessage(msg);
-        }
-        scrollToBottom();
+        chatViewModel = new ViewModelProvider(this).get(ChatViewModel.class);
+        chatViewModel.messagesState.observe(this, resource -> {
+            if (resource == null) return;
+            if (resource.status == com.example.timsanbong.utils.Resource.Status.SUCCESS && resource.data != null) {
+                List<ChatMessage> messages = resource.data;
+                if (messages.isEmpty()) {
+                    messages = buildMockMessages();
+                }
+                for (ChatMessage msg : messages) {
+                    chatAdapter.addMessage(msg);
+                }
+                scrollToBottom();
+            } else if (resource.status == com.example.timsanbong.utils.Resource.Status.ERROR) {
+                List<ChatMessage> messages = buildMockMessages();
+                for (ChatMessage msg : messages) {
+                    chatAdapter.addMessage(msg);
+                }
+                scrollToBottom();
+            }
+        });
+
+        chatViewModel.sendMessageState.observe(this, resource -> {
+            if (resource == null) return;
+            if (resource.status == com.example.timsanbong.utils.Resource.Status.SUCCESS && resource.data != null) {
+                chatAdapter.addMessage(resource.data);
+                etChatInput.setText("");
+                scrollToBottom();
+            }
+        });
+
+        long convId = 1; // Assuming conversation object has getId as String, we parse or use default
+        try {
+            convId = Long.parseLong(conversation.getId());
+        } catch (Exception ignored) {}
+        
+        chatViewModel.loadMessages(convId, 0, 50);
     }
 
     private void sendMessage() {
         String text = etChatInput.getText().toString().trim();
         if (text.isEmpty()) return;
 
-        String time = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
-        chatAdapter.addMessage(new ChatMessage(ChatMessage.SIDE_ME, text, time));
-        etChatInput.setText("");
-        scrollToBottom();
+        com.example.timsanbong.data.model.MessageRequest req = new com.example.timsanbong.data.model.MessageRequest();
+        long convId = 1;
+        try {
+            convId = Long.parseLong(conversation.getId());
+        } catch (Exception ignored) {}
+        req.setConversationId(convId);
+        req.setContent(text);
+        
+        chatViewModel.sendMessage(req);
     }
 
     private void scrollToBottom() {

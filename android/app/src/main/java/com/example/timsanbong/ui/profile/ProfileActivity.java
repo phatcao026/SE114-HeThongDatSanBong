@@ -10,31 +10,44 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.timsanbong.R;
 import com.example.timsanbong.ui.auth.LoginActivity;
-import com.example.timsanbong.ui.customer.MyBookingsActivity;
 import com.example.timsanbong.utils.NavBarManager;
 import com.example.timsanbong.utils.Resource;
 import com.google.android.material.button.MaterialButton;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private TextView tvName, tvEmail, tvPhone;
-    private MaterialButton btnMyBookings, btnLogout;
+    private TextView tvName, tvEmail, tvTrustScore;
+    private android.widget.ProgressBar pbTrustScore;
+    private TextView tabPersonalInfo, tabBookingHistory;
+    private android.view.View cardPersonalInfo, layoutBookingHistory;
+    private MaterialButton btnLogout;
     private NavBarManager navBarManager;
     private ProfileViewModel profileViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
+        setContentView(R.layout.activity_profile_main);
 
         tvName = findViewById(R.id.tvName);
         tvEmail = findViewById(R.id.tvEmail);
-        tvPhone = findViewById(R.id.tvPhone);
-        btnMyBookings = findViewById(R.id.btnMyBookings);
+        tvTrustScore = findViewById(R.id.tvTrustScore);
+        pbTrustScore = findViewById(R.id.pbTrustScore);
+        tabPersonalInfo = findViewById(R.id.tabPersonalInfo);
+        tabBookingHistory = findViewById(R.id.tabBookingHistory);
+        cardPersonalInfo = findViewById(R.id.cardPersonalInfo);
+        layoutBookingHistory = findViewById(R.id.layoutBookingHistory);
         btnLogout = findViewById(R.id.btnLogout);
+        android.widget.ImageView btnSettings = findViewById(R.id.btnSettings);
 
-        btnMyBookings.setOnClickListener(v -> startActivity(new Intent(this, MyBookingsActivity.class)));
         btnLogout.setOnClickListener(v -> profileViewModel.logout());
+        
+        btnSettings.setOnClickListener(v -> {
+            startActivity(new Intent(this, com.example.timsanbong.ui.customer.TeamManagementActivity.class));
+        });
+        
+        setupTabs();
+        animateTrustScore(92); // Mock trust score
 
         navBarManager = new NavBarManager(this, NavBarManager.ITEM_HOME);
         navBarManager.setup();
@@ -47,7 +60,6 @@ public class ProfileActivity extends AppCompatActivity {
             } else if (resource.status == Resource.Status.SUCCESS) {
                 tvName.setText(resource.data.getFullName());
                 tvEmail.setText(resource.data.getEmail());
-                tvPhone.setText(resource.data.getPhone());
             } else {
                 Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
             }
@@ -63,5 +75,41 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         profileViewModel.loadProfile();
+    }
+    
+    private void setupTabs() {
+        tabPersonalInfo.setOnClickListener(v -> {
+            tabPersonalInfo.setBackgroundResource(R.drawable.bg_segment_active);
+            tabPersonalInfo.setTextColor(getColor(R.color.text_on_primary));
+            tabPersonalInfo.setTypeface(null, android.graphics.Typeface.BOLD);
+            
+            tabBookingHistory.setBackgroundResource(android.R.color.transparent);
+            tabBookingHistory.setTextColor(getColor(R.color.text_secondary));
+            tabBookingHistory.setTypeface(null, android.graphics.Typeface.NORMAL);
+            
+            cardPersonalInfo.setVisibility(android.view.View.VISIBLE);
+            layoutBookingHistory.setVisibility(android.view.View.GONE);
+        });
+        
+        tabBookingHistory.setOnClickListener(v -> {
+            tabBookingHistory.setBackgroundResource(R.drawable.bg_segment_active);
+            tabBookingHistory.setTextColor(getColor(R.color.text_on_primary));
+            tabBookingHistory.setTypeface(null, android.graphics.Typeface.BOLD);
+            
+            tabPersonalInfo.setBackgroundResource(android.R.color.transparent);
+            tabPersonalInfo.setTextColor(getColor(R.color.text_secondary));
+            tabPersonalInfo.setTypeface(null, android.graphics.Typeface.NORMAL);
+            
+            cardPersonalInfo.setVisibility(android.view.View.GONE);
+            layoutBookingHistory.setVisibility(android.view.View.VISIBLE);
+        });
+    }
+    
+    private void animateTrustScore(int score) {
+        tvTrustScore.setText(score + "/100");
+        android.animation.ObjectAnimator animation = android.animation.ObjectAnimator.ofInt(pbTrustScore, "progress", 0, score);
+        animation.setDuration(1000);
+        animation.setInterpolator(new android.view.animation.DecelerateInterpolator());
+        animation.start();
     }
 }
