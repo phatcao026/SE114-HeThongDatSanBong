@@ -15,6 +15,8 @@ public class TeamResponse {
     private Enums.TeamMemberStatus memberStatus;
     private LocalDateTime createdAt;
 
+    private Long conversationId;
+
     public Long getId() {
         return id;
     }
@@ -85,5 +87,13 @@ public class TeamResponse {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Long getConversationId() {
+        return conversationId;
+    }
+
+    public void setConversationId(Long conversationId) {
+        this.conversationId = conversationId;
     }
 }

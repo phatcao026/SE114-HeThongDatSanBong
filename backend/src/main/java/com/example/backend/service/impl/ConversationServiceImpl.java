@@ -248,6 +248,7 @@ public class ConversationServiceImpl implements ConversationService {
         ConversationResponse response = new ConversationResponse();
         response.setId(conversation.getId());
         response.setType(conversation.getType());
+        response.setName(conversation.getName());
         response.setMemberIds(members.stream().map(ConversationMember::getUserId).toList());
         response.setMemberNames(members.stream()
                 .map(member -> usersById.get(member.getUserId()))

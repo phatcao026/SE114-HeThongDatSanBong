@@ -18,13 +18,15 @@ public class Conversation {
     @Enumerated(EnumType.STRING)
     private Enums.ConversationType type;
 
+    private String name;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "conversation")
+    @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ConversationMember> members;
 
-    @OneToMany(mappedBy = "conversation")
+    @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages;
 
 }
