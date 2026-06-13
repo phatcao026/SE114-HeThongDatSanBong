@@ -1,7 +1,10 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.request.TeamCreateRequest;
+import com.example.backend.dto.request.TeamInvitationDecisionRequest;
+import com.example.backend.dto.request.TeamInviteRequest;
 import com.example.backend.dto.request.TeamUpdateRequest;
+import com.example.backend.dto.response.TeamMemberResponse;
 import com.example.backend.dto.response.TeamResponse;
 import com.example.backend.service.TeamService;
 import com.example.backend.utils.Enums;
@@ -41,6 +44,18 @@ public class TeamController {
         return ResponseEntity.ok(teamService.getMyTeams());
     }
 
+    @GetMapping("/invitations/my")
+    public ResponseEntity<List<TeamMemberResponse>> getMyInvitations() {
+        return ResponseEntity.ok(teamService.getMyInvitations());
+    }
+
+    @PutMapping("/invitations/{invitationId}")
+    public ResponseEntity<TeamMemberResponse> respondToInvitation(
+            @PathVariable Long invitationId,
+            @Valid @RequestBody TeamInvitationDecisionRequest request) {
+        return ResponseEntity.ok(teamService.respondToInvitation(invitationId, request));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<TeamResponse> getTeamById(@PathVariable Long id) {
         return ResponseEntity.ok(teamService.getTeamById(id));
@@ -60,5 +75,22 @@ public class TeamController {
     @DeleteMapping("/{id}")
     public ResponseEntity<TeamResponse> deleteTeam(@PathVariable Long id) {
         return ResponseEntity.ok(teamService.deleteTeam(id));
+    }
+
+    @GetMapping("/{id}/members")
+    public ResponseEntity<List<TeamMemberResponse>> getTeamMembers(@PathVariable Long id) {
+        return ResponseEntity.ok(teamService.getTeamMembers(id));
+    }
+
+    @PostMapping("/{id}/invite")
+    public ResponseEntity<TeamMemberResponse> inviteMember(@PathVariable Long id,
+                                                           @Valid @RequestBody TeamInviteRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(teamService.inviteMember(id, request));
+    }
+
+    @DeleteMapping("/{id}/members/{memberId}")
+    public ResponseEntity<TeamMemberResponse> removeMember(@PathVariable Long id,
+                                                           @PathVariable Long memberId) {
+        return ResponseEntity.ok(teamService.removeMember(id, memberId));
     }
 }
