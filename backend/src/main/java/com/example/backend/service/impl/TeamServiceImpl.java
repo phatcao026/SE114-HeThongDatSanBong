@@ -9,10 +9,15 @@ import com.example.backend.dto.response.TeamResponse;
 import com.example.backend.entity.Team;
 import com.example.backend.entity.TeamMember;
 import com.example.backend.entity.User;
+import com.example.backend.entity.Conversation;
+import com.example.backend.entity.ConversationMember;
+import com.example.backend.entity.ConversationMemberId;
 import com.example.backend.exception.AppException;
 import com.example.backend.repository.TeamMemberRepository;
 import com.example.backend.repository.TeamRepository;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.repository.ConversationRepository;
+import com.example.backend.repository.ConversationMemberRepository;
 import com.example.backend.service.NotificationService;
 import com.example.backend.service.TeamService;
 import com.example.backend.utils.Enums;
@@ -35,15 +40,21 @@ public class TeamServiceImpl implements TeamService {
     private final TeamMemberRepository teamMemberRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final ConversationRepository conversationRepository;
+    private final ConversationMemberRepository conversationMemberRepository;
 
     public TeamServiceImpl(TeamRepository teamRepository,
                            TeamMemberRepository teamMemberRepository,
                            UserRepository userRepository,
-                           NotificationService notificationService) {
+                           NotificationService notificationService,
+                           ConversationRepository conversationRepository,
+                           ConversationMemberRepository conversationMemberRepository) {
         this.teamRepository = teamRepository;
         this.teamMemberRepository = teamMemberRepository;
         this.userRepository = userRepository;
         this.notificationService = notificationService;
+        this.conversationRepository = conversationRepository;
+        this.conversationMemberRepository = conversationMemberRepository;
     }
 
     @Override
@@ -93,11 +104,23 @@ public class TeamServiceImpl implements TeamService {
         userRepository.findById(currentUserId)
                 .orElseThrow(() -> new AppException(404, "User not found"));
 
+        Conversation conversation = new Conversation();
+        conversation.setType(Enums.ConversationType.TEAM);
+        conversation.setName(cleanRequired(request.getName(), "Team name is required"));
+        conversation.setCreatedAt(LocalDateTime.now());
+        Conversation savedConversation = conversationRepository.save(conversation);
+
+        ConversationMember captainMember = new ConversationMember();
+        captainMember.setConversationId(savedConversation.getId());
+        captainMember.setUserId(currentUserId);
+        conversationMemberRepository.save(captainMember);
+
         Team team = new Team();
         team.setName(cleanRequired(request.getName(), "Team name is required"));
         team.setDescription(cleanOptional(request.getDescription()));
         team.setLevel(request.getLevel());
         team.setCaptainId(currentUserId);
+        team.setConversationId(savedConversation.getId());
         team.setCreatedAt(LocalDateTime.now());
 
         Team savedTeam = teamRepository.save(team);
@@ -112,7 +135,14 @@ public class TeamServiceImpl implements TeamService {
         ensureCanManageTeam(team);
 
         if (request.getName() != null) {
-            team.setName(cleanRequired(request.getName(), "Team name is required"));
+            String cleanName = cleanRequired(request.getName(), "Team name is required");
+            team.setName(cleanName);
+            if (team.getConversationId() != null) {
+                conversationRepository.findById(team.getConversationId()).ifPresent(conv -> {
+                    conv.setName(cleanName);
+                    conversationRepository.save(conv);
+                });
+            }
         }
         if (request.getDescription() != null) {
             team.setDescription(cleanOptional(request.getDescription()));
@@ -130,10 +160,14 @@ public class TeamServiceImpl implements TeamService {
         Team team = findTeam(id);
         ensureCanManageTeam(team);
 
+        Long conversationId = team.getConversationId();
         TeamResponse response = toResponse(team);
         try {
             teamRepository.delete(team);
             teamRepository.flush();
+            if (conversationId != null) {
+                conversationRepository.deleteById(conversationId);
+            }
             return response;
         } catch (DataIntegrityViolationException ex) {
             throw new AppException(409, "Cannot delete team that is linked to another feature");
@@ -205,6 +239,9 @@ public class TeamServiceImpl implements TeamService {
 
         TeamMemberResponse response = toMemberResponse(member);
         teamMemberRepository.delete(member);
+        if (team.getConversationId() != null) {
+            conversationMemberRepository.deleteById(new ConversationMemberId(team.getConversationId(), member.getUserId()));
+        }
         return response;
     }
 
@@ -234,6 +271,15 @@ public class TeamServiceImpl implements TeamService {
         boolean accepted = Boolean.TRUE.equals(request.getAccept());
         invitation.setStatus(accepted ? Enums.TeamMemberStatus.ACCEPTED : Enums.TeamMemberStatus.REJECTED);
         TeamMember savedInvitation = teamMemberRepository.save(invitation);
+
+        if (accepted && team.getConversationId() != null) {
+            if (!conversationMemberRepository.existsByConversationIdAndUserId(team.getConversationId(), currentUserId)) {
+                ConversationMember member = new ConversationMember();
+                member.setConversationId(team.getConversationId());
+                member.setUserId(currentUserId);
+                conversationMemberRepository.save(member);
+            }
+        }
 
         if (team.getCaptainId() != null) {
             String message = accepted
@@ -319,6 +365,7 @@ public class TeamServiceImpl implements TeamService {
         response.setCreatedAt(team.getCreatedAt());
         response.setIsCaptain(isCaptain);
         response.setMemberStatus(memberStatus);
+        response.setConversationId(team.getConversationId());
 
         User captain = team.getCaptain();
         if (captain != null) {

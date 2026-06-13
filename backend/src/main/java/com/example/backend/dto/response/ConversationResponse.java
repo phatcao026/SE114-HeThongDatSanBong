@@ -16,6 +16,8 @@ public class ConversationResponse {
     private LocalDateTime lastMessageCreatedAt;
     private LocalDateTime createdAt;
 
+    private String name;
+
     public Long getId() {
         return id;
     }
@@ -86,5 +88,13 @@ public class ConversationResponse {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

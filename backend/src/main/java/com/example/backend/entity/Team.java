@@ -25,9 +25,16 @@ public class Team {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "conversation_id")
+    private Long conversationId;
+
     @ManyToOne
     @JoinColumn(name = "captain_id", insertable = false, updatable = false)
     private User captain;
+
+    @OneToOne
+    @JoinColumn(name = "conversation_id", insertable = false, updatable = false)
+    private Conversation conversation;
 
     // getters & setters
     public Team() {}
@@ -50,6 +57,12 @@ public class Team {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
+    public Long getConversationId() { return conversationId; }
+    public void setConversationId(Long conversationId) { this.conversationId = conversationId; }
+
     public User getCaptain() { return captain; }
     public void setCaptain(User captain) { this.captain = captain; }
+
+    public Conversation getConversation() { return conversation; }
+    public void setConversation(Conversation conversation) { this.conversation = conversation; }
 }
