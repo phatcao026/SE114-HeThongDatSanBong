@@ -11,6 +11,8 @@ public class TeamResponse {
     private Long captainId;
     private String captainName;
     private Enums.TeamLevel level;
+    private Boolean isCaptain;
+    private Enums.TeamMemberStatus memberStatus;
     private LocalDateTime createdAt;
 
     public Long getId() {
@@ -59,6 +61,22 @@ public class TeamResponse {
 
     public void setLevel(Enums.TeamLevel level) {
         this.level = level;
+    }
+
+    public Boolean getIsCaptain() {
+        return isCaptain;
+    }
+
+    public void setIsCaptain(Boolean captain) {
+        isCaptain = captain;
+    }
+
+    public Enums.TeamMemberStatus getMemberStatus() {
+        return memberStatus;
+    }
+
+    public void setMemberStatus(Enums.TeamMemberStatus memberStatus) {
+        this.memberStatus = memberStatus;
     }
 
     public LocalDateTime getCreatedAt() {
