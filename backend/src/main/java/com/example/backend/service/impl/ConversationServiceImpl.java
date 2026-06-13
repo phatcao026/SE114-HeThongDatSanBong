@@ -20,6 +20,8 @@ import com.example.backend.utils.TokenUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -41,17 +43,23 @@ public class ConversationServiceImpl implements ConversationService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final StringRedisTemplate redisTemplate;
 
     public ConversationServiceImpl(ConversationRepository conversationRepository,
                                    ConversationMemberRepository conversationMemberRepository,
                                    MessageRepository messageRepository,
                                    UserRepository userRepository,
-                                   NotificationService notificationService) {
+                                   NotificationService notificationService,
+                                   SimpMessagingTemplate messagingTemplate,
+                                   StringRedisTemplate redisTemplate) {
         this.conversationRepository = conversationRepository;
         this.conversationMemberRepository = conversationMemberRepository;
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
         this.notificationService = notificationService;
+        this.messagingTemplate = messagingTemplate;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
@@ -112,7 +120,13 @@ public class ConversationServiceImpl implements ConversationService {
 
     @Override
     public List<MessageResponse> getMessages(Long conversationId) {
-        ensureConversationMember(conversationId);
+        Long currentUserId = TokenUtils.getCurrentUserId();
+        ensureConversationMember(conversationId, currentUserId);
+
+        // Reset Redis unread count for this user in this conversation
+        String key = "unread_count:" + currentUserId + ":" + conversationId;
+        redisTemplate.delete(key);
+
         List<Message> messages = messageRepository.findByConversationIdOrderByCreatedAtAsc(conversationId);
         return toMessageResponses(messages);
     }
@@ -130,8 +144,23 @@ public class ConversationServiceImpl implements ConversationService {
         message.setCreatedAt(LocalDateTime.now());
 
         Message savedMessage = messageRepository.save(message);
+        MessageResponse response = toMessageResponse(savedMessage);
+
+        // Broadcast to WebSocket topic
+        String destination = "/topic/conversations/" + conversationId;
+        messagingTemplate.convertAndSend(destination, response);
+
+        // Increment Redis unread counters for other members
+        List<ConversationMember> members = conversationMemberRepository.findByConversationId(conversationId);
+        for (ConversationMember member : members) {
+            if (!member.getUserId().equals(currentUserId)) {
+                String key = "unread_count:" + member.getUserId() + ":" + conversationId;
+                redisTemplate.opsForValue().increment(key);
+            }
+        }
+
         notifyConversationMembers(savedMessage);
-        return toMessageResponse(savedMessage);
+        return response;
     }
 
     private ConversationResponse createConversation(Enums.ConversationType type, List<Long> memberIds) {
@@ -262,6 +291,16 @@ public class ConversationServiceImpl implements ConversationService {
             response.setLastMessageCreatedAt(lastMessage.getCreatedAt());
         }
         response.setCreatedAt(conversation.getCreatedAt());
+
+        try {
+            Long currentUserId = TokenUtils.getCurrentUserId();
+            String key = "unread_count:" + currentUserId + ":" + conversation.getId();
+            String val = redisTemplate.opsForValue().get(key);
+            response.setUnreadCount(val != null ? Integer.parseInt(val) : 0);
+        } catch (Exception ex) {
+            response.setUnreadCount(0);
+        }
+
         return response;
     }
 

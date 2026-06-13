@@ -17,6 +17,7 @@ public class ConversationResponse {
     private LocalDateTime createdAt;
 
     private String name;
+    private Integer unreadCount;
 
     public Long getId() {
         return id;
@@ -96,5 +97,13 @@ public class ConversationResponse {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Integer getUnreadCount() {
+        return unreadCount;
+    }
+
+    public void setUnreadCount(Integer unreadCount) {
+        this.unreadCount = unreadCount;
     }
 }
