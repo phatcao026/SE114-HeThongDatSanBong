@@ -9,7 +9,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.timsanbong.R;
+import com.example.timsanbong.ui.profile.ProfileActivity;
 import com.example.timsanbong.utils.NavBarManager;
+import android.content.Intent;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 
@@ -68,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
+        tvAvatar.setOnClickListener(v -> startActivity(new Intent(this, ProfileActivity.class)));
         btnNotifications.setOnClickListener(v -> showToast(R.string.notifications_title));
         btnSearchNearby.setOnClickListener(v -> showToast(R.string.action_search_nearby));
         btnMatchmaking.setOnClickListener(v -> showToast(R.string.matchmaking_title));

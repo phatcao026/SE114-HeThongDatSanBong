@@ -17,6 +17,7 @@ import com.example.timsanbong.R;
 import com.example.timsanbong.data.api.ApiClient;
 import com.example.timsanbong.data.model.User;
 import com.google.android.material.button.MaterialButton;
+import android.content.Intent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +43,16 @@ public class AdminUserActivity extends AppCompatActivity {
         adapter = new AdminUserAdapter(new ArrayList<>());
         rvUsers.setAdapter(adapter);
         rvUsers.setNestedScrollingEnabled(false);
+
+        adapter.setOnItemClickListener(user -> {
+            Intent intent = new Intent(this, AdminUserDetailActivity.class);
+            intent.putExtra("userId", user.getId());
+            intent.putExtra("fullName", user.getFullName());
+            intent.putExtra("email", user.getEmail());
+            intent.putExtra("phone", user.getPhone());
+            intent.putExtra("role", user.getRole());
+            startActivity(intent);
+        });
 
         fetchUsers();
         setupFilters();
@@ -71,9 +82,23 @@ public class AdminUserActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<User>> call, Throwable t) {
-                Toast.makeText(AdminUserActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AdminUserActivity.this, "Lỗi kết nối - Sử dụng dữ liệu demo", Toast.LENGTH_SHORT).show();
+                setupDemoUsers();
             }
         });
+    }
+
+    private void setupDemoUsers() {
+        allUsers = new ArrayList<>();
+        allUsers.add(new User(101, "Nguyễn Văn A", "admin@test.com", "0901234567", "ADMIN"));
+        allUsers.add(new User(102, "Trần Thị B", "owner@test.com", "0902345678", "OWNER"));
+        allUsers.add(new User(103, "Lê Văn C", "player@test.com", "0903456789", "PLAYER"));
+        allUsers.add(new User(104, "Phạm Minh D", "user4@test.com", "0904567890", "PLAYER"));
+        allUsers.add(new User(105, "Hoàng Anh E", "user5@test.com", "0905678901", "PLAYER"));
+        
+        adapter.updateList(allUsers);
+        TextView tvCount = findViewById(R.id.tvUserCount);
+        tvCount.setText(allUsers.size() + " người dùng");
     }
 
     private void setupFilters() {
@@ -144,6 +169,16 @@ public class AdminUserActivity extends AppCompatActivity {
 
     static class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.ViewHolder> {
         private final List<User> users;
+        private OnItemClickListener listener;
+
+        public interface OnItemClickListener {
+            void onItemClick(User user);
+        }
+
+        public void setOnItemClickListener(OnItemClickListener listener) {
+            this.listener = listener;
+        }
+
         AdminUserAdapter(List<User> users) { this.users = users; }
 
         public void updateList(List<User> newList) {
@@ -171,6 +206,10 @@ public class AdminUserActivity extends AppCompatActivity {
             
             holder.tvStatus.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#F0FDF4")));
             holder.tvStatus.setTextColor(android.graphics.Color.parseColor("#60D86E"));
+
+            holder.itemView.setOnClickListener(v -> {
+                if (listener != null) listener.onItemClick(user);
+            });
         }
 
         @Override

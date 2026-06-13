@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -151,6 +152,10 @@ public class AdminAuditActivity extends AppCompatActivity {
             holder.tvPriority.setBackgroundTintList(ColorStateList.valueOf(bgColorInt));
             
             holder.vAccent.setBackgroundColor(colorInt);
+
+            holder.itemView.setOnClickListener(v -> {
+                Toast.makeText(v.getContext(), "Xem chi tiết: " + report.title, Toast.LENGTH_SHORT).show();
+            });
         }
 
         @Override
