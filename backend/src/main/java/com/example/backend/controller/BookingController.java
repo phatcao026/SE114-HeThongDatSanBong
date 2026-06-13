@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.example.backend.utils.Enums;
 
 import java.util.List;
 
@@ -58,5 +60,22 @@ public class BookingController {
     @PutMapping("/{id}/complete")
     public ResponseEntity<BookingResponse> completeBooking(@PathVariable Long id) {
         return ResponseEntity.ok(bookingService.completeBooking(id));
+    }
+
+    @PutMapping("/{id}/check-in")
+    public ResponseEntity<BookingResponse> checkInBooking(@PathVariable Long id) {
+        return ResponseEntity.ok(bookingService.checkInBooking(id));
+    }
+
+    @PostMapping("/{id}/check-out")
+    public ResponseEntity<BookingResponse> checkOutBooking(
+            @PathVariable Long id,
+            @RequestParam(required = false, defaultValue = "CASH") Enums.PaymentMethod paymentMethod) {
+        return ResponseEntity.ok(bookingService.checkOutBooking(id, paymentMethod));
+    }
+
+    @PutMapping("/{id}/no-show")
+    public ResponseEntity<BookingResponse> markAsNoShow(@PathVariable Long id) {
+        return ResponseEntity.ok(bookingService.markAsNoShow(id));
     }
 }

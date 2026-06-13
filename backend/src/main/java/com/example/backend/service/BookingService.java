@@ -19,4 +19,10 @@ public interface BookingService {
     BookingResponse confirmBooking(Long id);
 
     BookingResponse completeBooking(Long id);
+
+    BookingResponse checkInBooking(Long id);
+
+    BookingResponse checkOutBooking(Long id, com.example.backend.utils.Enums.PaymentMethod paymentMethod);
+
+    BookingResponse markAsNoShow(Long id);
 }

@@ -4,10 +4,12 @@ import com.example.backend.dto.request.BookingCreateRequest;
 import com.example.backend.dto.response.BookingResponse;
 import com.example.backend.entity.Booking;
 import com.example.backend.entity.Field;
+import com.example.backend.entity.Payment;
 import com.example.backend.entity.TimeSlot;
 import com.example.backend.exception.AppException;
 import com.example.backend.repository.BookingRepository;
 import com.example.backend.repository.FieldRepository;
+import com.example.backend.repository.PaymentRepository;
 import com.example.backend.repository.TimeSlotRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.service.BookingLockService;
@@ -45,19 +47,22 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final BookingLockService bookingLockService;
+    private final PaymentRepository paymentRepository;
 
     public BookingServiceImpl(BookingRepository bookingRepository,
                               FieldRepository fieldRepository,
                               TimeSlotRepository timeSlotRepository,
                               UserRepository userRepository,
                               NotificationService notificationService,
-                              BookingLockService bookingLockService) {
+                              BookingLockService bookingLockService,
+                              PaymentRepository paymentRepository) {
         this.bookingRepository = bookingRepository;
         this.fieldRepository = fieldRepository;
         this.timeSlotRepository = timeSlotRepository;
         this.userRepository = userRepository;
         this.notificationService = notificationService;
         this.bookingLockService = bookingLockService;
+        this.paymentRepository = paymentRepository;
     }
 
     @Override
@@ -343,6 +348,88 @@ public class BookingServiceImpl implements BookingService {
         response.setUpdatedAt(booking.getUpdatedAt());
         response.setMessage(message);
         return response;
+    }
+
+    @Override
+    @Transactional
+    public BookingResponse checkInBooking(Long id) {
+        Booking booking = findBooking(id);
+        ensureCanManageBooking(booking);
+
+        if (booking.getStatus() != Enums.BookingStatus.DEPOSIT_PAID
+                && booking.getStatus() != Enums.BookingStatus.CONFIRMED) {
+            throw new AppException(400, "Trạng thái đơn không hợp lệ để Check-in. Đơn phải ở trạng thái ĐÃ CỌC hoặc ĐÃ XÁC NHẬN.");
+        }
+
+        booking.setStatus(Enums.BookingStatus.CONFIRMED);
+        booking.setUpdatedAt(LocalDateTime.now());
+        Booking savedBooking = bookingRepository.save(booking);
+
+        notifyBookingUpdate(savedBooking, "Check-in thành công",
+                "Bạn đã được check-in cho ca đá ở sân #" + savedBooking.getFieldId() + ".");
+
+        return toResponse(savedBooking, "Check-in thành công! Khách đã nhận sân.");
+    }
+
+    @Override
+    @Transactional
+    public BookingResponse checkOutBooking(Long id, Enums.PaymentMethod paymentMethod) {
+        Booking booking = findBooking(id);
+        ensureCanManageBooking(booking);
+
+        if (booking.getStatus() == Enums.BookingStatus.COMPLETED) {
+            throw new AppException(400, "Đơn này đã được thanh toán và hoàn tất trước đó rồi!");
+        }
+
+        if (booking.getStatus() == Enums.BookingStatus.CANCELLED) {
+            throw new AppException(400, "Đơn này đã bị hủy, không thể check-out.");
+        }
+
+        BigDecimal total = booking.getTotalAmount() != null ? booking.getTotalAmount() : BigDecimal.ZERO;
+        BigDecimal deposit = booking.getDepositAmount() != null ? booking.getDepositAmount() : BigDecimal.ZERO;
+        BigDecimal remaining = total.subtract(deposit);
+
+        booking.setStatus(Enums.BookingStatus.COMPLETED);
+        booking.setUpdatedAt(LocalDateTime.now());
+        Booking savedBooking = bookingRepository.save(booking);
+
+        if (remaining.compareTo(BigDecimal.ZERO) > 0) {
+            Payment restOfAmount = new Payment();
+            restOfAmount.setBookingId(savedBooking.getId());
+            restOfAmount.setUserId(savedBooking.getUserId());
+            restOfAmount.setAmount(remaining);
+            restOfAmount.setPaymentMethod(paymentMethod != null ? paymentMethod : Enums.PaymentMethod.CASH);
+            restOfAmount.setStatus(Enums.PaymentStatus.SUCCESS);
+            restOfAmount.setCreatedAt(LocalDateTime.now());
+
+            paymentRepository.save(restOfAmount);
+        }
+
+        notifyBookingUpdate(savedBooking, "✅ Ca đá đã hoàn tất!",
+                "Chủ sân đã xác nhận thu đủ tiền và hoàn tất ca đá của bạn. Cảm ơn bạn!");
+
+        return toResponse(savedBooking, "Check-out thành công. Khách thanh toán nốt: " + remaining + " VND qua hình thức " + paymentMethod);
+    }
+
+    @Override
+    @Transactional
+    public BookingResponse markAsNoShow(Long id) {
+        Booking booking = findBooking(id);
+        ensureCanManageBooking(booking);
+
+        if (booking.getStatus() != Enums.BookingStatus.DEPOSIT_PAID
+                && booking.getStatus() != Enums.BookingStatus.CONFIRMED) {
+            throw new AppException(400, "Chỉ có thể đánh dấu bùng kèo với đơn đã cọc hoặc đã xác nhận.");
+        }
+
+        booking.setStatus(Enums.BookingStatus.CANCELLED);
+        booking.setUpdatedAt(LocalDateTime.now());
+        Booking savedBooking = bookingRepository.save(booking);
+
+        notifyBookingUpdate(savedBooking, "Vắng mặt (No-Show)",
+                "Bạn đã không đến nhận sân đúng giờ. Đơn đặt sân đã bị hủy và cọc được tịch thu.");
+
+        return toResponse(savedBooking, "Đã đánh dấu khách không đến. Tịch thu cọc thành công!");
     }
 
     private String cleanOptional(String value) {
