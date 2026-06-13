@@ -1,8 +1,13 @@
 package com.example.backend.repository;
 
 import com.example.backend.entity.MatchPost;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,4 +23,8 @@ public interface MatchPostRepository extends JpaRepository<MatchPost, Long>, Jpa
     List<MatchPost> findByStatusOrderByCreatedAtDesc(com.example.backend.utils.Enums.PostStatus status);
 
     long countByStatus(com.example.backend.utils.Enums.PostStatus status);
+
+    @EntityGraph(attributePaths = {"user"})
+    @Query("SELECT m FROM MatchPost m WHERE m.status = 'OPEN' AND m.userId != :currentUserId ORDER BY m.createdAt DESC")
+    Page<MatchPost> findPotentialMatches(@Param("currentUserId") Long currentUserId, Pageable pageable);
 }

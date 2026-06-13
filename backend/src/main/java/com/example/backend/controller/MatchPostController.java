@@ -5,6 +5,7 @@ import com.example.backend.dto.request.MatchPostUpdateRequest;
 import com.example.backend.dto.request.MatchRequestCreateRequest;
 import com.example.backend.dto.response.MatchPostResponse;
 import com.example.backend.dto.response.MatchRequestResponse;
+import com.example.backend.dto.response.RecommendedMatchResponse;
 import com.example.backend.service.MatchPostService;
 import com.example.backend.service.MatchRequestService;
 import com.example.backend.utils.Enums;
@@ -44,6 +45,12 @@ public class MatchPostController {
             @RequestParam(required = false) Long fieldId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return ResponseEntity.ok(matchPostService.getMatchPosts(status, postType, skillLevel, fieldId, date));
+    }
+
+    @GetMapping("/recommendations")
+    public ResponseEntity<List<RecommendedMatchResponse>> getSmartRecommendations(
+            @RequestParam String playstyleNote) {
+        return ResponseEntity.ok(matchPostService.getSmartRecommendations(playstyleNote));
     }
 
     @GetMapping("/my")
