@@ -33,7 +33,7 @@ public class BookingViewModel extends AndroidViewModel {
 
     public void loadMyBookings() {
         _bookingsState.setValue(Resource.loading(null));
-        bookingRepository.getMyBookings(getApplication(), new RepositoryCallback<List<Booking>>() {
+        bookingRepository.getBookings(getApplication(), new RepositoryCallback<List<Booking>>() {
             @Override
             public void onSuccess(List<Booking> data) {
                 _bookingsState.postValue(Resource.success(data));
@@ -46,9 +46,13 @@ public class BookingViewModel extends AndroidViewModel {
         });
     }
 
-    public void createBooking(long fieldId, String bookingDate, String startTime, String endTime) {
+    public void createBooking(long fieldId, long timeSlotId, String bookingDate) {
         _bookingCreateState.setValue(Resource.loading(null));
-        bookingRepository.createBooking(getApplication(), fieldId, bookingDate, startTime, endTime,
+        com.example.timsanbong.data.model.BookingRequest request = new com.example.timsanbong.data.model.BookingRequest();
+        request.setFieldId(fieldId);
+        request.setTimeSlotId(timeSlotId);
+        request.setBookingDate(bookingDate);
+        bookingRepository.createBooking(getApplication(), request,
                 new RepositoryCallback<Booking>() {
                     @Override
                     public void onSuccess(Booking data) {

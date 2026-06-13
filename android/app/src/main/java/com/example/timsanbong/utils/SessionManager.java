@@ -37,7 +37,24 @@ public class SessionManager {
         return getToken() != null;
     }
 
+    public void saveUserId(long userId) {
+        prefs.edit().putLong(Constants.KEY_USER_ID, userId).apply();
+    }
+
+    public long getUserId() {
+        return prefs.getLong(Constants.KEY_USER_ID, -1);
+    }
+
+    public void saveUserRole(String role) {
+        prefs.edit().putString(Constants.KEY_USER_ROLE, role).apply();
+    }
+
     public String getUserRole() {
+        String role = prefs.getString(Constants.KEY_USER_ROLE, null);
+        if (role != null && !role.trim().isEmpty()) {
+            return role;
+        }
+
         String json = getUserJson();
         if (json == null) return "PLAYER";
         try {
@@ -46,6 +63,14 @@ public class SessionManager {
         } catch (JSONException e) {
             return "PLAYER";
         }
+    }
+
+    public void saveUserEmail(String email) {
+        prefs.edit().putString(Constants.KEY_USER_EMAIL, email).apply();
+    }
+
+    public String getUserEmail() {
+        return prefs.getString(Constants.KEY_USER_EMAIL, null);
     }
 
     public boolean isAdmin() {

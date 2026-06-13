@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_secondary"
+    tools:context=".ui.customer.ChatActivity">
+
+    <!-- Chat header -->
+    <LinearLayout
+        android:id="@+id/layoutChatHeader"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/spacing_2"
+        android:paddingVertical="@dimen/spacing_2"
+        android:background="@color/background_primary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Back button -->
+        <ImageView
+            android:id="@+id/ivChatBack"
+            android:layout_width="@dimen/spacing_8"
+            android:layout_height="@dimen/spacing_8"
+            android:padding="@dimen/spacing_2"
+            android:src="@android:drawable/ic_media_previous"
+            app:tint="@color/text_secondary"
+            android:background="@drawable/ripple_primary"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/cd_back" />
+
+        <!-- Avatar with online dot -->
+        <FrameLayout
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="@dimen/spacing_2">
+
+            <View
+                android:id="@+id/viewChatAvatarBg"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/shape_oval" />
+
+            <TextView
+                android:id="@+id/tvChatInitials"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textColor="@color/text_on_primary"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/be_vietnam_pro" />
+
+            <View
+                android:id="@+id/viewChatOnlineDot"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_gravity="bottom|end"
+                android:background="@drawable/shape_oval"
+                android:backgroundTint="@color/success"
+                android:visibility="gone" />
+        </FrameLayout>
+
+        <!-- Name + status -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/spacing_3"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvChatName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/be_vietnam_pro"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/tvChatStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_hint"
+                android:textSize="11sp"
+                android:fontFamily="@font/be_vietnam_pro" />
+        </LinearLayout>
+
+        <!-- Phone icon -->
+        <ImageView
+            android:id="@+id/ivChatCall"
+            android:layout_width="@dimen/spacing_8"
+            android:layout_height="@dimen/spacing_8"
+            android:padding="@dimen/spacing_2"
+            android:src="@drawable/ic_phone"
+            app:tint="@color/text_secondary"
+            android:background="@drawable/ripple_primary"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/cd_call" />
+
+        <!-- More options -->
+        <ImageView
+            android:id="@+id/ivChatMore"
+            android:layout_width="@dimen/spacing_8"
+            android:layout_height="@dimen/spacing_8"
+            android:padding="@dimen/spacing_2"
+            android:src="@drawable/ic_more_vert"
+            app:tint="@color/text_secondary"
+            android:background="@drawable/ripple_primary"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/cd_more_options" />
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:id="@+id/dividerHeader"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/border"
+        app:layout_constraintTop_toBottomOf="@id/layoutChatHeader"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Messages list -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMessages"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingVertical="@dimen/spacing_3"
+        app:layout_constraintTop_toBottomOf="@id/dividerHeader"
+        app:layout_constraintBottom_toTopOf="@id/layoutComposer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Composer -->
+    <LinearLayout
+        android:id="@+id/layoutComposer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/spacing_3"
+        android:paddingVertical="@dimen/spacing_3"
+        android:background="@color/background_primary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Attach -->
+        <ImageView
+            android:id="@+id/ivAttach"
+            android:layout_width="@dimen/spacing_8"
+            android:layout_height="@dimen/spacing_8"
+            android:padding="@dimen/spacing_2"
+            android:src="@drawable/ic_attach"
+            app:tint="@color/text_secondary"
+            android:background="@drawable/ripple_primary"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/cd_attach_file" />
+
+        <!-- Input container -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="@dimen/spacing_2"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:minHeight="@dimen/button_height"
+            android:paddingHorizontal="@dimen/spacing_4"
+            android:background="@drawable/bg_search_input">
+
+            <EditText
+                android:id="@+id/etChatInput"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/chat_input_hint"
+                android:background="@android:color/transparent"
+                android:textSize="14sp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_hint"
+                android:fontFamily="@font/be_vietnam_pro"
+                android:inputType="textMultiLine"
+                android:maxLines="4" />
+        </LinearLayout>
+
+        <!-- Send button -->
+        <ImageView
+            android:id="@+id/ivSend"
+            android:layout_width="@dimen/spacing_8"
+            android:layout_height="@dimen/spacing_8"
+            android:padding="@dimen/spacing_2"
+            android:src="@drawable/ic_send"
+            app:tint="@color/text_on_primary"
+            android:background="@drawable/bg_avatar_circle"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/cd_send_message" />
+    </LinearLayout>
+
+    <!-- Top divider for composer -->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/border"
+        app:layout_constraintBottom_toTopOf="@id/layoutComposer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,16 +1,6 @@
 package com.example.timsanbong.data.api;
 
-import com.example.timsanbong.data.model.AdminDashboardOverviewResponse;
-import com.example.timsanbong.data.model.AuthResponse;
-import com.example.timsanbong.data.model.Booking;
-import com.example.timsanbong.data.model.Field;
-import com.example.timsanbong.data.model.FieldCreateRequest;
-import com.example.timsanbong.data.model.FieldUpdateRequest;
-import com.example.timsanbong.data.model.PaymentResponse;
-import com.example.timsanbong.data.model.TimeSlot;
-import com.example.timsanbong.data.model.TimeSlotCreateRequest;
-import com.example.timsanbong.data.model.TimeSlotUpdateRequest;
-import com.example.timsanbong.data.model.User;
+import com.example.timsanbong.data.model.*;
 
 import java.util.List;
 import java.util.Map;
@@ -33,25 +23,131 @@ public interface ApiService {
     @POST("auth/register")
     Call<AuthResponse> register(@Body Map<String, String> body);
 
+    @POST("auth/forgot-password")
+    Call<Void> forgotPassword(@Body Map<String, String> body);
+
+    @POST("auth/verify-otp")
+    Call<Void> verifyOtp(@Body Map<String, String> body);
+
+    @POST("auth/reset-password")
+    Call<Void> resetPassword(@Body Map<String, String> body);
+
+    @GET("auth/google-url")
+    Call<GoogleUrlResponse> getGoogleUrl();
+
+    @POST("auth/google-sync")
+    Call<AuthResponse> googleSync(@Body Map<String, String> body);
+
+    // Users / profile
+    @GET("users/me")
+    Call<User> getMyProfile();
+
+    @PUT("users/{id}")
+    Call<User> updateUser(@Path("id") long id, @Body User user);
+
     // Fields
     @GET("fields")
     Call<List<Field>> getFields();
 
-    @GET("fields")
-    Call<List<Field>> searchFields(@Query("keyword") String keyword);
-
     @GET("fields/{id}")
     Call<Field> getFieldById(@Path("id") long id);
 
-    // Bookings
+    @GET("fields/{id}/availability")
+    Call<List<TimeSlotResponse>> getTimeslots(@Path("id") long id, @Query("date") String date);
+
+    // Player bookings
     @POST("bookings")
-    Call<Booking> createBooking(@Body Map<String, Object> body);
+    Call<Booking> createBooking(@Body BookingRequest body);
 
     @GET("bookings")
-    Call<List<Booking>> getMyBookings();
+    Call<List<Booking>> getBookings();
+
+    @GET("bookings/{id}")
+    Call<Booking> getBookingById(@Path("id") long id);
 
     @PUT("bookings/{id}/cancel")
     Call<Booking> cancelBooking(@Path("id") long id);
+
+    // Payments
+    @POST("payments/create-session/{bookingId}")
+    Call<CheckoutSessionResponse> createCheckoutSession(@Path("bookingId") long bookingId);
+
+    // Match posts
+    @GET("match-posts")
+    Call<PageResponse<MatchPost>> getMatchPosts(@Query("page") int page,
+                                                @Query("size") int size,
+                                                @Query("postType") String postType);
+
+    @POST("match-posts")
+    Call<MatchPost> createMatchPost(@Body MatchPostRequest request);
+
+    @PUT("match-posts/{id}")
+    Call<MatchPost> updateMatchPost(@Path("id") long id, @Body MatchPostRequest request);
+
+    @DELETE("match-posts/{id}")
+    Call<Void> deleteMatchPost(@Path("id") long id);
+
+    @GET("match-posts/me")
+    Call<PageResponse<MatchPost>> getMyMatchPosts(@Query("page") int page, @Query("size") int size);
+
+    // Match requests
+    @POST("match-requests")
+    Call<MatchRequestResponse> createMatchRequest(@Body Map<String, Long> body);
+
+    @PUT("match-requests/{id}/status")
+    Call<MatchRequestResponse> updateMatchRequestStatus(@Path("id") long id,
+                                                        @Body MatchRequestStatusUpdate update);
+
+    // Teams
+    @GET("teams/me")
+    Call<List<TeamResponse>> getMyTeams();
+
+    @POST("teams")
+    Call<TeamResponse> createTeam(@Body TeamRequest request);
+
+    @PUT("teams/{id}")
+    Call<TeamResponse> updateTeam(@Path("id") long id, @Body TeamRequest request);
+
+    @DELETE("teams/{id}")
+    Call<Void> deleteTeam(@Path("id") long id);
+
+    @GET("teams/invitations/me")
+    Call<List<InvitationResponse>> getInvitations();
+
+    @PUT("teams/invitations/{id}")
+    Call<Void> respondToInvitation(@Path("id") long id, @Body Map<String, String> body);
+
+    // Conversations & messages
+    @GET("conversations")
+    Call<List<Conversation>> getConversations();
+
+    @GET("conversations/unread-count")
+    Call<UnreadCountResponse> getUnreadConversationCount();
+
+    @GET("messages")
+    Call<PageResponse<ChatMessage>> getMessages(@Query("conversationId") long conversationId,
+                                                @Query("page") int page,
+                                                @Query("size") int size);
+
+    @POST("messages")
+    Call<ChatMessage> sendMessage(@Body MessageRequest request);
+
+    // Notifications
+    @GET("notifications")
+    Call<PageResponse<AppNotification>> getNotifications(@Query("page") int page, @Query("size") int size);
+
+    @GET("notifications/unread-count")
+    Call<UnreadCountResponse> getUnreadNotificationCount();
+
+    @PUT("notifications/{id}/read")
+    Call<Void> markNotificationRead(@Path("id") long id);
+
+    @PUT("notifications/read-all")
+    Call<Void> markAllNotificationsRead();
+
+    // Reviews
+    @POST("fairplay/reviews")
+    Call<Void> submitReview(@Body ReviewRequest request);
 
     // Owner fields
     @POST("fields")
@@ -67,7 +163,8 @@ public interface ApiService {
     Call<TimeSlot> createOwnerTimeSlot(@Path("id") long fieldId, @Body TimeSlotCreateRequest request);
 
     @PUT("fields/{id}/time-slots/{slotId}")
-    Call<TimeSlot> updateOwnerTimeSlot(@Path("id") long fieldId, @Path("slotId") long slotId,
+    Call<TimeSlot> updateOwnerTimeSlot(@Path("id") long fieldId,
+                                       @Path("slotId") long slotId,
                                        @Body TimeSlotUpdateRequest request);
 
     @DELETE("fields/{id}/time-slots/{slotId}")
@@ -85,10 +182,6 @@ public interface ApiService {
 
     @PUT("bookings/{id}/cancel")
     Call<Booking> cancelOwnerBooking(@Path("id") long id);
-
-    // Profile
-    @GET("users/me")
-    Call<User> getMyProfile();
 
     // Admin
     @GET("admin/overview")

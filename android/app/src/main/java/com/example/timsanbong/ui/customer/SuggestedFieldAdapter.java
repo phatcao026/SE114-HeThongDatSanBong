@@ -36,7 +36,7 @@ public class SuggestedFieldAdapter extends RecyclerView.Adapter<SuggestedFieldAd
     @NonNull
     @Override
     public SuggestedFieldViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_suggested_field, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_customer_suggested_field, parent, false);
         return new SuggestedFieldViewHolder(view);
     }
 
@@ -76,13 +76,14 @@ public class SuggestedFieldAdapter extends RecyclerView.Adapter<SuggestedFieldAd
             String imageUrl = item.getImageUrl();
             if (imageUrl == null || imageUrl.trim().isEmpty()) {
                 Glide.with(itemView.getContext())
-                        .load(R.drawable.ic_launcher_bg)
+                        .load(R.drawable.bg_pitch_cover)
                         .centerCrop()
                         .into(ivFieldImage);
             } else {
                 Glide.with(itemView.getContext())
                         .load(imageUrl)
-                        .placeholder(R.drawable.ic_launcher_bg)
+                        .placeholder(R.drawable.bg_pitch_cover)
+                        .error(R.drawable.bg_pitch_cover)
                         .centerCrop()
                         .into(ivFieldImage);
             }

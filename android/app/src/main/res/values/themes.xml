@@ -4,19 +4,82 @@
         <item name="colorPrimary">@color/brand</item>
         <item name="colorPrimaryVariant">@color/brand_dark</item>
         <item name="colorOnPrimary">@color/white</item>
-        <item name="colorSecondary">@color/brand_light</item>
+        <item name="colorSecondary">@color/accent_orange</item>
         <item name="colorOnSecondary">@color/text_title</item>
-        <item name="android:statusBarColor">@color/brand</item>
+        <item name="fontFamily">@font/be_vietnam_pro</item>
+        <item name="android:fontFamily">@font/be_vietnam_pro</item>
+        <item name="android:statusBarColor">@color/background_secondary</item>
+        <item name="android:navigationBarColor">@color/primary</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <style name="Theme.TimSanBong.NoActionBar" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/brand</item>
         <item name="colorPrimaryVariant">@color/brand_dark</item>
         <item name="colorOnPrimary">@color/white</item>
-        <item name="colorSecondary">@color/brand_light</item>
+        <item name="colorSecondary">@color/accent_orange</item>
         <item name="colorOnSecondary">@color/text_title</item>
-        <item name="android:statusBarColor">@color/brand</item>
+        <item name="fontFamily">@font/be_vietnam_pro</item>
+        <item name="android:fontFamily">@font/be_vietnam_pro</item>
+        <item name="android:statusBarColor">@color/background_secondary</item>
+        <item name="android:navigationBarColor">@color/primary</item>
+        <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowBackground">@color/background</item>
+        <item name="materialButtonStyle">@style/Widget.TimSanBong.Button.Filled</item>
+        <item name="chipStyle">@style/Widget.TimSanBong.Chip.Choice</item>
+    </style>
+
+    <style name="TextAppearance.TimSanBong" parent="TextAppearance.MaterialComponents.Body1" />
+
+    <style name="TextAppearance.TimSanBong.Display">
+        <item name="android:fontFamily">@font/bricolage_grotesque</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Widget.TimSanBong.Button.Filled" parent="Widget.MaterialComponents.Button">
+        <item name="android:fontFamily">@font/be_vietnam_pro</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">@dimen/button_height</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
+        <item name="backgroundTint">@color/primary</item>
+        <item name="android:textColor">@color/text_on_primary</item>
+        <item name="elevation">0dp</item>
+    </style>
+
+    <style name="Widget.TimSanBong.Button.Flood" parent="Widget.TimSanBong.Button.Filled">
+        <item name="backgroundTint">@color/accent_orange</item>
+        <item name="rippleColor">@color/accent_orange_dark</item>
+    </style>
+
+    <style name="Widget.TimSanBong.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:fontFamily">@font/be_vietnam_pro</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
+        <item name="strokeColor">@color/primary_dark</item>
+        <item name="android:textColor">@color/primary_dark</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+    </style>
+
+    <style name="Widget.TimSanBong.Chip.Choice" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="android:fontFamily">@font/be_vietnam_pro</item>
+        <item name="android:textColor">@color/chip_text_color_state</item>
+        <item name="chipBackgroundColor">@color/chip_bg_color_state</item>
+        <item name="chipStrokeColor">@color/border_gray</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="checkedIconVisible">true</item>
+        <item name="checkedIconTint">@color/primary_dark</item>
+        <item name="chipMinHeight">36dp</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.TimSanBong.Pill</item>
+    </style>
+
+    <style name="ShapeAppearance.TimSanBong" parent="ShapeAppearance.MaterialComponents.SmallComponent" />
+
+    <style name="ShapeAppearance.TimSanBong.Pill">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/radius_pill</item>
     </style>
 
     <!-- BottomSheet -->

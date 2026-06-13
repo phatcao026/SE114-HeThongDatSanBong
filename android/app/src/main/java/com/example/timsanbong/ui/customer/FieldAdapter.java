@@ -38,7 +38,7 @@ public class FieldAdapter extends RecyclerView.Adapter<FieldAdapter.FieldViewHol
     @NonNull
     @Override
     public FieldViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_field, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_customer_field, parent, false);
         return new FieldViewHolder(view);
     }
 
@@ -54,7 +54,7 @@ public class FieldAdapter extends RecyclerView.Adapter<FieldAdapter.FieldViewHol
 
     class FieldViewHolder extends RecyclerView.ViewHolder {
         private final ImageView ivFieldImage;
-        private final TextView tvFieldName, tvFieldAddress, tvPrice;
+        private final TextView tvFieldName, tvFieldAddress, tvFieldType, tvPrice, tvPriceHint;
         private final MaterialButton btnBook;
 
         FieldViewHolder(@NonNull View itemView) {
@@ -62,18 +62,29 @@ public class FieldAdapter extends RecyclerView.Adapter<FieldAdapter.FieldViewHol
             ivFieldImage = itemView.findViewById(R.id.ivFieldImage);
             tvFieldName = itemView.findViewById(R.id.tvFieldName);
             tvFieldAddress = itemView.findViewById(R.id.tvFieldAddress);
+            tvFieldType = itemView.findViewById(R.id.tvFieldType);
             tvPrice = itemView.findViewById(R.id.tvPrice);
+            tvPriceHint = itemView.findViewById(R.id.tvPriceHint);
             btnBook = itemView.findViewById(R.id.btnBook);
         }
 
         void bind(Field field) {
             tvFieldName.setText(field.getName());
             tvFieldAddress.setText(field.getAddress());
-            tvPrice.setText(String.format("%,.0f đ/giờ", field.getPricePerHour()));
+            tvFieldType.setText(field.getTypeLabel() + " · Cỏ nhân tạo");
+            double price = field.getPricePerHour();
+            if (price > 0) {
+                tvPrice.setText(String.format("Từ %,.0f đ", price));
+                tvPriceHint.setVisibility(View.VISIBLE);
+            } else {
+                tvPrice.setText(R.string.price_by_slot);
+                tvPriceHint.setVisibility(View.GONE);
+            }
 
             Glide.with(itemView.getContext())
                     .load(field.getImageUrl())
-                    .placeholder(android.R.drawable.ic_menu_gallery)
+                    .placeholder(R.drawable.bg_pitch_cover)
+                    .error(R.drawable.bg_pitch_cover)
                     .centerCrop()
                     .into(ivFieldImage);
 

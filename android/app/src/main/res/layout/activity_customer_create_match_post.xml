@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_secondary"
+    tools:context=".ui.customer.CreateMatchPostActivity">
+
+    <!-- Toolbar -->
+    <LinearLayout
+        android:id="@+id/layoutToolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/spacing_4"
+        android:paddingTop="@dimen/spacing_5"
+        android:paddingBottom="@dimen/spacing_3"
+        android:background="@color/background_secondary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="@dimen/spacing_40"
+            android:layout_height="@dimen/spacing_40"
+            android:padding="@dimen/spacing_2"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/text_primary"
+            android:background="@drawable/ripple_primary"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/cd_back" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/spacing_3"
+            android:text="Tạo bài đăng"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_heading3"
+            android:textStyle="bold"
+            android:fontFamily="@font/bricolage_grotesque" />
+    </LinearLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/spacing_8"
+        app:layout_constraintTop_toBottomOf="@id/layoutToolbar"
+        app:layout_constraintBottom_toTopOf="@id/btnSubmit"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/spacing_4">
+
+            <!-- Post Type Selector -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_3"
+                android:text="Loại bài đăng"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_body_large"
+                android:textStyle="bold"
+                android:fontFamily="@font/be_vietnam_pro" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_2"
+                android:orientation="horizontal"
+                android:padding="4dp"
+                android:background="@drawable/bg_segment_container">
+
+                <TextView
+                    android:id="@+id/tabFindOpponent"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/tab_find_opponent"
+                    android:textSize="@dimen/text_body_small"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:background="@drawable/bg_segment_active"
+                    android:textColor="@color/text_on_primary" />
+
+                <TextView
+                    android:id="@+id/tabFindMember"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/tab_find_member"
+                    android:textSize="@dimen/text_body_small"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:background="@android:color/transparent"
+                    android:textColor="@color/text_secondary" />
+            </LinearLayout>
+
+            <!-- Team Selector (dropdown) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilTeam"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_4"
+                android:hint="Chọn đội bóng"
+                app:boxCornerRadiusBottomEnd="@dimen/radius_small"
+                app:boxCornerRadiusBottomStart="@dimen/radius_small"
+                app:boxCornerRadiusTopEnd="@dimen/radius_small"
+                app:boxCornerRadiusTopStart="@dimen/radius_small"
+                app:boxStrokeColor="@color/border">
+
+                <AutoCompleteTextView
+                    android:id="@+id/actvTeam"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textColor="@color/text_primary" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Skill Level -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_4"
+                android:text="Trình độ"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_body_large"
+                android:textStyle="bold"
+                android:fontFamily="@font/be_vietnam_pro" />
+
+            <LinearLayout
+                android:id="@+id/layoutSkillChips"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_2"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/chipBeginner"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Mới chơi"
+                    android:textSize="@dimen/text_body_small"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:background="@drawable/bg_chip_filter"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginEnd="@dimen/spacing_2" />
+
+                <TextView
+                    android:id="@+id/chipIntermediate"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Trung cấp"
+                    android:textSize="@dimen/text_body_small"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:background="@drawable/bg_chip_filter_selected"
+                    android:textColor="@color/primary"
+                    android:layout_marginEnd="@dimen/spacing_2" />
+
+                <TextView
+                    android:id="@+id/chipAdvanced"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Nâng cao"
+                    android:textSize="@dimen/text_body_small"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:background="@drawable/bg_chip_filter"
+                    android:textColor="@color/text_secondary" />
+            </LinearLayout>
+
+            <!-- Play Date -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilPlayDate"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_4"
+                android:hint="Ngày đá"
+                app:startIconDrawable="@drawable/ic_calendar"
+                app:boxCornerRadiusBottomEnd="@dimen/radius_small"
+                app:boxCornerRadiusBottomStart="@dimen/radius_small"
+                app:boxCornerRadiusTopEnd="@dimen/radius_small"
+                app:boxCornerRadiusTopStart="@dimen/radius_small"
+                app:boxStrokeColor="@color/border">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPlayDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:inputType="none"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textColor="@color/text_primary" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Play Time -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilPlayTime"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_3"
+                android:hint="Giờ đá"
+                app:startIconDrawable="@drawable/ic_clock"
+                app:boxCornerRadiusBottomEnd="@dimen/radius_small"
+                app:boxCornerRadiusBottomStart="@dimen/radius_small"
+                app:boxCornerRadiusTopEnd="@dimen/radius_small"
+                app:boxCornerRadiusTopStart="@dimen/radius_small"
+                app:boxStrokeColor="@color/border">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPlayTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:inputType="none"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textColor="@color/text_primary" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Location -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilLocation"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_3"
+                android:hint="Địa điểm"
+                app:startIconDrawable="@drawable/ic_map_pin"
+                app:boxCornerRadiusBottomEnd="@dimen/radius_small"
+                app:boxCornerRadiusBottomStart="@dimen/radius_small"
+                app:boxCornerRadiusTopEnd="@dimen/radius_small"
+                app:boxCornerRadiusTopStart="@dimen/radius_small"
+                app:boxStrokeColor="@color/border">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textColor="@color/text_primary" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Description -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilDescription"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_3"
+                android:hint="Lời nhắn (tùy chọn)"
+                app:boxCornerRadiusBottomEnd="@dimen/radius_small"
+                app:boxCornerRadiusBottomStart="@dimen/radius_small"
+                app:boxCornerRadiusTopEnd="@dimen/radius_small"
+                app:boxCornerRadiusTopStart="@dimen/radius_small"
+                app:boxStrokeColor="@color/border"
+                app:counterEnabled="true"
+                app:counterMaxLength="200">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:minLines="3"
+                    android:gravity="top"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textColor="@color/text_primary" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Submit Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSubmit"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/button_height"
+        android:layout_marginHorizontal="@dimen/spacing_4"
+        android:layout_marginBottom="@dimen/spacing_4"
+        android:text="Đăng bài"
+        android:textSize="@dimen/text_body_large"
+        android:textStyle="bold"
+        android:textColor="@color/text_on_primary"
+        android:fontFamily="@font/be_vietnam_pro"
+        app:backgroundTint="@color/accent_orange"
+        app:cornerRadius="@dimen/radius_button"
+        app:icon="@drawable/ic_bolt"
+        app:iconTint="@color/text_on_primary"
+        app:iconGravity="textStart"
+        app:elevation="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

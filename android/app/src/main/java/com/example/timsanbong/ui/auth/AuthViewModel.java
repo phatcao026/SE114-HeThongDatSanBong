@@ -7,10 +7,10 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.timsanbong.data.api.ApiClient;
 import com.example.timsanbong.data.model.AuthResponse;
 import com.example.timsanbong.data.model.User;
 import com.example.timsanbong.data.repository.AuthRepository;
-import com.example.timsanbong.data.api.ApiClient;
 import com.example.timsanbong.utils.RepositoryCallback;
 import com.example.timsanbong.utils.Resource;
 import com.example.timsanbong.utils.SessionManager;
@@ -35,28 +35,20 @@ public class AuthViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> _loginSuccess = new MutableLiveData<>();
     public LiveData<Boolean> loginSuccess = _loginSuccess;
 
+    private final MutableLiveData<Resource<Void>> _forgotPasswordState = new MutableLiveData<>();
+    public LiveData<Resource<Void>> forgotPasswordState = _forgotPasswordState;
+
+    private final MutableLiveData<Resource<String>> _googleUrlState = new MutableLiveData<>();
+    public LiveData<Resource<String>> googleUrlState = _googleUrlState;
+
     public AuthViewModel(@NonNull Application application) {
         super(application);
         this.sessionManager = new SessionManager(application);
     }
 
-    public boolean loginDemo(String email, String password) {
-        DemoAccount account = findDemoAccount(email, password);
-        if (account == null) {
-            _loginMessage.setValue("Tài khoản demo hoặc mật khẩu không đúng");
-            return false;
-        }
-
-        String token = "DEBUG_TOKEN_" + account.role;
-        String userJson = buildUserJson(account);
-
-        sessionManager.saveToken(token);
-        sessionManager.saveUserJson(userJson);
-
-        return true;
-    }
-
     public void login(String email, String password) {
+        _registerState.setValue(Resource.loading(null));
+
         Map<String, String> body = new HashMap<>();
         body.put("email", email);
         body.put("password", password);
@@ -64,41 +56,14 @@ public class AuthViewModel extends AndroidViewModel {
         authRepository.login(getApplication(), body, new RepositoryCallback<AuthResponse>() {
             @Override
             public void onSuccess(AuthResponse data) {
-                sessionManager.saveToken(data.getToken());
-                ApiClient.reset();
+                saveToken(data);
                 loadProfileAfterLogin();
             }
 
             @Override
             public void onError(String message) {
                 _loginMessage.postValue(message);
-                _loginSuccess.postValue(false);
-            }
-        });
-    }
-
-    private void loadProfileAfterLogin() {
-        authRepository.getMyProfile(getApplication(), new RepositoryCallback<User>() {
-            @Override
-            public void onSuccess(User user) {
-                try {
-                    JSONObject userJson = new JSONObject();
-                    userJson.put("id", user.getId());
-                    userJson.put("fullName", user.getFullName());
-                    userJson.put("email", user.getEmail());
-                    userJson.put("phone", user.getPhone());
-                    userJson.put("role", user.getRole());
-                    sessionManager.saveUserJson(userJson.toString());
-                    _loginSuccess.postValue(true);
-                } catch (JSONException e) {
-                    _loginMessage.postValue("Không thể lưu phiên đăng nhập.");
-                    _loginSuccess.postValue(false);
-                }
-            }
-
-            @Override
-            public void onError(String message) {
-                _loginMessage.postValue(message);
+                _registerState.postValue(Resource.error(message, null));
                 _loginSuccess.postValue(false);
             }
         });
@@ -115,19 +80,7 @@ public class AuthViewModel extends AndroidViewModel {
         authRepository.register(getApplication(), body, new RepositoryCallback<AuthResponse>() {
             @Override
             public void onSuccess(AuthResponse data) {
-                if (data.getToken() != null && data.getUser() != null) {
-                    sessionManager.saveToken(data.getToken());
-                    try {
-                        JSONObject userJson = new JSONObject();
-                        userJson.put("id", data.getUser().getId());
-                        userJson.put("fullName", data.getUser().getFullName());
-                        userJson.put("email", data.getUser().getEmail());
-                        userJson.put("phone", data.getUser().getPhone());
-                        userJson.put("role", data.getUser().getRole());
-                        sessionManager.saveUserJson(userJson.toString());
-                    } catch (JSONException ignored) {
-                    }
-                }
+                saveToken(data);
                 _registerState.postValue(Resource.success(data));
             }
 
@@ -138,46 +91,117 @@ public class AuthViewModel extends AndroidViewModel {
         });
     }
 
-    private DemoAccount findDemoAccount(String email, String password) {
-        DemoAccount[] demoAccounts = new DemoAccount[]{
-                new DemoAccount("player_demo@test.com", "pass123", "Long Travis", "PLAYER", "0901000101", 101),
-                new DemoAccount("owner_demo@test.com", "pass123", "Quản lý Sân A", "OWNER", "0902000202", 201),
-                new DemoAccount("admin_demo@test.com", "pass123", "Hệ thống Admin", "ADMIN", "0903000303", 301)
-        };
+    public void forgotPassword(String email) {
+        _forgotPasswordState.setValue(Resource.loading(null));
+        Map<String, String> body = new HashMap<>();
+        body.put("email", email);
+        authRepository.forgotPassword(getApplication(), body, new RepositoryCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) { _forgotPasswordState.postValue(Resource.success(null)); }
 
-        for (DemoAccount account : demoAccounts) {
-            if (account.email.equalsIgnoreCase(email) && account.password.equals(password)) {
-                return account;
+            @Override
+            public void onError(String msg) { _forgotPasswordState.postValue(Resource.error(msg, null)); }
+        });
+    }
+
+    public void verifyOtp(String email, String otp) {
+        _forgotPasswordState.setValue(Resource.loading(null));
+        Map<String, String> body = new HashMap<>();
+        body.put("email", email);
+        body.put("otp", otp);
+        authRepository.verifyOtp(getApplication(), body, new RepositoryCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) { _forgotPasswordState.postValue(Resource.success(null)); }
+
+            @Override
+            public void onError(String msg) { _forgotPasswordState.postValue(Resource.error(msg, null)); }
+        });
+    }
+
+    public void resetPassword(String email, String otp, String newPassword) {
+        _forgotPasswordState.setValue(Resource.loading(null));
+        Map<String, String> body = new HashMap<>();
+        body.put("email", email);
+        body.put("otp", otp);
+        body.put("newPassword", newPassword);
+        authRepository.resetPassword(getApplication(), body, new RepositoryCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) { _forgotPasswordState.postValue(Resource.success(null)); }
+
+            @Override
+            public void onError(String msg) { _forgotPasswordState.postValue(Resource.error(msg, null)); }
+        });
+    }
+
+    public void getGoogleUrl() {
+        _googleUrlState.setValue(Resource.loading(null));
+        authRepository.getGoogleUrl(getApplication(), new RepositoryCallback<String>() {
+            @Override
+            public void onSuccess(String data) { _googleUrlState.postValue(Resource.success(data)); }
+
+            @Override
+            public void onError(String msg) { _googleUrlState.postValue(Resource.error(msg, null)); }
+        });
+    }
+
+    public void googleSync(String idToken) {
+        _registerState.setValue(Resource.loading(null));
+        authRepository.googleSync(getApplication(), idToken, new RepositoryCallback<AuthResponse>() {
+            @Override
+            public void onSuccess(AuthResponse data) {
+                saveToken(data);
+                loadProfileAfterLogin();
             }
-        }
-        return null;
+
+            @Override
+            public void onError(String msg) {
+                _loginMessage.postValue(msg);
+                _registerState.postValue(Resource.error(msg, null));
+                _loginSuccess.postValue(false);
+            }
+        });
     }
 
-    private String buildUserJson(DemoAccount account) {
+    private void saveToken(AuthResponse data) {
+        if (data != null && data.getAccessToken() != null) {
+            sessionManager.saveToken(data.getAccessToken());
+            ApiClient.reset();
+        }
+    }
+
+    private void loadProfileAfterLogin() {
+        authRepository.getMyProfile(getApplication(), new RepositoryCallback<User>() {
+            @Override
+            public void onSuccess(User user) {
+                saveUser(user);
+                _registerState.postValue(Resource.success(null));
+                _loginSuccess.postValue(true);
+            }
+
+            @Override
+            public void onError(String message) {
+                _loginMessage.postValue(message);
+                _registerState.postValue(Resource.error(message, null));
+                _loginSuccess.postValue(false);
+            }
+        });
+    }
+
+    private void saveUser(User user) {
+        if (user == null) return;
+        sessionManager.saveUserId(user.getId());
+        sessionManager.saveUserRole(user.getRole());
+        sessionManager.saveUserEmail(user.getEmail());
+
         try {
-            JSONObject json = new JSONObject();
-            json.put("id", account.id);
-            json.put("fullName", account.fullName);
-            json.put("email", account.email);
-            json.put("phone", account.phone);
-            json.put("role", account.role);
-            return json.toString();
-        } catch (JSONException e) {
-            return "{}";
-        }
-    }
-
-    private static class DemoAccount {
-        String email, password, fullName, role, phone;
-        long id;
-
-        DemoAccount(String email, String password, String fullName, String role, String phone, long id) {
-            this.email = email;
-            this.password = password;
-            this.fullName = fullName;
-            this.role = role;
-            this.phone = phone;
-            this.id = id;
+            JSONObject userJson = new JSONObject();
+            userJson.put("id", user.getId());
+            userJson.put("fullName", user.getFullName());
+            userJson.put("email", user.getEmail());
+            userJson.put("phone", user.getPhone());
+            userJson.put("role", user.getRole());
+            sessionManager.saveUserJson(userJson.toString());
+        } catch (JSONException ignored) {
         }
     }
 }

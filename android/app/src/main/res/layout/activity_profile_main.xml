@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_secondary"
+    tools:context=".ui.profile.ProfileActivity">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/nav_container_height"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomNav"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="@dimen/spacing_4"
+                android:paddingTop="@dimen/spacing_6"
+                android:paddingBottom="@dimen/spacing_3">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/profile"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_heading1"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/bricolage_grotesque" />
+
+                <ImageView
+                    android:id="@+id/btnSettings"
+                    android:layout_width="@dimen/spacing_40"
+                    android:layout_height="@dimen/spacing_40"
+                    android:padding="@dimen/spacing_2"
+                    android:src="@drawable/ic_more_vert"
+                    app:tint="@color/text_secondary"
+                    android:background="@drawable/ripple_primary"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:contentDescription="@string/cd_more_options" />
+            </LinearLayout>
+
+            <!-- Profile Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/spacing_4"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardBackgroundColor="@color/background_primary"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/border">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:padding="@dimen/spacing_6">
+
+                    <!-- Avatar -->
+                    <TextView
+                        android:id="@+id/tvAvatar"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:background="@drawable/bg_avatar_large"
+                        android:gravity="center"
+                        android:textColor="@color/primary"
+                        android:textStyle="bold"
+                        android:textSize="@dimen/text_heading1"
+                        android:fontFamily="@font/bricolage_grotesque"
+                        tools:text="TDK" />
+
+                    <!-- Name -->
+                    <TextView
+                        android:id="@+id/tvName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_3"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_heading3"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/bricolage_grotesque"
+                        tools:text="Trần Đức Khoa" />
+
+                    <!-- Email -->
+                    <TextView
+                        android:id="@+id/tvEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_1"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/text_body_medium"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        tools:text="khoa.td@email.com" />
+
+                    <!-- Trust Score Section -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_5"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Điểm uy tín"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="@dimen/text_body_small"
+                                android:fontFamily="@font/be_vietnam_pro" />
+
+                            <TextView
+                                android:id="@+id/tvTrustScore"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/primary"
+                                android:textSize="@dimen/text_body_large"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/be_vietnam_pro"
+                                tools:text="92/100" />
+                        </LinearLayout>
+
+                        <!-- Trust Score Progress Bar -->
+                        <ProgressBar
+                            android:id="@+id/pbTrustScore"
+                            style="@android:style/Widget.ProgressBar.Horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="8dp"
+                            android:layout_marginTop="@dimen/spacing_2"
+                            android:max="100"
+                            android:progress="92"
+                            android:progressDrawable="@drawable/bg_trust_track"
+                            tools:progress="92" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Tab selector -->
+            <LinearLayout
+                android:id="@+id/layoutProfileTabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginHorizontal="@dimen/spacing_4"
+                android:layout_marginTop="@dimen/spacing_4"
+                android:padding="4dp"
+                android:background="@drawable/bg_segment_container">
+
+                <TextView
+                    android:id="@+id/tabPersonalInfo"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Thông tin cá nhân"
+                    android:textSize="@dimen/text_body_small"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:background="@drawable/bg_segment_active"
+                    android:textColor="@color/text_on_primary" />
+
+                <TextView
+                    android:id="@+id/tabBookingHistory"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Lịch sử đặt sân"
+                    android:textSize="@dimen/text_body_small"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:background="@android:color/transparent"
+                    android:textColor="@color/text_secondary" />
+            </LinearLayout>
+
+            <!-- Tab Content: Personal Info -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardPersonalInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/spacing_4"
+                android:layout_marginTop="@dimen/spacing_3"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardBackgroundColor="@color/background_primary"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/border">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_4">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilName"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/full_name"
+                        app:boxCornerRadiusBottomEnd="@dimen/radius_small"
+                        app:boxCornerRadiusBottomStart="@dimen/radius_small"
+                        app:boxCornerRadiusTopEnd="@dimen/radius_small"
+                        app:boxCornerRadiusTopStart="@dimen/radius_small"
+                        app:boxStrokeColor="@color/border">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textPersonName"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textColor="@color/text_primary" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilPhone"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_3"
+                        android:hint="@string/phone"
+                        app:boxCornerRadiusBottomEnd="@dimen/radius_small"
+                        app:boxCornerRadiusBottomStart="@dimen/radius_small"
+                        app:boxCornerRadiusTopEnd="@dimen/radius_small"
+                        app:boxCornerRadiusTopStart="@dimen/radius_small"
+                        app:boxStrokeColor="@color/border">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etPhone"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="phone"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textColor="@color/text_primary" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSaveProfile"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/button_height"
+                        android:layout_marginTop="@dimen/spacing_5"
+                        android:text="Lưu thay đổi"
+                        android:textSize="@dimen/text_body_large"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_on_primary"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        app:backgroundTint="@color/primary"
+                        app:cornerRadius="@dimen/radius_button"
+                        app:elevation="0dp" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Tab Content: Booking History -->
+            <FrameLayout
+                android:id="@+id/layoutBookingHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/spacing_4"
+                android:layout_marginTop="@dimen/spacing_3"
+                android:visibility="gone">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvBookingHistory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:paddingBottom="@dimen/spacing_6" />
+
+                <TextView
+                    android:id="@+id/tvEmptyBookings"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_8"
+                    android:gravity="center"
+                    android:text="@string/empty_bookings"
+                    android:textColor="@color/text_hint"
+                    android:textSize="@dimen/text_body_medium"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+            <!-- Logout button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLogout"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginHorizontal="@dimen/spacing_4"
+                android:layout_marginTop="@dimen/spacing_6"
+                android:text="@string/logout"
+                android:textSize="@dimen/text_body_large"
+                android:textColor="@color/error"
+                android:fontFamily="@font/be_vietnam_pro"
+                app:cornerRadius="@dimen/radius_button"
+                app:strokeColor="@color/error" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <include
+        android:id="@+id/bottomNav"
+        layout="@layout/layout_customer_bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

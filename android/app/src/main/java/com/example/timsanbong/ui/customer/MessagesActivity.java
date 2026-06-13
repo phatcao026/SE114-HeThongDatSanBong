@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,12 +30,13 @@ public class MessagesActivity extends AppCompatActivity {
 
     // ── Data ─────────────────────────────────────────────
     private ConversationAdapter conversationAdapter;
-    private List<Conversation> allConversations;
+    private List<Conversation> allConversations = new ArrayList<>();
+    private ChatViewModel chatViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_messages);
+        setContentView(R.layout.activity_customer_messages);
         initViews();
         setupListeners();
         loadData();
@@ -67,8 +69,21 @@ public class MessagesActivity extends AppCompatActivity {
     }
 
     private void loadData() {
-        allConversations = buildMockConversations();
-        showConversations(allConversations);
+        chatViewModel = new ViewModelProvider(this).get(ChatViewModel.class);
+        chatViewModel.conversationsState.observe(this, resource -> {
+            if (resource == null) return;
+            if (resource.status == com.example.timsanbong.utils.Resource.Status.SUCCESS && resource.data != null) {
+                allConversations = resource.data;
+                if (allConversations.isEmpty()) {
+                    allConversations = buildMockConversations();
+                }
+                showConversations(allConversations);
+            } else if (resource.status == com.example.timsanbong.utils.Resource.Status.ERROR) {
+                allConversations = buildMockConversations();
+                showConversations(allConversations);
+            }
+        });
+        chatViewModel.loadConversations();
     }
 
     private void filterConversations(String query) {

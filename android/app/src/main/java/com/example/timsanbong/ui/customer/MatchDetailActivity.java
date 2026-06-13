@@ -46,7 +46,7 @@ public class MatchDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_match_detail);
+        setContentView(R.layout.activity_customer_match_detail);
         match = (MatchPost) getIntent().getSerializableExtra(Constants.EXTRA_MATCH);
         initViews();
         setupListeners();
@@ -89,7 +89,7 @@ public class MatchDetailActivity extends AppCompatActivity {
         btnDetailChat.setOnClickListener(v -> {
             if (match == null) return;
             Conversation conv = new Conversation(
-                    match.getId(),
+                    match.getIdString(),
                     match.getTeam(),
                     match.getCaptainInitials(),
                     "Bắt đầu cuộc trò chuyện…",

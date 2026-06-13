@@ -1,72 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRIMARY PALETTE (Brand) -->
-    <color name="primary">#60D86E</color>
-    <color name="primary_dark">#45C45A</color>
-    <color name="primary_light">#E8F9EB</color>
+    <color name="primary">#0E8A4F</color>
+    <color name="primary_dark">#0B6E3F</color>
+    <color name="primary_light">#D2F3DD</color>
+    <color name="pitch_50">#ECFBF1</color>
+    <color name="pitch_100">#D2F3DD</color>
+    <color name="pitch_200">#A6E6BB</color>
+    <color name="pitch_300">#6DD292</color>
+    <color name="pitch_400">#34BC6E</color>
+    <color name="pitch_500">#18A158</color>
+    <color name="pitch_600">#0E8A4F</color>
+    <color name="pitch_700">#0B6E3F</color>
+    <color name="pitch_800">#0A532F</color>
+    <color name="pitch_900">#073E23</color>
+
+    <!-- PROTOTYPE ACCENT PALETTE -->
+    <color name="flood_50">#FFF3EB</color>
+    <color name="flood_100">#FFE0CB</color>
+    <color name="flood_200">#FFC196</color>
+    <color name="flood_300">#FF9D5B</color>
+    <color name="flood_400">#FF822F</color>
+    <color name="flood_500">#FF6A1A</color>
+    <color name="flood_600">#E8540A</color>
+    <color name="flood_700">#B83E04</color>
 
     <!-- TEXT COLORS -->
-    <color name="text_primary">#1A202C</color>
-    <color name="text_secondary">#4A5568</color>
+    <color name="text_primary">#1A1A17</color>
+    <color name="text_secondary">#6E6E64</color>
     <color name="text_on_primary">#FFFFFF</color>
-    <color name="text_hint">#A0AEC0</color>
-    <color name="neutral_gray">#6B7280</color>
+    <color name="text_hint">#9A9A8E</color>
+    <color name="neutral_gray">#9A9A8E</color>
+    <color name="ink_50">#F7F7F4</color>
+    <color name="ink_100">#EFEFEA</color>
+    <color name="ink_200">#E2E2DA</color>
+    <color name="ink_300">#C9C9BF</color>
+    <color name="ink_400">#9A9A8E</color>
+    <color name="ink_500">#6E6E64</color>
+    <color name="ink_600">#4A4A43</color>
+    <color name="ink_700">#2E2E29</color>
+    <color name="ink_800">#1A1A17</color>
+    <color name="ink_900">#0E0E0C</color>
 
     <!-- BACKGROUND COLORS -->
     <color name="background_primary">#FFFFFF</color>
-    <color name="background_secondary">#F8FAF8</color>
-    <color name="background_tertiary">#F0F4F0</color>
+    <color name="background_secondary">#F7F7F4</color>
+    <color name="background_tertiary">#EFEFEA</color>
+    <color name="surface_container_lowest">#FFFFFF</color>
+    <color name="surface_container_low">#FAFAF7</color>
+    <color name="surface_container">#F4F4F0</color>
+    <color name="surface_container_high">#EEEEE9</color>
+    <color name="surface_container_highest">#E8E8E2</color>
 
     <!-- BORDER & DIVIDER -->
-    <color name="border">#E2E8F0</color>
-    <color name="border_gray">#F3F4F6</color>
+    <color name="border">#C9C9BF</color>
+    <color name="border_gray">#E2E2DA</color>
 
     <!-- SEMANTIC COLORS -->
-    <color name="error">#EF4444</color>
-    <color name="success">#10B981</color>
-    <color name="warning">#F59E0B</color>
+    <color name="error">#DC2A2A</color>
+    <color name="success">#18A158</color>
+    <color name="success_bg">#ECFBF1</color>
+    <color name="warning">#E89B00</color>
+    <color name="warning_bg">#FFF6E0</color>
+    <color name="info">#2A6FDB</color>
+    <color name="info_bg">#E7F0FE</color>
 
     <!-- LEGACY / ALIASES (for backwards compatibility) -->
-    <color name="brand">#60D86E</color>
-    <color name="brand_dark">#45C45A</color>
-    <color name="brand_light">#E8F9EB</color>
-    <color name="text_title">#1A202C</color>
-    <color name="text_body">#4A5568</color>
+    <color name="brand">#0E8A4F</color>
+    <color name="brand_dark">#0B6E3F</color>
+    <color name="brand_light">#D2F3DD</color>
+    <color name="text_title">#1A1A17</color>
+    <color name="text_body">#6E6E64</color>
     <color name="white">#FFFFFF</color>
-    <color name="background">#F8FAF8</color>
-    <color name="divider">#E2E8F0</color>
-    <color name="color_error">#EF4444</color>
-    <color name="primary_text">#2F855A</color>
-    <color name="text_heading">#1A202C</color>
+    <color name="background">#F7F7F4</color>
+    <color name="divider">#C9C9BF</color>
+    <color name="color_error">#DC2A2A</color>
+    <color name="primary_text">#0E8A4F</color>
+    <color name="text_heading">#1A1A17</color>
 
     <!-- Booking status badge backgrounds -->
-    <color name="status_pending_bg">#FFF4D6</color>
-    <color name="status_confirmed_bg">#E6F7F0</color>
-    <color name="status_cancelled_bg">#FDE8E8</color>
-    <color name="status_default_bg">#E8F0FE</color>
+    <color name="status_pending_bg">#DBEAFE</color>
+    <color name="status_pending_text">#1D4ED8</color>
+    <color name="status_deposit_paid_bg">#DBEAFE</color>
+    <color name="status_deposit_paid_text">#1D4ED8</color>
+    <color name="status_confirmed_bg">#DCFCE7</color>
+    <color name="status_confirmed_text">#15803D</color>
+    <color name="status_completed_bg">#DCFCE7</color>
+    <color name="status_completed_text">#15803D</color>
+    <color name="status_cancelled_bg">#FEE2E2</color>
+    <color name="status_cancelled_text">#DC2626</color>
+    <color name="status_default_bg">#F3F4F6</color>
+    <color name="status_default_text">#6B7280</color>
 
-    <!-- Matchmaking / accent (orange floodlight) -->
+    <!-- Matchmaking / accent (orange) -->
     <color name="accent_orange">#FF6A1A</color>
     <color name="accent_orange_light">#FFF3EB</color>
     <color name="accent_orange_dark">#E8540A</color>
 
+    <!-- Payment method brands -->
+    <color name="brand_momo">#A50064</color>
+    <color name="brand_stripe">#635BFF</color>
+
+
     <!-- Badges -->
-    <color name="badge_green_bg">#ECFBF1</color>
-    <color name="badge_green_text">#0B6E3F</color>
-    <color name="badge_orange_bg">#FFF3EB</color>
-    <color name="badge_orange_text">#B83E04</color>
-    <color name="badge_neutral_bg">#F0F4F0</color>
+    <color name="badge_green_bg">#DCFCE7</color>
+    <color name="badge_green_text">#15803D</color>
+    <color name="badge_orange_bg">#FFF7ED</color>
+    <color name="badge_orange_text">#EA580C</color>
+    <color name="badge_neutral_bg">#F3F4F6</color>
     <color name="badge_neutral_text">#4A5568</color>
+    <color name="badge_blue_bg">#DBEAFE</color>
+    <color name="badge_blue_text">#1D4ED8</color>
+    <color name="badge_red_bg">#FEE2E2</color>
+    <color name="badge_red_text">#DC2626</color>
 
     <!-- Trust score overlay badge -->
-    <color name="trust_high">#0E8A4F</color>
-    <color name="trust_mid">#F59E0B</color>
-    <color name="trust_low">#EF4444</color>
+    <color name="trust_high">#18A158</color>
+    <color name="trust_mid">#E89B00</color>
+    <color name="trust_low">#DC2A2A</color>
 
     <!-- Chat bubbles -->
+    <color name="chat_bubble_me">#0E8A4F</color>
+    <color name="chat_bubble_them">#EFEFEA</color>
     <color name="chat_system_bg">#ECFBF1</color>
     <color name="chat_system_text">#0B6E3F</color>
     <color name="chat_system_border">#D2F3DD</color>
+
+    <!-- Google / Social -->
+    <color name="google_red">#DB4437</color>
+
+    <!-- Rating star -->
+    <color name="star_yellow">#FBBF24</color>
+    <color name="star_gray">#D1D5DB</color>
+
+    <!-- Time slot states -->
+    <color name="slot_available_bg">#DCFCE7</color>
+    <color name="slot_available_text">#15803D</color>
+    <color name="slot_selected_bg">#16A34A</color>
+    <color name="slot_selected_text">#FFFFFF</color>
+    <color name="slot_booked_bg">#F3F4F6</color>
+    <color name="slot_booked_text">#9CA3AF</color>
+
+    <!-- Shimmer / Skeleton loading -->
+    <color name="shimmer_base">#E5E7EB</color>
+    <color name="shimmer_highlight">#F9FAFB</color>
 
     <!-- Owner UI palette -->
     <color name="bg_screen">#F4F7F5</color>

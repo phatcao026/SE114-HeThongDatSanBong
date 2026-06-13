@@ -13,41 +13,29 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import com.example.timsanbong.data.model.TimeSlotResponse;
+
 public class FieldRepository {
 
     public void getFields(Context context, RepositoryCallback<List<Field>> callback) {
-        if (com.example.timsanbong.utils.Constants.MOCK_MODE) {
-            callback.onSuccess(getMockFields());
-            return;
-        }
         ApiClient.getService(context).getFields().enqueue(new Callback<List<Field>>() {
             @Override
             public void onResponse(Call<List<Field>> call, Response<List<Field>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     callback.onSuccess(response.body());
                 } else {
-                    callback.onSuccess(getMockFields());
+                    callback.onError("Không thể tải danh sách sân.");
                 }
             }
 
             @Override
             public void onFailure(Call<List<Field>> call, Throwable t) {
-                callback.onSuccess(getMockFields());
+                callback.onError("Lỗi kết nối.");
             }
         });
     }
 
     public void getFieldById(Context context, long id, RepositoryCallback<Field> callback) {
-        if (com.example.timsanbong.utils.Constants.MOCK_MODE) {
-            for (Field field : getMockFields()) {
-                if (field.getId() == id) {
-                    callback.onSuccess(field);
-                    return;
-                }
-            }
-            callback.onError("Không thể tải thông tin sân.");
-            return;
-        }
         ApiClient.getService(context).getFieldById(id).enqueue(new Callback<Field>() {
             @Override
             public void onResponse(Call<Field> call, Response<Field> response) {
@@ -65,13 +53,21 @@ public class FieldRepository {
         });
     }
 
-    public List<Field> getMockFields() {
-        List<Field> fields = new ArrayList<>();
-        fields.add(new Field(1, "Sân Bóng A", "123 Đường Lê Lợi, Q1", 150000, "https://via.placeholder.com/300", "Sân cỏ nhân tạo 5 người", "5 người", true));
-        fields.add(new Field(2, "Sân Bóng B", "456 Đường Nguyễn Huệ, Q1", 200000, "https://via.placeholder.com/300", "Sân cỏ tự nhiên 7 người", "7 người", true));
-        fields.add(new Field(3, "Sân Bóng C", "789 Đường Trần Hưng Đạo, Q5", 250000, "https://via.placeholder.com/300", "Sân cỏ nhân tạo 11 người", "11 người", false));
-        fields.add(new Field(4, "Sân Bóng D", "321 Đường Phạm Văn Đồng, Q3", 180000, "https://via.placeholder.com/300", "Sân cỏ tự nhiên 5 người", "5 người", true));
-        fields.add(new Field(5, "Sân Bóng E", "654 Đường Cách Mạng Tháng 8, Q10", 220000, "https://via.placeholder.com/300", "Sân cỏ nhân tạo 7 người", "7 người", true));
-        return fields;
+    public void getTimeslots(Context context, long id, String date, RepositoryCallback<List<TimeSlotResponse>> callback) {
+        ApiClient.getService(context).getTimeslots(id, date).enqueue(new Callback<List<TimeSlotResponse>>() {
+            @Override
+            public void onResponse(Call<List<TimeSlotResponse>> call, Response<List<TimeSlotResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onError("Không thể tải khung giờ.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<TimeSlotResponse>> call, Throwable t) {
+                callback.onError("Không thể kết nối máy chủ.");
+            }
+        });
     }
 }

@@ -12,6 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.widget.ImageViewCompat;
 
 import com.example.timsanbong.R;
+import com.example.timsanbong.ui.customer.FindPitchActivity;
 import com.example.timsanbong.ui.customer.MainActivity;
 import com.example.timsanbong.ui.customer.MatchmakingActivity;
 import com.example.timsanbong.ui.customer.MessagesActivity;
@@ -56,7 +57,7 @@ public class NavBarManager {
             if (activeItem != ITEM_HOME) navigate(MainActivity.class);
         });
         navSearch.setOnClickListener(v -> {
-            if (activeItem != ITEM_SEARCH) navigate(MainActivity.class);
+            if (activeItem != ITEM_SEARCH) navigate(FindPitchActivity.class);
         });
         navMatch.setOnClickListener(v -> {
             if (activeItem != ITEM_MATCH) navigate(MatchmakingActivity.class);
@@ -87,9 +88,9 @@ public class NavBarManager {
 
         MaterialShapeDrawable shapeDrawable = new MaterialShapeDrawable(shapeModel);
         shapeDrawable.setFillColor(ColorStateList.valueOf(
-            ContextCompat.getColor(activity, R.color.primary_dark)));
+            ContextCompat.getColor(activity, R.color.primary)));
         shapeDrawable.setStroke(strokeWidthPx,
-            ContextCompat.getColor(activity, R.color.primary_dark));
+            ContextCompat.getColor(activity, R.color.primary));
 
         ViewCompat.setBackground(navContainer, shapeDrawable);
         ViewCompat.setElevation(navContainer, 0f);

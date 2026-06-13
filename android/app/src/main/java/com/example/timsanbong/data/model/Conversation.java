@@ -4,33 +4,63 @@ import java.io.Serializable;
 
 public class Conversation implements Serializable {
 
-    private final String id;
-    private final String name;
-    private final String initials;
-    private final String lastMessage;
-    private final String time;
-    private final int unreadCount;
-    private final String matchContext;
-    private final boolean online;
+    @com.google.gson.annotations.SerializedName("id")
+    private long id;
 
-    public Conversation(String id, String name, String initials, String lastMessage,
-                        String time, int unreadCount, String matchContext, boolean online) {
-        this.id = id;
+    @com.google.gson.annotations.SerializedName("otherUser")
+    private User otherUser;
+
+    @com.google.gson.annotations.SerializedName("lastMessage")
+    private ChatMessage lastMessage;
+
+    @com.google.gson.annotations.SerializedName("unreadCount")
+    private int unreadCount;
+
+    // UI Mock backwards compatibility
+    private String stringId;
+    private String name;
+    private String initials;
+    private String lastMessageString;
+    private String timeAgo;
+    private String subtitle;
+    private boolean isOnline;
+
+    public Conversation() {}
+
+    // Mock constructor
+    public Conversation(String stringId, String name, String initials, String lastMessageString, String timeAgo, int unreadCount, String subtitle, boolean isOnline) {
+        this.stringId = stringId;
         this.name = name;
         this.initials = initials;
-        this.lastMessage = lastMessage;
-        this.time = time;
+        this.lastMessageString = lastMessageString;
+        this.timeAgo = timeAgo;
         this.unreadCount = unreadCount;
-        this.matchContext = matchContext;
-        this.online = online;
+        this.subtitle = subtitle;
+        this.isOnline = isOnline;
+        try {
+            this.id = Long.parseLong(stringId);
+        } catch (NumberFormatException ignored) {}
     }
 
-    public String getId() { return id; }
-    public String getName() { return name; }
-    public String getInitials() { return initials; }
-    public String getLastMessage() { return lastMessage; }
-    public String getTime() { return time; }
+    public Conversation(long id, User otherUser, ChatMessage lastMessage, int unreadCount) {
+        this.id = id;
+        this.otherUser = otherUser;
+        this.lastMessage = lastMessage;
+        this.unreadCount = unreadCount;
+    }
+
+    public String getId() { return stringId != null ? stringId : String.valueOf(id); }
+    public User getOtherUser() { return otherUser; }
+    public String getLastMessage() { 
+        if (lastMessageString != null) return lastMessageString;
+        return lastMessage != null ? lastMessage.getContent() : ""; 
+    }
     public int getUnreadCount() { return unreadCount; }
-    public String getMatchContext() { return matchContext; }
-    public boolean isOnline() { return online; }
+    
+    public String getName() { return name != null ? name : (otherUser != null ? otherUser.getName() : "Người dùng"); }
+    public String getInitials() { return initials != null ? initials : "U"; }
+    public String getTimeAgo() { return timeAgo != null ? timeAgo : "Vừa xong"; }
+    public String getSubtitle() { return subtitle; }
+    public String getMatchContext() { return subtitle; }
+    public boolean isOnline() { return isOnline; }
 }

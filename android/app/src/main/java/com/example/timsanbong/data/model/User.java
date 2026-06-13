@@ -18,6 +18,9 @@ public class User {
     @SerializedName("role")
     private String role;
 
+    @SerializedName("trustScore")
+    private int trustScore;
+
     public User() {}
 
     public User(long id, String fullName, String email, String phone, String role) {
@@ -30,7 +33,9 @@ public class User {
 
     public long getId() { return id; }
     public String getFullName() { return fullName; }
+    public String getName() { return fullName; }
     public String getEmail() { return email; }
     public String getPhone() { return phone; }
     public String getRole() { return role; }
+    public int getTrustScore() { return trustScore; }
 }

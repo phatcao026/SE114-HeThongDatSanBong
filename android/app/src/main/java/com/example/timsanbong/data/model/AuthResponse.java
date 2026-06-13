@@ -3,12 +3,25 @@ package com.example.timsanbong.data.model;
 import com.google.gson.annotations.SerializedName;
 
 public class AuthResponse {
-    @SerializedName(value = "token", alternate = {"accessToken"})
-    private String token;
+    @SerializedName(value = "accessToken", alternate = {"token"})
+    private String accessToken;
 
-    @SerializedName("user")
-    private User user;
+    @SerializedName("message")
+    private String message;
 
-    public String getToken() { return token; }
-    public User getUser() { return user; }
+    @SerializedName("userId")
+    private long userId;
+
+    @SerializedName("role")
+    private String role;
+
+    @SerializedName("email")
+    private String email;
+
+    public String getAccessToken() { return accessToken; }
+    public String getToken() { return accessToken; }
+    public String getMessage() { return message; }
+    public long getUserId() { return userId; }
+    public String getRole() { return role; }
+    public String getEmail() { return email; }
 }
