@@ -99,4 +99,10 @@ public interface ApiService {
 
     @GET("admin/payments")
     Call<List<PaymentResponse>> getAdminPayments();
+
+    @GET("admin/bookings")
+    Call<List<Booking>> getAdminBookings();
+
+    @GET("admin/fields")
+    Call<List<Field>> getAdminFields();
 }

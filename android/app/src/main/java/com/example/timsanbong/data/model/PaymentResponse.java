@@ -11,6 +11,17 @@ public class PaymentResponse {
     private String status;
     private String createdAt;
 
+    public PaymentResponse() {}
+
+    public PaymentResponse(Long id, Long userId, double amount, String paymentMethod, String status, String createdAt) {
+        this.id = id;
+        this.userId = userId;
+        this.amount = java.math.BigDecimal.valueOf(amount);
+        this.paymentMethod = paymentMethod;
+        this.status = status;
+        this.createdAt = createdAt;
+    }
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Long getBookingId() { return bookingId; }

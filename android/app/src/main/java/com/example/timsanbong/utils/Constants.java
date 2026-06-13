@@ -18,7 +18,7 @@ public class Constants {
     public static final String EXTRA_CONVERSATION = "extra_conversation";
     public static final String EXTRA_MATCH = "extra_match";
 
-    public static final boolean MOCK_MODE = false;
+    public static final boolean MOCK_MODE = true;
     public static final boolean MOCK_PAYMENT_MODE = true;
     public static final boolean MOCK_PAYMENT_SUCCESS = true;
 }

@@ -1,6 +1,7 @@
 package com.example.timsanbong.ui.admin;
 
 import android.os.Bundle;
+import android.content.Intent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -39,6 +40,26 @@ public class AdminMainActivity extends AppCompatActivity {
         
         navBarManager = new AdminNavBarManager(this, AdminNavBarManager.ITEM_OVERVIEW);
         navBarManager.setup();
+
+        findViewById(R.id.cardGmv).setOnClickListener(v -> {
+            startActivity(new Intent(this, AdminTransactionActivity.class));
+        });
+
+        findViewById(R.id.cardUsers).setOnClickListener(v -> {
+            startActivity(new Intent(this, AdminUserActivity.class));
+        });
+
+        findViewById(R.id.cardFields).setOnClickListener(v -> {
+            startActivity(new Intent(this, AdminFieldActivity.class));
+        });
+
+        findViewById(R.id.cardBookings).setOnClickListener(v -> {
+            startActivity(new Intent(this, AdminBookingActivity.class));
+        });
+
+        findViewById(R.id.btnViewAudit).setOnClickListener(v -> {
+            startActivity(new Intent(this, AdminAuditActivity.class));
+        });
     }
 
     private void fetchStats() {
@@ -67,8 +88,9 @@ public class AdminMainActivity extends AppCompatActivity {
         View gmv = findViewById(R.id.cardGmv);
         ((ImageView) gmv.findViewById(R.id.ivStatIcon)).setImageResource(R.drawable.ic_admin_wallet);
         ((TextView) gmv.findViewById(R.id.tvStatLabel)).setText("Doanh thu");
-        ((TextView) gmv.findViewById(R.id.tvStatValue)).setText(currencyFormat.format(stats.getTotalRevenue()));
-        ((TextView) gmv.findViewById(R.id.tvTrendValue)).setText("GMV");
+        double revenue = stats.getTotalRevenue() != null ? stats.getTotalRevenue().doubleValue() : 0;
+        ((TextView) gmv.findViewById(R.id.tvStatValue)).setText(currencyFormat.format(revenue));
+        ((TextView) gmv.findViewById(R.id.tvTrendValue)).setText("Tổng GMV");
 
         View users = findViewById(R.id.cardUsers);
         ((ImageView) users.findViewById(R.id.ivStatIcon)).setImageResource(R.drawable.ic_admin_users);

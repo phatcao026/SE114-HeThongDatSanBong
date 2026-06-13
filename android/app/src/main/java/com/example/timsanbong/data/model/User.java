@@ -18,6 +18,16 @@ public class User {
     @SerializedName("role")
     private String role;
 
+    public User() {}
+
+    public User(long id, String fullName, String email, String phone, String role) {
+        this.id = id;
+        this.fullName = fullName;
+        this.email = email;
+        this.phone = phone;
+        this.role = role;
+    }
+
     public long getId() { return id; }
     public String getFullName() { return fullName; }
     public String getEmail() { return email; }

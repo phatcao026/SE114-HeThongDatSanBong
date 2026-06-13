@@ -88,6 +88,19 @@
                 app:elevation="@dimen/shadow_elevation_md" />
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAdminPanel"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginTop="@dimen/spacing_3"
+                android:text="Admin Panel"
+                android:textSize="@dimen/text_body_large"
+                android:textStyle="bold"
+                android:textColor="@color/text_on_primary"
+                app:backgroundTint="@color/accent_orange"
+                app:cornerRadius="@dimen/radius_button"
+                app:elevation="@dimen/shadow_elevation_md" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLogout"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
