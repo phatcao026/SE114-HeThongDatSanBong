@@ -15,6 +15,7 @@ import com.example.backend.exception.AppException;
 import com.example.backend.repository.BookingRepository;
 import com.example.backend.repository.FieldRepository;
 import com.example.backend.repository.TimeSlotRepository;
+import com.example.backend.repository.FieldReviewRepository;
 import com.example.backend.service.FieldService;
 import com.example.backend.utils.Enums;
 import com.example.backend.utils.TokenUtils;
@@ -34,13 +35,16 @@ public class FieldServiceImpl implements FieldService {
     private final FieldRepository fieldRepository;
     private final TimeSlotRepository timeSlotRepository;
     private final BookingRepository bookingRepository;
+    private final FieldReviewRepository fieldReviewRepository;
 
     public FieldServiceImpl(FieldRepository fieldRepository,
                             TimeSlotRepository timeSlotRepository,
-                            BookingRepository bookingRepository) {
+                            BookingRepository bookingRepository,
+                            FieldReviewRepository fieldReviewRepository) {
         this.fieldRepository = fieldRepository;
         this.timeSlotRepository = timeSlotRepository;
         this.bookingRepository = bookingRepository;
+        this.fieldReviewRepository = fieldReviewRepository;
     }
 
     @Override
@@ -268,6 +272,8 @@ public class FieldServiceImpl implements FieldService {
         response.setCoverImage(field.getCoverImage());
         response.setCreatedAt(field.getCreatedAt());
         response.setUpdatedAt(field.getUpdatedAt());
+        response.setAverageRating(fieldReviewRepository.getAverageRatingForField(field.getId()));
+        response.setReviewCount(fieldReviewRepository.getReviewCountForField(field.getId()));
         return response;
     }
 
@@ -283,6 +289,8 @@ public class FieldServiceImpl implements FieldService {
         response.setCoverImage(field.getCoverImage());
         response.setCreatedAt(field.getCreatedAt());
         response.setUpdatedAt(field.getUpdatedAt());
+        response.setAverageRating(fieldReviewRepository.getAverageRatingForField(field.getId()));
+        response.setReviewCount(fieldReviewRepository.getReviewCountForField(field.getId()));
         response.setTimeSlots(field.getTimeSlots()
                 .stream()
                 .map(this::toTimeSlotResponse)

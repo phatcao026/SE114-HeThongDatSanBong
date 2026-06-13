@@ -16,6 +16,9 @@ public class FieldResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    private Double averageRating;
+    private Long reviewCount;
+
     public Long getId() {
         return id;
     }
@@ -94,5 +97,21 @@ public class FieldResponse {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    public Long getReviewCount() {
+        return reviewCount;
+    }
+
+    public void setReviewCount(Long reviewCount) {
+        this.reviewCount = reviewCount;
     }
 }

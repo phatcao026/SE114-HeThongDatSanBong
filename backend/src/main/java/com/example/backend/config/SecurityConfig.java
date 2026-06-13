@@ -58,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/payments/webhook").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/fields/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/field/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/teams/my", "/api/teams/invitations/my").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/teams/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/match-posts/**").permitAll()
