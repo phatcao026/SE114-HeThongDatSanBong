@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg_screen">
+
+    <!-- Top Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/white"
+        android:elevation="2dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp">
+
+        <!-- Title Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Quay lại trang tổng quan"
+                    android:textSize="11sp"
+                    android:textColor="@color/text_hint" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title_field_management"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/subtitle_field_management"
+                    android:textSize="11sp"
+                    android:textColor="@color/text_hint" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnAddOwnerField"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="+ Tạo sân"
+                android:textSize="12sp"
+                android:textColor="@color/white"
+                android:background="@drawable/bg_green_button"
+                style="?android:attr/borderlessButtonStyle"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp" />
+
+        </LinearLayout>
+
+        <!-- Field Chips (horizontal scroll) -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/ll_field_chips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+
+        </HorizontalScrollView>
+
+    </LinearLayout>
+
+    <!-- Scrollable Body -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Add Time Slot Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:layout_marginBottom="12dp">
+
+                <!-- Expand Header -->
+                <LinearLayout
+                    android:id="@+id/btn_toggle_add_slot"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@android:drawable/ic_input_add"
+                        android:background="@color/green_surface"
+                        android:tint="@color/green_primary"
+                        android:padding="6dp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/add_slot_title"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
+
+                    <ImageView
+                        android:id="@+id/iv_toggle_arrow"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@android:drawable/arrow_down_float"
+                        android:tint="@color/text_hint" />
+
+                </LinearLayout>
+
+                <!-- Add Slot Form (hidden by default) -->
+                <LinearLayout
+                    android:id="@+id/ll_add_slot_form"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:visibility="gone">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/bg_divider"
+                        android:layout_marginBottom="12dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/add_slot_subtitle"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_hint"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- Row 1: Date & Time Range -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="10dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="8dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/label_date"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_secondary"
+                                android:layout_marginBottom="4dp" />
+                            <EditText
+                                android:id="@+id/et_slot_date"
+                                android:layout_width="match_parent"
+                                android:layout_height="44dp"
+                                android:text="12/06/2026"
+                                android:textSize="12sp"
+                                android:textColor="@color/text_primary"
+                                android:background="@drawable/bg_input"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp"
+                                android:inputType="date"
+                                android:hint="dd/mm/yyyy"
+                                android:singleLine="true" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/label_time_range"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_secondary"
+                                android:layout_marginBottom="4dp" />
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="44dp"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+                                <EditText
+                                    android:id="@+id/et_start_time"
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1"
+                                    android:text="18:00"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary"
+                                    android:background="@drawable/bg_input"
+                                    android:paddingStart="8dp"
+                                    android:paddingEnd="8dp"
+                                    android:gravity="center"
+                                    android:singleLine="true" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="-"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/text_hint"
+                                    android:layout_marginStart="4dp"
+                                    android:layout_marginEnd="4dp" />
+                                <EditText
+                                    android:id="@+id/et_end_time"
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1"
+                                    android:text="19:30"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary"
+                                    android:background="@drawable/bg_input"
+                                    android:paddingStart="8dp"
+                                    android:paddingEnd="8dp"
+                                    android:gravity="center"
+                                    android:singleLine="true" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Row 2: Price & Status -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="8dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/label_price"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_secondary"
+                                android:layout_marginBottom="4dp" />
+                            <EditText
+                                android:id="@+id/et_slot_price"
+                                android:layout_width="match_parent"
+                                android:layout_height="44dp"
+                                android:text="350000"
+                                android:textSize="12sp"
+                                android:textColor="@color/text_primary"
+                                android:background="@drawable/bg_input"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp"
+                                android:inputType="numberDecimal"
+                                android:singleLine="true" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/label_status"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_secondary"
+                                android:layout_marginBottom="4dp" />
+                            <Spinner
+                                android:id="@+id/sp_slot_status"
+                                android:layout_width="match_parent"
+                                android:layout_height="44dp"
+                                android:background="@drawable/bg_input"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Add Button -->
+                    <Button
+                        android:id="@+id/btn_add_slot"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="@string/btn_add_slot"
+                        android:textSize="13sp"
+                        android:textColor="@color/white"
+                        android:background="@drawable/bg_green_button"
+                        style="?android:attr/borderlessButtonStyle" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Field Detail Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:layout_marginBottom="12dp">
+
+                <!-- Field Header Image -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:background="@drawable/bg_field_header">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@android:drawable/ic_menu_camera"
+                        android:tint="#80FFFFFF"
+                        android:layout_centerInParent="true" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="12dp"
+                        android:layout_alignParentBottom="true">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:id="@+id/tv_field_name"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Sân Bóng 1"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/white" />
+                            <TextView
+                                android:id="@+id/tv_field_type"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Sân 5"
+                                android:textSize="11sp"
+                                android:textColor="#CCFFFFFF" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tv_slot_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="48 khung giờ"
+                            android:textSize="11sp"
+                            android:textColor="@color/white"
+                            android:background="#4D000000"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:paddingTop="4dp"
+                            android:paddingBottom="4dp" />
+
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <!-- Time Slots Section -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="8dp">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Khung giờ"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary" />
+                        <TextView
+                            android:id="@+id/tv_total_slots"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tổng: 11 khung giờ"
+                            android:textSize="11sp"
+                            android:textColor="@color/text_hint" />
+                    </LinearLayout>
+
+                    <!-- Table Header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="32dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="@color/gray_light"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.2"
+                            android:text="@string/col_date"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_secondary" />
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.4"
+                            android:text="@string/col_time"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_secondary" />
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/col_price"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_secondary" />
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.8"
+                            android:text="@string/col_status"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_secondary" />
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.6"
+                            android:text=""
+                            android:textSize="10sp" />
+                    </LinearLayout>
+
+                    <!-- Time Slots RecyclerView -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvOwnerFields"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false" />
+
+                    <TextView
+                        android:id="@+id/tvOwnerEmptyFields"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="16dp"
+                        android:text="@string/empty_fields"
+                        android:textColor="@color/text_hint"
+                        android:textSize="12sp"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Add New Field Button -->
+            <LinearLayout
+                android:id="@+id/btn_add_new_field"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="@drawable/bg_dashed_border"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@android:drawable/ic_input_add"
+                    android:tint="@color/text_hint" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/btn_create_field_new"
+                    android:textSize="13sp"
+                    android:textColor="@color/text_hint" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <include layout="@layout/layout_owner_bottom_nav" />
+
+</LinearLayout>

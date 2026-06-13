@@ -8,7 +8,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.timsanbong.data.model.AuthResponse;
+import com.example.timsanbong.data.model.User;
 import com.example.timsanbong.data.repository.AuthRepository;
+import com.example.timsanbong.data.api.ApiClient;
 import com.example.timsanbong.utils.RepositoryCallback;
 import com.example.timsanbong.utils.Resource;
 import com.example.timsanbong.utils.SessionManager;
@@ -30,6 +32,9 @@ public class AuthViewModel extends AndroidViewModel {
     private final MutableLiveData<String> _loginMessage = new MutableLiveData<>();
     public LiveData<String> loginMessage = _loginMessage;
 
+    private final MutableLiveData<Boolean> _loginSuccess = new MutableLiveData<>();
+    public LiveData<Boolean> loginSuccess = _loginSuccess;
+
     public AuthViewModel(@NonNull Application application) {
         super(application);
         this.sessionManager = new SessionManager(application);
@@ -49,6 +54,54 @@ public class AuthViewModel extends AndroidViewModel {
         sessionManager.saveUserJson(userJson);
 
         return true;
+    }
+
+    public void login(String email, String password) {
+        Map<String, String> body = new HashMap<>();
+        body.put("email", email);
+        body.put("password", password);
+
+        authRepository.login(getApplication(), body, new RepositoryCallback<AuthResponse>() {
+            @Override
+            public void onSuccess(AuthResponse data) {
+                sessionManager.saveToken(data.getToken());
+                ApiClient.reset();
+                loadProfileAfterLogin();
+            }
+
+            @Override
+            public void onError(String message) {
+                _loginMessage.postValue(message);
+                _loginSuccess.postValue(false);
+            }
+        });
+    }
+
+    private void loadProfileAfterLogin() {
+        authRepository.getMyProfile(getApplication(), new RepositoryCallback<User>() {
+            @Override
+            public void onSuccess(User user) {
+                try {
+                    JSONObject userJson = new JSONObject();
+                    userJson.put("id", user.getId());
+                    userJson.put("fullName", user.getFullName());
+                    userJson.put("email", user.getEmail());
+                    userJson.put("phone", user.getPhone());
+                    userJson.put("role", user.getRole());
+                    sessionManager.saveUserJson(userJson.toString());
+                    _loginSuccess.postValue(true);
+                } catch (JSONException e) {
+                    _loginMessage.postValue("Không thể lưu phiên đăng nhập.");
+                    _loginSuccess.postValue(false);
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                _loginMessage.postValue(message);
+                _loginSuccess.postValue(false);
+            }
+        });
     }
 
     public void register(String fullName, String email, String password) {

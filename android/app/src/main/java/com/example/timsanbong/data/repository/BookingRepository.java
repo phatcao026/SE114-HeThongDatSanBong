@@ -76,9 +76,9 @@ public class BookingRepository {
             callback.onSuccess(null);
             return;
         }
-        ApiClient.getService(context).cancelBooking(bookingId).enqueue(new Callback<Void>() {
+        ApiClient.getService(context).cancelBooking(bookingId).enqueue(new Callback<Booking>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
+            public void onResponse(Call<Booking> call, Response<Booking> response) {
                 if (response.isSuccessful()) {
                     callback.onSuccess(null);
                 } else {
@@ -87,7 +87,7 @@ public class BookingRepository {
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
+            public void onFailure(Call<Booking> call, Throwable t) {
                 callback.onError("Không thể kết nối máy chủ.");
             }
         });

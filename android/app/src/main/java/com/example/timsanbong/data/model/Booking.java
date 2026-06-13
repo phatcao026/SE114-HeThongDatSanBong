@@ -3,11 +3,17 @@ package com.example.timsanbong.data.model;
 import com.google.gson.annotations.SerializedName;
 
 public class Booking {
-    @SerializedName("id")
+    @SerializedName(value = "id", alternate = {"bookingId"})
     private long id;
 
     @SerializedName("field")
     private Field field;
+
+    @SerializedName("fieldId")
+    private long fieldId;
+
+    @SerializedName("fieldName")
+    private String fieldName;
 
     @SerializedName("user")
     private User user;
@@ -21,7 +27,7 @@ public class Booking {
     @SerializedName("endTime")
     private String endTime;
 
-    @SerializedName("totalPrice")
+    @SerializedName(value = "totalPrice", alternate = {"totalAmount"})
     private double totalPrice;
 
     @SerializedName("status")
@@ -42,7 +48,16 @@ public class Booking {
     }
 
     public long getId() { return id; }
-    public Field getField() { return field; }
+    public Field getField() {
+        if (field != null) {
+            return field;
+        }
+        if (fieldId > 0 || fieldName != null) {
+            return new Field(fieldId, fieldName == null ? "Sân bóng" : fieldName, "", 0,
+                    null, "", "", true);
+        }
+        return null;
+    }
     public User getUser() { return user; }
     public String getBookingDate() { return bookingDate; }
     public String getStartTime() { return startTime; }
