@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="78dp"
+    android:background="@drawable/bg_owner_bottom_nav"
+    android:elevation="10dp"
+    android:orientation="horizontal"
+    android:paddingStart="12dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="12dp"
+    android:paddingBottom="8dp">
+
+    <LinearLayout
+        android:id="@+id/ownerNavDashboard"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/bg_owner_nav_item"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:minHeight="56dp"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/wrapOwnerNavDashboard"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:background="@drawable/bg_owner_nav_icon">
+
+            <ImageView
+                android:id="@+id/ivOwnerNavDashboard"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@android:drawable/ic_menu_today" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tvOwnerNavDashboard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/nav_dashboard"
+            android:textSize="11sp"
+            android:singleLine="true" />
+    </LinearLayout>
+
+    <Space
+        android:layout_width="8dp"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/ownerNavFields"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/bg_owner_nav_item"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:minHeight="56dp"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/wrapOwnerNavFields"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:background="@drawable/bg_owner_nav_icon">
+
+            <ImageView
+                android:id="@+id/ivOwnerNavFields"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@android:drawable/ic_menu_mapmode" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tvOwnerNavFields"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/nav_fields"
+            android:textSize="11sp"
+            android:singleLine="true" />
+    </LinearLayout>
+
+    <Space
+        android:layout_width="8dp"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/ownerNavBookings"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/bg_owner_nav_item"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:minHeight="56dp"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/wrapOwnerNavBookings"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:background="@drawable/bg_owner_nav_icon">
+
+            <ImageView
+                android:id="@+id/ivOwnerNavBookings"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@android:drawable/ic_menu_agenda" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tvOwnerNavBookings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Lịch đặt"
+            android:textSize="11sp"
+            android:singleLine="true" />
+    </LinearLayout>
+</LinearLayout>
