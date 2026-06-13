@@ -99,6 +99,20 @@
             android:exported="false"
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
 
+        <!-- Owner Activities -->
+        <activity
+            android:name=".ui.owner.OwnerDashboardActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+        <activity
+            android:name=".ui.owner.OwnerFieldManagementActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+        <activity
+            android:name=".ui.owner.OwnerBookingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+
         <!-- Admin Activities (from dev) -->
         <activity
             android:name=".ui.admin.AdminMainActivity"
@@ -118,6 +132,14 @@
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
         <activity
             android:name=".ui.admin.AdminProfileActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+        <activity
+            android:name=".ui.admin.AdminBookingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+        <activity
+            android:name=".ui.admin.AdminFieldActivity"
             android:exported="false"
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
     </application>

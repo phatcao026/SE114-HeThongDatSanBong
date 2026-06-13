@@ -18,9 +18,16 @@ import com.example.backend.repository.MatchRequestRepository;
 import com.example.backend.repository.TeamRepository;
 import com.example.backend.repository.TimeSlotRepository;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.dto.ai.AiOpponentDto;
+import com.example.backend.dto.ai.AiRecommendationResult;
+import com.example.backend.dto.response.RecommendedMatchResponse;
 import com.example.backend.service.MatchPostService;
+import com.example.backend.service.ai.GroqAiService;
 import com.example.backend.utils.Enums;
 import com.example.backend.utils.TokenUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -52,6 +59,7 @@ public class MatchPostServiceImpl implements MatchPostService {
     private final TimeSlotRepository timeSlotRepository;
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
+    private final GroqAiService groqAiService;
 
     public MatchPostServiceImpl(MatchPostRepository matchPostRepository,
                                 MatchRequestRepository matchRequestRepository,
@@ -59,7 +67,8 @@ public class MatchPostServiceImpl implements MatchPostService {
                                 FieldRepository fieldRepository,
                                 TimeSlotRepository timeSlotRepository,
                                 TeamRepository teamRepository,
-                                UserRepository userRepository) {
+                                UserRepository userRepository,
+                                GroqAiService groqAiService) {
         this.matchPostRepository = matchPostRepository;
         this.matchRequestRepository = matchRequestRepository;
         this.bookingRepository = bookingRepository;
@@ -67,6 +76,7 @@ public class MatchPostServiceImpl implements MatchPostService {
         this.timeSlotRepository = timeSlotRepository;
         this.teamRepository = teamRepository;
         this.userRepository = userRepository;
+        this.groqAiService = groqAiService;
     }
 
     @Override
@@ -457,5 +467,50 @@ public class MatchPostServiceImpl implements MatchPostService {
         }
 
         return value.trim();
+    }
+
+    @Override
+    public List<RecommendedMatchResponse> getSmartRecommendations(String playstyleNote) {
+        Long currentUserId = TokenUtils.getCurrentUserId();
+        User currentUser = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new AppException(404, "Không tìm thấy User"));
+        int currentTrust = currentUser.getTrustScore() != null ? currentUser.getTrustScore() : 100;
+
+        Pageable top15 = PageRequest.of(0, 15);
+        Page<MatchPost> rawMatchesPage = matchPostRepository.findPotentialMatches(currentUserId, top15);
+        if (rawMatchesPage.isEmpty()) {
+            return List.of();
+        }
+
+        List<MatchPost> top15Matches = rawMatchesPage.getContent();
+
+        List<AiOpponentDto> aiInputData = top15Matches.stream()
+                .map(m -> {
+                    int opponentTrust = m.getUser() != null && m.getUser().getTrustScore() != null
+                            ? m.getUser().getTrustScore()
+                            : 100;
+
+                    return new AiOpponentDto(m.getId(), m.getMessage(), opponentTrust);
+                })
+                .toList();
+
+        List<AiRecommendationResult> aiResults = groqAiService.recommendOpponents(
+                playstyleNote, currentTrust, aiInputData
+        );
+
+        return aiResults.stream().map(aiRes -> {
+            MatchPost fullMatchInfo = top15Matches.stream()
+                    .filter(m -> m.getId().equals(aiRes.getMatchId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (fullMatchInfo == null) return null;
+
+            RecommendedMatchResponse response = new RecommendedMatchResponse();
+            response.setMatchId(fullMatchInfo.getId());
+            response.setOpponentNote(fullMatchInfo.getMessage());
+            response.setAiExplanation(aiRes.getAiReason());
+            return response;
+        }).filter(Objects::nonNull).toList();
     }
 }

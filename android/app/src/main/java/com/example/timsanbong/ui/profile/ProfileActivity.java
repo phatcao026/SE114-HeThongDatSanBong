@@ -21,7 +21,6 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView tabPersonalInfo, tabBookingHistory;
     private android.view.View cardPersonalInfo, layoutBookingHistory;
     private MaterialButton btnLogout;
-    private NavBarManager navBarManager;
     private ProfileViewModel profileViewModel;
 
     @Override
@@ -41,26 +40,21 @@ public class ProfileActivity extends AppCompatActivity {
         android.widget.ImageView btnSettings = findViewById(R.id.btnSettings);
 
         btnLogout.setOnClickListener(v -> profileViewModel.logout());
-        
-        btnSettings.setOnClickListener(v -> {
-            startActivity(new Intent(this, com.example.timsanbong.ui.customer.TeamManagementActivity.class));
-        });
-        
-        setupTabs();
-        animateTrustScore(92); // Mock trust score
+        btnSettings.setOnClickListener(v ->
+                startActivity(new Intent(this, com.example.timsanbong.ui.customer.TeamManagementActivity.class)));
 
-        navBarManager = new NavBarManager(this, NavBarManager.ITEM_HOME);
-        navBarManager.setup();
+        setupTabs();
+        animateTrustScore(92);
+
+        new NavBarManager(this, NavBarManager.ITEM_HOME).setup();
 
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
 
         profileViewModel.profileState.observe(this, resource -> {
-            if (resource.status == Resource.Status.LOADING) {
-                // Show loading if desired
-            } else if (resource.status == Resource.Status.SUCCESS) {
+            if (resource.status == Resource.Status.SUCCESS) {
                 tvName.setText(resource.data.getFullName());
                 tvEmail.setText(resource.data.getEmail());
-            } else {
+            } else if (resource.status == Resource.Status.ERROR) {
                 Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
             }
         });
@@ -76,38 +70,39 @@ public class ProfileActivity extends AppCompatActivity {
 
         profileViewModel.loadProfile();
     }
-    
+
     private void setupTabs() {
         tabPersonalInfo.setOnClickListener(v -> {
             tabPersonalInfo.setBackgroundResource(R.drawable.bg_segment_active);
             tabPersonalInfo.setTextColor(getColor(R.color.text_on_primary));
             tabPersonalInfo.setTypeface(null, android.graphics.Typeface.BOLD);
-            
+
             tabBookingHistory.setBackgroundResource(android.R.color.transparent);
             tabBookingHistory.setTextColor(getColor(R.color.text_secondary));
             tabBookingHistory.setTypeface(null, android.graphics.Typeface.NORMAL);
-            
+
             cardPersonalInfo.setVisibility(android.view.View.VISIBLE);
             layoutBookingHistory.setVisibility(android.view.View.GONE);
         });
-        
+
         tabBookingHistory.setOnClickListener(v -> {
             tabBookingHistory.setBackgroundResource(R.drawable.bg_segment_active);
             tabBookingHistory.setTextColor(getColor(R.color.text_on_primary));
             tabBookingHistory.setTypeface(null, android.graphics.Typeface.BOLD);
-            
+
             tabPersonalInfo.setBackgroundResource(android.R.color.transparent);
             tabPersonalInfo.setTextColor(getColor(R.color.text_secondary));
             tabPersonalInfo.setTypeface(null, android.graphics.Typeface.NORMAL);
-            
+
             cardPersonalInfo.setVisibility(android.view.View.GONE);
             layoutBookingHistory.setVisibility(android.view.View.VISIBLE);
         });
     }
-    
+
     private void animateTrustScore(int score) {
         tvTrustScore.setText(score + "/100");
-        android.animation.ObjectAnimator animation = android.animation.ObjectAnimator.ofInt(pbTrustScore, "progress", 0, score);
+        android.animation.ObjectAnimator animation =
+                android.animation.ObjectAnimator.ofInt(pbTrustScore, "progress", 0, score);
         animation.setDuration(1000);
         animation.setInterpolator(new android.view.animation.DecelerateInterpolator());
         animation.start();

@@ -13,6 +13,7 @@ public class Constants {
     public static final String EXTRA_MATCH_POST = "extra_match_post";
     public static final String EXTRA_MATCH_ID = "extra_match_id";
     
+    public static final boolean MOCK_MODE = false;
     public static final boolean MOCK_PAYMENT_MODE = true;
     public static final boolean MOCK_PAYMENT_SUCCESS = true;
 

@@ -144,4 +144,19 @@
     <!-- Shimmer / Skeleton loading -->
     <color name="shimmer_base">#E5E7EB</color>
     <color name="shimmer_highlight">#F9FAFB</color>
+
+    <!-- Owner UI palette -->
+    <color name="bg_screen">#F4F7F5</color>
+    <color name="bg_divider">#E7ECE8</color>
+    <color name="border_light">#DDE7E0</color>
+    <color name="gray_light">#F2F5F3</color>
+    <color name="green_primary">#199A5A</color>
+    <color name="green_dark">#0F6E42</color>
+    <color name="green_surface">#E7F7EE</color>
+    <color name="orange_primary">#F97316</color>
+    <color name="orange_surface">#FFF1E7</color>
+    <color name="blue_primary">#2563EB</color>
+    <color name="blue_light">#EAF1FF</color>
+    <color name="danger_surface">#FEECEC</color>
+    <color name="owner_card_stroke">#D9E5DD</color>
 </resources>

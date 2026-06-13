@@ -4,11 +4,10 @@ import android.content.Context;
 
 import com.example.timsanbong.data.api.ApiClient;
 import com.example.timsanbong.data.model.Booking;
-import com.example.timsanbong.data.model.Field;
+import com.example.timsanbong.data.model.BookingRequest;
 import com.example.timsanbong.utils.RepositoryCallback;
 
 import java.util.List;
-import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -34,7 +33,7 @@ public class BookingRepository {
         });
     }
 
-    public void createBooking(Context context, com.example.timsanbong.data.model.BookingRequest request,
+    public void createBooking(Context context, BookingRequest request,
                               RepositoryCallback<Booking> callback) {
         ApiClient.getService(context).createBooking(request).enqueue(new Callback<Booking>() {
             @Override
@@ -54,9 +53,9 @@ public class BookingRepository {
     }
 
     public void cancelBooking(Context context, long bookingId, RepositoryCallback<Void> callback) {
-        ApiClient.getService(context).cancelBooking(bookingId).enqueue(new Callback<Void>() {
+        ApiClient.getService(context).cancelBooking(bookingId).enqueue(new Callback<Booking>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
+            public void onResponse(Call<Booking> call, Response<Booking> response) {
                 if (response.isSuccessful()) {
                     callback.onSuccess(null);
                 } else {
@@ -65,7 +64,7 @@ public class BookingRepository {
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
+            public void onFailure(Call<Booking> call, Throwable t) {
                 callback.onError("Không thể kết nối máy chủ.");
             }
         });

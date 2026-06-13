@@ -2,9 +2,14 @@ package com.example.timsanbong.data.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class Field {
     @SerializedName("id")
     private long id;
+
+    @SerializedName("ownerId")
+    private long ownerId;
 
     @SerializedName("name")
     private String name;
@@ -15,45 +20,74 @@ public class Field {
     @SerializedName("description")
     private String description;
 
-    @SerializedName("type")
-    private String type; // FIVE_A_SIDE | SEVEN_A_SIDE | ELEVEN_A_SIDE
+    @SerializedName(value = "type", alternate = {"fieldType"})
+    private String type;
 
     @SerializedName("status")
-    private String status; // AVAILABLE | MAINTENANCE | BOOKED
+    private String status;
 
-    @SerializedName("coverImage")
+    @SerializedName(value = "coverImage", alternate = {"imageUrl"})
     private String coverImage;
 
+    @SerializedName("available")
+    private boolean available;
+
+    @SerializedName("pricePerHour")
+    private double pricePerHour;
+
     @SerializedName("timeSlots")
-    private java.util.List<TimeSlotResponse> timeSlots; // only on detail response
+    private List<TimeSlotResponse> timeSlots;
+
+    public Field() {}
+
+    public Field(long id, String name, String address, double pricePerHour, String imageUrl,
+                 String description, String fieldType, boolean available) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.pricePerHour = pricePerHour;
+        this.coverImage = imageUrl;
+        this.description = description;
+        this.type = fieldType;
+        this.available = available;
+    }
 
     public long getId() { return id; }
+    public long getOwnerId() { return ownerId; }
     public String getName() { return name; }
     public String getAddress() { return address; }
     public String getDescription() { return description; }
     public String getType() { return type; }
     public String getStatus() { return status; }
     public String getImageUrl() { return coverImage; }
-    public java.util.List<TimeSlotResponse> getTimeSlots() { return timeSlots; }
+    public List<TimeSlotResponse> getTimeSlots() { return timeSlots; }
 
-    public boolean isAvailable() { return status == null || "AVAILABLE".equals(status); }
+    public boolean isAvailable() {
+        return available || status == null || "AVAILABLE".equalsIgnoreCase(status);
+    }
 
-    /** Matches FieldFilter values from FilterBottomSheetFragment. */
     public String getFieldType() {
-        if ("SEVEN_A_SIDE".equals(type)) return "7 người";
-        if ("ELEVEN_A_SIDE".equals(type)) return "11 người";
+        if (type == null || type.trim().isEmpty()) return "5 người";
+        if ("SEVEN_A_SIDE".equalsIgnoreCase(type) || "Sân 7".equalsIgnoreCase(type)
+                || "7 người".equalsIgnoreCase(type)) {
+            return "7 người";
+        }
+        if ("ELEVEN_A_SIDE".equalsIgnoreCase(type) || "Sân 11".equalsIgnoreCase(type)
+                || "11 người".equalsIgnoreCase(type)) {
+            return "11 người";
+        }
         return "5 người";
     }
 
-    /** Display label, e.g. "Sân 5". */
     public String getTypeLabel() {
-        if ("SEVEN_A_SIDE".equals(type)) return "Sân 7";
-        if ("ELEVEN_A_SIDE".equals(type)) return "Sân 11";
+        String fieldType = getFieldType();
+        if ("7 người".equals(fieldType)) return "Sân 7";
+        if ("11 người".equals(fieldType)) return "Sân 11";
         return "Sân 5";
     }
 
-    /** Lowest price across time slots (detail response only); 0 when unknown. */
     public double getPricePerHour() {
+        if (pricePerHour > 0) return pricePerHour;
         if (timeSlots == null || timeSlots.isEmpty()) return 0;
         double min = 0;
         for (TimeSlotResponse slot : timeSlots) {
@@ -63,6 +97,4 @@ public class Field {
         }
         return min;
     }
-
-    public Field() {}
 }

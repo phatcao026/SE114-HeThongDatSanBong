@@ -11,7 +11,11 @@ public class TeamResponse {
     private Long captainId;
     private String captainName;
     private Enums.TeamLevel level;
+    private Boolean isCaptain;
+    private Enums.TeamMemberStatus memberStatus;
     private LocalDateTime createdAt;
+
+    private Long conversationId;
 
     public Long getId() {
         return id;
@@ -61,11 +65,35 @@ public class TeamResponse {
         this.level = level;
     }
 
+    public Boolean getIsCaptain() {
+        return isCaptain;
+    }
+
+    public void setIsCaptain(Boolean captain) {
+        isCaptain = captain;
+    }
+
+    public Enums.TeamMemberStatus getMemberStatus() {
+        return memberStatus;
+    }
+
+    public void setMemberStatus(Enums.TeamMemberStatus memberStatus) {
+        this.memberStatus = memberStatus;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Long getConversationId() {
+        return conversationId;
+    }
+
+    public void setConversationId(Long conversationId) {
+        this.conversationId = conversationId;
     }
 }

@@ -3,6 +3,7 @@ package com.example.backend.service;
 import com.example.backend.dto.request.MatchPostCreateRequest;
 import com.example.backend.dto.request.MatchPostUpdateRequest;
 import com.example.backend.dto.response.MatchPostResponse;
+import com.example.backend.dto.response.RecommendedMatchResponse;
 import com.example.backend.utils.Enums;
 
 import java.time.LocalDate;
@@ -24,4 +25,6 @@ public interface MatchPostService {
     MatchPostResponse updateMatchPost(Long id, MatchPostUpdateRequest request);
 
     MatchPostResponse closeMatchPost(Long id);
+
+    List<RecommendedMatchResponse> getSmartRecommendations(String playstyleNote);
 }

@@ -1,10 +1,11 @@
 package com.example.timsanbong.ui.customer;
 
-import android.os.Bundle;
 import android.content.Intent;
+import android.os.Bundle;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,8 +21,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import androidx.lifecycle.ViewModelProvider;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,8 +38,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvHotSeeAll;
     private TextView tvSuggestedMore;
     private RecyclerView rvSuggestedFields;
-    private SuggestedFieldAdapter suggestedFieldAdapter;
-    private NavBarManager navBarManager;
     private FieldViewModel fieldViewModel;
     private SessionManager sessionManager;
 
@@ -72,8 +69,7 @@ public class MainActivity extends AppCompatActivity {
         rvSuggestedFields.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        navBarManager = new NavBarManager(this, NavBarManager.ITEM_HOME);
-        navBarManager.setup();
+        new NavBarManager(this, NavBarManager.ITEM_HOME).setup();
     }
 
     private void setupListeners() {
@@ -99,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
         sessionManager = new SessionManager(this);
         fieldViewModel = new ViewModelProvider(this).get(FieldViewModel.class);
 
-        // Load Avatar initials and info from session
         try {
             JSONObject userJson = new JSONObject(sessionManager.getUserJson());
             String fullName = userJson.optString("fullName", "User");
@@ -110,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
             tvAvatar.setText("U");
         }
 
-        // TODO: Real API for UpcomingCount, TrustScore, Hot Matches
         tvUpcomingCount.setText("2");
         tvTrustScore.setText("98");
         tvMessageCount.setText("1");
@@ -126,13 +120,13 @@ public class MainActivity extends AppCompatActivity {
                         field.getName(),
                         field.getImageUrl(),
                         field.getFieldType() != null ? field.getFieldType() : "Sân 5",
-                        4.5f, // Mock rating
-                        "2.0km", // Mock distance
+                        4.5f,
+                        "2.0km",
                         field.isAvailable()
                 ));
             }
-            suggestedFieldAdapter = new SuggestedFieldAdapter(suggestedFields, item -> {
-                android.content.Intent intent = new android.content.Intent(MainActivity.this, FieldDetailActivity.class);
+            SuggestedFieldAdapter suggestedFieldAdapter = new SuggestedFieldAdapter(suggestedFields, item -> {
+                Intent intent = new Intent(MainActivity.this, FieldDetailActivity.class);
                 intent.putExtra("fieldId", item.getId());
                 startActivity(intent);
             });
@@ -141,5 +135,4 @@ public class MainActivity extends AppCompatActivity {
 
         fieldViewModel.loadFields();
     }
-
 }

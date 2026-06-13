@@ -62,8 +62,15 @@ public class ApiClient {
 
             okHttpClient = new OkHttpClient.Builder()
                     .addInterceptor(chain -> {
-                        String token = prefs.getString("token", null);
                         Request original = chain.request();
+                        String path = original.url().encodedPath();
+
+                        // Don't add Authorization header for login and register endpoints
+                        if (path.contains("auth/login") || path.contains("auth/register")) {
+                            return chain.proceed(original);
+                        }
+
+                        String token = prefs.getString("token", null);
                         if (token != null) {
                             Request request = original.newBuilder()
                                     .header("Authorization", "Bearer " + token)

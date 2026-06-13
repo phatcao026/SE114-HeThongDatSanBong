@@ -3,6 +3,9 @@ package com.example.timsanbong.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class SessionManager {
     private final SharedPreferences prefs;
 
@@ -47,7 +50,19 @@ public class SessionManager {
     }
 
     public String getUserRole() {
-        return prefs.getString(Constants.KEY_USER_ROLE, null);
+        String role = prefs.getString(Constants.KEY_USER_ROLE, null);
+        if (role != null && !role.trim().isEmpty()) {
+            return role;
+        }
+
+        String json = getUserJson();
+        if (json == null) return "PLAYER";
+        try {
+            JSONObject obj = new JSONObject(json);
+            return obj.optString("role", "PLAYER");
+        } catch (JSONException e) {
+            return "PLAYER";
+        }
     }
 
     public void saveUserEmail(String email) {
@@ -56,5 +71,13 @@ public class SessionManager {
 
     public String getUserEmail() {
         return prefs.getString(Constants.KEY_USER_EMAIL, null);
+    }
+
+    public boolean isAdmin() {
+        return "ADMIN".equalsIgnoreCase(getUserRole());
+    }
+
+    public boolean isOwner() {
+        return "OWNER".equalsIgnoreCase(getUserRole());
     }
 }

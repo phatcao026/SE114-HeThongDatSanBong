@@ -38,7 +38,7 @@ public interface ApiService {
     @POST("auth/google-sync")
     Call<AuthResponse> googleSync(@Body Map<String, String> body);
 
-    // Users
+    // Users / profile
     @GET("users/me")
     Call<User> getMyProfile();
 
@@ -55,7 +55,7 @@ public interface ApiService {
     @GET("fields/{id}/availability")
     Call<List<TimeSlotResponse>> getTimeslots(@Path("id") long id, @Query("date") String date);
 
-    // Bookings
+    // Player bookings
     @POST("bookings")
     Call<Booking> createBooking(@Body BookingRequest body);
 
@@ -66,15 +66,17 @@ public interface ApiService {
     Call<Booking> getBookingById(@Path("id") long id);
 
     @PUT("bookings/{id}/cancel")
-    Call<Void> cancelBooking(@Path("id") long id);
+    Call<Booking> cancelBooking(@Path("id") long id);
 
     // Payments
     @POST("payments/create-session/{bookingId}")
     Call<CheckoutSessionResponse> createCheckoutSession(@Path("bookingId") long bookingId);
 
-    // Match Posts
+    // Match posts
     @GET("match-posts")
-    Call<PageResponse<MatchPost>> getMatchPosts(@Query("page") int page, @Query("size") int size, @Query("postType") String postType);
+    Call<PageResponse<MatchPost>> getMatchPosts(@Query("page") int page,
+                                                @Query("size") int size,
+                                                @Query("postType") String postType);
 
     @POST("match-posts")
     Call<MatchPost> createMatchPost(@Body MatchPostRequest request);
@@ -88,12 +90,13 @@ public interface ApiService {
     @GET("match-posts/me")
     Call<PageResponse<MatchPost>> getMyMatchPosts(@Query("page") int page, @Query("size") int size);
 
-    // Match Requests
+    // Match requests
     @POST("match-requests")
-    Call<MatchRequestResponse> createMatchRequest(@Body Map<String, Long> body); // matchPostId
+    Call<MatchRequestResponse> createMatchRequest(@Body Map<String, Long> body);
 
     @PUT("match-requests/{id}/status")
-    Call<MatchRequestResponse> updateMatchRequestStatus(@Path("id") long id, @Body MatchRequestStatusUpdate update);
+    Call<MatchRequestResponse> updateMatchRequestStatus(@Path("id") long id,
+                                                        @Body MatchRequestStatusUpdate update);
 
     // Teams
     @GET("teams/me")
@@ -112,9 +115,9 @@ public interface ApiService {
     Call<List<InvitationResponse>> getInvitations();
 
     @PUT("teams/invitations/{id}")
-    Call<Void> respondToInvitation(@Path("id") long id, @Body Map<String, String> body); // status
+    Call<Void> respondToInvitation(@Path("id") long id, @Body Map<String, String> body);
 
-    // Conversations & Messages
+    // Conversations & messages
     @GET("conversations")
     Call<List<Conversation>> getConversations();
 
@@ -122,7 +125,9 @@ public interface ApiService {
     Call<UnreadCountResponse> getUnreadConversationCount();
 
     @GET("messages")
-    Call<PageResponse<ChatMessage>> getMessages(@Query("conversationId") long conversationId, @Query("page") int page, @Query("size") int size);
+    Call<PageResponse<ChatMessage>> getMessages(@Query("conversationId") long conversationId,
+                                                @Query("page") int page,
+                                                @Query("size") int size);
 
     @POST("messages")
     Call<ChatMessage> sendMessage(@Body MessageRequest request);
@@ -143,4 +148,54 @@ public interface ApiService {
     // Reviews
     @POST("fairplay/reviews")
     Call<Void> submitReview(@Body ReviewRequest request);
+
+    // Owner fields
+    @POST("fields")
+    Call<Field> createOwnerField(@Body FieldCreateRequest request);
+
+    @PUT("fields/{id}")
+    Call<Field> updateOwnerField(@Path("id") long id, @Body FieldUpdateRequest request);
+
+    @DELETE("fields/{id}")
+    Call<Field> deleteOwnerField(@Path("id") long id);
+
+    @POST("fields/{id}/time-slots")
+    Call<TimeSlot> createOwnerTimeSlot(@Path("id") long fieldId, @Body TimeSlotCreateRequest request);
+
+    @PUT("fields/{id}/time-slots/{slotId}")
+    Call<TimeSlot> updateOwnerTimeSlot(@Path("id") long fieldId,
+                                       @Path("slotId") long slotId,
+                                       @Body TimeSlotUpdateRequest request);
+
+    @DELETE("fields/{id}/time-slots/{slotId}")
+    Call<TimeSlot> deleteOwnerTimeSlot(@Path("id") long fieldId, @Path("slotId") long slotId);
+
+    // Owner bookings
+    @GET("bookings/owner")
+    Call<List<Booking>> getOwnerBookings();
+
+    @PUT("bookings/{id}/confirm")
+    Call<Booking> confirmOwnerBooking(@Path("id") long id);
+
+    @PUT("bookings/{id}/complete")
+    Call<Booking> completeOwnerBooking(@Path("id") long id);
+
+    @PUT("bookings/{id}/cancel")
+    Call<Booking> cancelOwnerBooking(@Path("id") long id);
+
+    // Admin
+    @GET("admin/overview")
+    Call<AdminDashboardOverviewResponse> getAdminOverview();
+
+    @GET("admin/users")
+    Call<List<User>> getAdminUsers();
+
+    @GET("admin/payments")
+    Call<List<PaymentResponse>> getAdminPayments();
+
+    @GET("admin/bookings")
+    Call<List<Booking>> getAdminBookings();
+
+    @GET("admin/fields")
+    Call<List<Field>> getAdminFields();
 }
