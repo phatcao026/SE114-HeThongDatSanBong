@@ -3,7 +3,7 @@ package com.example.timsanbong.data.model;
 import com.google.gson.annotations.SerializedName;
 
 public class AuthResponse {
-    @SerializedName("token")
+    @SerializedName(value = "token", alternate = {"accessToken"})
     private String token;
 
     @SerializedName("user")

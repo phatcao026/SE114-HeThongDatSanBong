@@ -10,9 +10,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.timsanbong.R;
+import com.example.timsanbong.ui.admin.AdminMainActivity;
 import com.example.timsanbong.ui.customer.MainActivity;
+import com.example.timsanbong.ui.owner.OwnerDashboardActivity;
+import com.example.timsanbong.utils.Constants;
+import com.example.timsanbong.utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -50,6 +57,11 @@ public class LoginActivity extends AppCompatActivity {
         authViewModel.loginMessage.observe(this, message -> {
             tilPassword.setError(message);
         });
+        authViewModel.loginSuccess.observe(this, success -> {
+            if (Boolean.TRUE.equals(success)) {
+                navigateByRole();
+            }
+        });
     }
 
     private void attemptLogin() {
@@ -76,10 +88,12 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        if (authViewModel.loginDemo(email, password)) {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
+        if (Constants.MOCK_MODE) {
+            if (authViewModel.loginDemo(email, password)) {
+                navigateByRole();
+            }
+        } else {
+            authViewModel.login(email, password);
         }
     }
 
@@ -111,9 +125,27 @@ public class LoginActivity extends AppCompatActivity {
     private void bypassLogin() {
         // Auto-login with demo account
         if (authViewModel.loginDemo("player_demo@test.com", "pass123")) {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
+            navigateByRole();
         }
+    }
+
+    private void navigateByRole() {
+        SessionManager sessionManager = new SessionManager(this);
+        Class<?> destination = MainActivity.class;
+
+        try {
+            JSONObject userJson = new JSONObject(sessionManager.getUserJson());
+            String role = userJson.optString("role", "PLAYER");
+            if ("OWNER".equalsIgnoreCase(role)) {
+                destination = OwnerDashboardActivity.class;
+            } else if ("ADMIN".equalsIgnoreCase(role)) {
+                destination = AdminMainActivity.class;
+            }
+        } catch (JSONException ignored) {
+        }
+
+        Intent intent = new Intent(this, destination);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 }

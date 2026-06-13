@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/etOwnerSlotStartTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Gio bat dau" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/etOwnerSlotEndTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Gio ket thuc" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/etOwnerSlotPrice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Gia"
+        android:inputType="numberDecimal" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/etOwnerSlotStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Trang thai" />
+</LinearLayout>

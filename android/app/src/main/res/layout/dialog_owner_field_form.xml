@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/etOwnerFieldName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ten san" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/etOwnerFieldType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Loai san" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/etOwnerFieldAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Dia chi" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/etOwnerFieldDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Mo ta" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/etOwnerFieldCoverImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Anh bia" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/etOwnerFieldStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Trang thai" />
+</LinearLayout>

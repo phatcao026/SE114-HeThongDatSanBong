@@ -230,4 +230,40 @@
 
     <string name="badge_hot">Hot</string>
     <string name="rating_distance_format">%1$.1f • %2$s</string>
+
+    <!-- Owner -->
+    <string name="greeting">Xin chào, chủ sân</string>
+    <string name="greeting_subtitle">Theo dõi sân, lịch đặt và doanh thu trong ngày.</string>
+    <string name="btn_create_field">Tạo sân mới</string>
+    <string name="btn_view_bookings">Xem lịch đặt</string>
+    <string name="stat_total_fields">Tổng sân</string>
+    <string name="stat_slots">Khung giờ</string>
+    <string name="stat_pending">Chờ cọc</string>
+    <string name="stat_process">Cần xử lý</string>
+    <string name="stat_collected">Cọc đã thu</string>
+    <string name="stat_done">Hoàn thành</string>
+    <string name="section_fields_managed">Sân đang quản lý</string>
+    <string name="section_deposits">Đơn cần xử lý</string>
+    <string name="section_transactions">Giao dịch gần đây</string>
+    <string name="section_quick_actions">Thao tác nhanh</string>
+    <string name="btn_manage">Quản lý</string>
+    <string name="btn_see_all">Xem tất cả</string>
+    <string name="title_field_management">Quản lý sân</string>
+    <string name="subtitle_field_management">Cập nhật sân và khung giờ mở bán.</string>
+    <string name="add_slot_title">Thêm khung giờ mới</string>
+    <string name="add_slot_subtitle">Chọn ngày, giờ, giá và trạng thái cho khung giờ.</string>
+    <string name="label_date">Ngày</string>
+    <string name="label_time_range">Khung giờ</string>
+    <string name="label_price">Giá</string>
+    <string name="label_status">Trạng thái</string>
+    <string name="btn_add_slot">Thêm khung giờ</string>
+    <string name="col_date">Ngày</string>
+    <string name="col_time">Giờ</string>
+    <string name="col_price">Giá</string>
+    <string name="col_status">TT</string>
+    <string name="btn_create_field_new">Tạo sân mới</string>
+    <string name="title_booking_history">Lịch đặt sân</string>
+    <string name="subtitle_booking_history">Theo dõi và xử lý các đơn đặt sân.</string>
+    <string name="nav_dashboard">Tổng quan</string>
+    <string name="nav_fields">Sân</string>
 </resources>
