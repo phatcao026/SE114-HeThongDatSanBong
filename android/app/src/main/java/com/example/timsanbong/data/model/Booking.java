@@ -64,4 +64,9 @@ public class Booking {
     public String getEndTime() { return endTime; }
     public double getTotalPrice() { return totalPrice; }
     public String getStatus() { return status; }
+    public String getFieldName() {
+        if (fieldName != null) return fieldName;
+        if (field != null) return field.getName();
+        return "Sân bóng";
+    }
 }

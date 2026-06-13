@@ -79,7 +79,7 @@
             android:exported="false"
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
 
-git        <!-- Owner Activities -->
+        <!-- Owner Activities -->
         <activity
             android:name=".ui.owner.OwnerDashboardActivity"
             android:exported="false"
@@ -112,6 +112,14 @@ git        <!-- Owner Activities -->
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
         <activity
             android:name=".ui.admin.AdminProfileActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+        <activity
+            android:name=".ui.admin.AdminBookingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+        <activity
+            android:name=".ui.admin.AdminFieldActivity"
             android:exported="false"
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
     </application>

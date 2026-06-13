@@ -67,9 +67,18 @@ public class AdminTransactionActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<PaymentResponse>> call, Throwable t) {
-                Toast.makeText(AdminTransactionActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AdminTransactionActivity.this, "Lỗi kết nối - Sử dụng dữ liệu demo", Toast.LENGTH_SHORT).show();
+                setupDemoTransactions();
             }
         });
+    }
+
+    private void setupDemoTransactions() {
+        allTransactions = new ArrayList<>();
+        allTransactions.add(new PaymentResponse(1L, 101L, 500000, "CASH", "SUCCESS", "2024-06-12 10:00"));
+        allTransactions.add(new PaymentResponse(2L, 103L, 350000, "STRIPE", "SUCCESS", "2024-06-12 11:30"));
+        allTransactions.add(new PaymentResponse(3L, 104L, 200000, "STRIPE", "FAILED", "2024-06-12 12:15"));
+        adapter.updateList(allTransactions);
     }
 
     private void setupHeaderCards() {

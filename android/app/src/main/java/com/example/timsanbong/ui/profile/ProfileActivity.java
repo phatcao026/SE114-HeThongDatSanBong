@@ -9,16 +9,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.timsanbong.R;
+import com.example.timsanbong.ui.admin.AdminMainActivity;
 import com.example.timsanbong.ui.auth.LoginActivity;
 import com.example.timsanbong.ui.customer.MyBookingsActivity;
 import com.example.timsanbong.utils.NavBarManager;
 import com.example.timsanbong.utils.Resource;
+import com.example.timsanbong.utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
+import android.view.View;
 
 public class ProfileActivity extends AppCompatActivity {
 
     private TextView tvName, tvEmail, tvPhone;
-    private MaterialButton btnMyBookings, btnLogout;
+    private MaterialButton btnMyBookings, btnLogout, btnAdminPanel;
     private NavBarManager navBarManager;
     private ProfileViewModel profileViewModel;
 
@@ -31,10 +34,20 @@ public class ProfileActivity extends AppCompatActivity {
         tvEmail = findViewById(R.id.tvEmail);
         tvPhone = findViewById(R.id.tvPhone);
         btnMyBookings = findViewById(R.id.btnMyBookings);
+        btnAdminPanel = findViewById(R.id.btnAdminPanel);
         btnLogout = findViewById(R.id.btnLogout);
 
         btnMyBookings.setOnClickListener(v -> startActivity(new Intent(this, MyBookingsActivity.class)));
+        btnAdminPanel.setOnClickListener(v -> startActivity(new Intent(this, AdminMainActivity.class)));
         btnLogout.setOnClickListener(v -> profileViewModel.logout());
+
+        // Only show Admin Panel button if user is an admin
+        SessionManager sessionManager = new SessionManager(this);
+        if (sessionManager.isAdmin()) {
+            btnAdminPanel.setVisibility(View.VISIBLE);
+        } else {
+            btnAdminPanel.setVisibility(View.GONE);
+        }
 
         navBarManager = new NavBarManager(this, NavBarManager.ITEM_HOME);
         navBarManager.setup();
