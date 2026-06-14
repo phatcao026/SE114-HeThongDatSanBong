@@ -5,7 +5,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,19 +15,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.timsanbong.R;
-import com.example.timsanbong.data.model.ChatMessage;
 import com.example.timsanbong.data.model.Conversation;
+import com.example.timsanbong.data.model.MessageRequest;
 import com.example.timsanbong.utils.Constants;
+import com.example.timsanbong.utils.SessionManager;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 public class ChatActivity extends AppCompatActivity {
 
-    // ── Views ────────────────────────────────────────────
     private View viewChatAvatarBg;
     private TextView tvChatInitials;
     private View viewChatOnlineDot;
@@ -38,7 +33,6 @@ public class ChatActivity extends AppCompatActivity {
     private EditText etChatInput;
     private ImageView ivSend;
 
-    // ── Data ─────────────────────────────────────────────
     private ChatMessageAdapter chatAdapter;
     private Conversation conversation;
     private ChatViewModel chatViewModel;
@@ -66,7 +60,7 @@ public class ChatActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         rvMessages.setLayoutManager(layoutManager);
-        chatAdapter = new ChatMessageAdapter(new ArrayList<>());
+        chatAdapter = new ChatMessageAdapter(new ArrayList<>(), new SessionManager(this).getUserId());
         rvMessages.setAdapter(chatAdapter);
 
         findViewById(R.id.ivChatBack).setOnClickListener(v -> finish());
@@ -95,10 +89,7 @@ public class ChatActivity extends AppCompatActivity {
         tvChatStatus.setText(conversation.isOnline()
                 ? getString(R.string.chat_status_online)
                 : getString(R.string.chat_status_recent));
-
-        if (conversation.isOnline()) {
-            viewChatOnlineDot.setVisibility(View.VISIBLE);
-        }
+        viewChatOnlineDot.setVisibility(conversation.isOnline() ? View.VISIBLE : View.GONE);
 
         android.graphics.drawable.GradientDrawable avatarBg =
                 (android.graphics.drawable.GradientDrawable) viewChatAvatarBg.getBackground().mutate();
@@ -108,20 +99,10 @@ public class ChatActivity extends AppCompatActivity {
         chatViewModel.messagesState.observe(this, resource -> {
             if (resource == null) return;
             if (resource.status == com.example.timsanbong.utils.Resource.Status.SUCCESS && resource.data != null) {
-                List<ChatMessage> messages = resource.data;
-                if (messages.isEmpty()) {
-                    messages = buildMockMessages();
-                }
-                for (ChatMessage msg : messages) {
-                    chatAdapter.addMessage(msg);
-                }
+                chatAdapter.updateMessages(resource.data);
                 scrollToBottom();
             } else if (resource.status == com.example.timsanbong.utils.Resource.Status.ERROR) {
-                List<ChatMessage> messages = buildMockMessages();
-                for (ChatMessage msg : messages) {
-                    chatAdapter.addMessage(msg);
-                }
-                scrollToBottom();
+                chatAdapter.updateMessages(new ArrayList<>());
             }
         });
 
@@ -134,49 +115,27 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        long convId = 1; // Assuming conversation object has getId as String, we parse or use default
-        try {
-            convId = Long.parseLong(conversation.getId());
-        } catch (Exception ignored) {}
-        
-        chatViewModel.loadMessages(convId, 0, 50);
+        chatViewModel.loadMessages(getConversationId(), 0, 50);
     }
 
     private void sendMessage() {
         String text = etChatInput.getText().toString().trim();
         if (text.isEmpty()) return;
 
-        com.example.timsanbong.data.model.MessageRequest req = new com.example.timsanbong.data.model.MessageRequest();
-        long convId = 1;
+        MessageRequest request = new MessageRequest(getConversationId(), text);
+        chatViewModel.sendMessage(request);
+    }
+
+    private long getConversationId() {
         try {
-            convId = Long.parseLong(conversation.getId());
-        } catch (Exception ignored) {}
-        req.setConversationId(convId);
-        req.setContent(text);
-        
-        chatViewModel.sendMessage(req);
+            return Long.parseLong(conversation.getId());
+        } catch (Exception ignored) {
+            return -1;
+        }
     }
 
     private void scrollToBottom() {
         int count = chatAdapter.getItemCount();
         if (count > 0) rvMessages.scrollToPosition(count - 1);
-    }
-
-    private List<ChatMessage> buildMockMessages() {
-        List<ChatMessage> list = new ArrayList<>();
-        list.add(new ChatMessage(ChatMessage.SIDE_SYSTEM,
-                "Bạn và " + (conversation != null ? conversation.getName() : "") + " đã kết nối qua Bắt kèo",
-                ""));
-        list.add(new ChatMessage(ChatMessage.SIDE_THEM,
-                "Ê mình muốn xác nhận lịch ngày mai nhé", "16:00"));
-        list.add(new ChatMessage(ChatMessage.SIDE_ME,
-                "Ok, mình sẽ có mặt đúng giờ nhé!", "16:01"));
-        list.add(new ChatMessage(ChatMessage.SIDE_THEM,
-                "Vị trí sân ở đâu bạn nhỉ? Mình lần đầu đến Sân Thái Mỹ", "16:02"));
-        list.add(new ChatMessage(ChatMessage.SIDE_ME,
-                "Mình sẽ pin map cho. Đậu xe cổng phụ bên hông nhé", "16:03"));
-        list.add(new ChatMessage(ChatMessage.SIDE_THEM,
-                "Cảm ơn nhiều nha! Hẹn gặp ngày mai", "16:04"));
-        return list;
     }
 }

@@ -4,8 +4,9 @@ import android.content.Context;
 
 import com.example.timsanbong.data.api.ApiClient;
 import com.example.timsanbong.data.model.AppNotification;
-import com.example.timsanbong.data.model.PageResponse;
 import com.example.timsanbong.utils.RepositoryCallback;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -13,10 +14,10 @@ import retrofit2.Response;
 
 public class NotificationRepository {
 
-    public void getNotifications(Context context, int page, int size, RepositoryCallback<PageResponse<AppNotification>> callback) {
-        ApiClient.getService(context).getNotifications(page, size).enqueue(new Callback<PageResponse<AppNotification>>() {
+    public void getNotifications(Context context, RepositoryCallback<List<AppNotification>> callback) {
+        ApiClient.getService(context).getNotifications(null).enqueue(new Callback<List<AppNotification>>() {
             @Override
-            public void onResponse(Call<PageResponse<AppNotification>> call, Response<PageResponse<AppNotification>> response) {
+            public void onResponse(Call<List<AppNotification>> call, Response<List<AppNotification>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     callback.onSuccess(response.body());
                 } else {
@@ -25,7 +26,7 @@ public class NotificationRepository {
             }
 
             @Override
-            public void onFailure(Call<PageResponse<AppNotification>> call, Throwable t) {
+            public void onFailure(Call<List<AppNotification>> call, Throwable t) {
                 callback.onError("Lỗi kết nối.");
             }
         });

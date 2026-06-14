@@ -4,7 +4,7 @@ import com.example.timsanbong.data.model.PaymentRequest;
 
 public interface PaymentRepository {
     interface Callback {
-        void onSuccess(String message);
+        void onSuccess(String message, String checkoutUrl);
         void onError(String message);
     }
 

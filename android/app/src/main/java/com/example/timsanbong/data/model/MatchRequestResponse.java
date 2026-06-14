@@ -6,7 +6,7 @@ public class MatchRequestResponse {
     @SerializedName("id")
     private long id;
 
-    @SerializedName("matchPostId")
+    @SerializedName(value = "matchPostId", alternate = {"postId"})
     private long matchPostId;
 
     @SerializedName("requesterId")

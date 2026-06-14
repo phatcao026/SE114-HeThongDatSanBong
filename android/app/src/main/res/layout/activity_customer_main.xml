@@ -271,9 +271,10 @@
                         android:orientation="vertical">
 
                         <TextView
+                            android:id="@+id/tvUpcomingFieldName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/mock_field_name_1"
+                            android:text=""
                             android:textColor="@color/text_primary"
                             android:textSize="@dimen/text_body_medium"
                             android:textStyle="bold"
@@ -282,6 +283,7 @@
                             android:ellipsize="end" />
 
                         <TextView
+                            android:id="@+id/tvUpcomingTime"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/spacing_1"

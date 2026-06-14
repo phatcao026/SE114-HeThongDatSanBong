@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -13,15 +14,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.timsanbong.R;
 import com.example.timsanbong.data.model.Conversation;
 import com.example.timsanbong.data.model.MatchPost;
+import com.example.timsanbong.data.repository.ChatRepository;
 import com.example.timsanbong.utils.Constants;
 import com.example.timsanbong.utils.NavBarManager;
+import com.example.timsanbong.utils.RepositoryCallback;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MatchmakingActivity extends AppCompatActivity {
 
-    // ── Views ────────────────────────────────────────────
     private TextView tabAll, tabOpponent, tabMember, tabSuggested;
     private TextView tvMatchCount;
     private RecyclerView rvMatches;
@@ -29,11 +31,12 @@ public class MatchmakingActivity extends AppCompatActivity {
     private View fabCreatePost;
     private NavBarManager navBarManager;
 
-    // ── Data ─────────────────────────────────────────────
     private MatchAdapter matchAdapter;
     private List<MatchPost> allMatches = new ArrayList<>();
     private int currentTab = 0;
     private MatchViewModel matchViewModel;
+    private final ChatRepository chatRepository = new ChatRepository();
+    private MatchPost pendingAcceptedMatch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,33 +61,21 @@ public class MatchmakingActivity extends AppCompatActivity {
         navBarManager.setup();
 
         if (fabCreatePost != null) {
-            fabCreatePost.setOnClickListener(v -> {
-                startActivity(new Intent(this, CreateMatchPostActivity.class));
-            });
+            fabCreatePost.setOnClickListener(v ->
+                    startActivity(new Intent(this, CreateMatchPostActivity.class)));
         }
 
         rvMatches.setLayoutManager(new LinearLayoutManager(this));
         matchAdapter = new MatchAdapter(new ArrayList<>(), new MatchAdapter.OnMatchActionListener() {
             @Override
             public void onAccept(MatchPost match, int position) {
-                match.setAccepted(true);
-                matchAdapter.updateMatches(getFilteredList(currentTab));
+                pendingAcceptedMatch = match;
+                matchViewModel.createMatchRequest(match.getId(), "");
             }
 
             @Override
             public void onChat(MatchPost match) {
-                Conversation conv = new Conversation(
-                        match.getIdString(),
-                        match.getTeam(),
-                        match.getCaptainInitials(),
-                        "Bắt đầu cuộc trò chuyện…",
-                        "Vừa xong",
-                        0,
-                        match.getTypeLabel() + " • " + match.getField(),
-                        false);
-                Intent intent = new Intent(MatchmakingActivity.this, ChatActivity.class);
-                intent.putExtra(Constants.EXTRA_CONVERSATION, conv);
-                startActivity(intent);
+                openDirectConversation(match);
             }
 
             @Override
@@ -122,14 +113,25 @@ public class MatchmakingActivity extends AppCompatActivity {
             if (resource == null) return;
             if (resource.status == com.example.timsanbong.utils.Resource.Status.SUCCESS && resource.data != null) {
                 allMatches = resource.data;
-                // Add mocked items as fallback since DB might be empty
-                if (allMatches.isEmpty()) {
-                    allMatches = buildMockMatches();
-                }
                 selectTab(currentTab);
             } else if (resource.status == com.example.timsanbong.utils.Resource.Status.ERROR) {
-                allMatches = buildMockMatches(); // fallback
+                allMatches = new ArrayList<>();
                 selectTab(currentTab);
+            }
+        });
+
+        matchViewModel.matchRequestState.observe(this, resource -> {
+            if (resource == null) return;
+            if (resource.status == com.example.timsanbong.utils.Resource.Status.SUCCESS) {
+                if (pendingAcceptedMatch != null) {
+                    pendingAcceptedMatch.setAccepted(true);
+                    pendingAcceptedMatch = null;
+                }
+                matchAdapter.updateMatches(getFilteredList(currentTab));
+                Toast.makeText(this, "Da gui yeu cau bat keo.", Toast.LENGTH_SHORT).show();
+            } else if (resource.status == com.example.timsanbong.utils.Resource.Status.ERROR) {
+                Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
+                pendingAcceptedMatch = null;
             }
         });
 
@@ -154,37 +156,33 @@ public class MatchmakingActivity extends AppCompatActivity {
 
     private List<MatchPost> getFilteredList(int tab) {
         List<MatchPost> result = new ArrayList<>();
-        for (MatchPost m : allMatches) {
-            if (tab == 0) result.add(m);
-            else if (tab == 1 && MatchPost.TYPE_FIND_OPPONENT.equals(m.getType())) result.add(m);
-            else if (tab == 2 && MatchPost.TYPE_FIND_MEMBER.equals(m.getType())) result.add(m);
-            else if (tab == 3 && m.getTrustScore() >= 90) result.add(m);
+        for (MatchPost match : allMatches) {
+            if (tab == 0) result.add(match);
+            else if (tab == 1 && MatchPost.TYPE_FIND_OPPONENT.equals(match.getType())) result.add(match);
+            else if (tab == 2 && MatchPost.TYPE_FIND_MEMBER.equals(match.getType())) result.add(match);
+            else if (tab == 3 && match.getTrustScore() >= 90) result.add(match);
         }
         return result;
     }
 
-    private List<MatchPost> buildMockMatches() {
-        List<MatchPost> list = new ArrayList<>();
-        list.add(new MatchPost("1", "Bão Đông FC", "Nguyễn Văn A", "BĐ", 92, "Amateur",
-                MatchPost.TYPE_FIND_OPPONENT, "Tìm đối",
-                "Sân Thái Mỹ - Q1", "Thứ 7 - 14/06", "18:00-19:30", "420.000đ/người",
-                "Tụi mình cần 1 đội khoảng 7 người, level trung bình, chơi giao hữu thân thiện nhé!",
-                "3/7", "2 phút", true));
-        list.add(new MatchPost("2", "Cá Sấu United", "Trần Thị B", "CU", 78, "Intermediate",
-                MatchPost.TYPE_FIND_MEMBER, "Tìm cầu thủ",
-                "Sân Trần Bình - Bình Thạnh", "CN - 15/06", "06:00-07:30", "380.000đ/người",
-                "Cần 3 cầu thủ chạy cánh, ưu tiên có kinh nghiệm thi đấu phong trào.",
-                "4/11", "15 phút", false));
-        list.add(new MatchPost("3", "Thủ Đức All-Stars", "Lê Văn C", "TĐ", 96, "Amateur",
-                MatchPost.TYPE_FIND_OPPONENT, "Tìm đối",
-                "Sân Thủ Đức Sport - Thủ Đức", "Thứ 7 - 14/06", "15:00-16:30", "500.000đ/người",
-                "Đội chúng mình toàn dân Thủ Đức, chơi đều đặn cuối tuần. Mời đội bạn thử sức!",
-                "5/7", "30 phút", true));
-        list.add(new MatchPost("4", "FC Hậu Vệ", "Phạm Quốc D", "HV", 85, "Amateur",
-                MatchPost.TYPE_FIND_OPPONENT, "Tìm đối",
-                "Sân Bình Dương FC - Bình Dương", "Thứ 6 - 13/06", "20:00-21:30", "350.000đ/người",
-                "Cần đối thủ cho buổi tập tối thứ 6, mọi level đều welcome!",
-                "6/7", "1 giờ", false));
-        return list;
+    private void openDirectConversation(MatchPost match) {
+        if (match.getUserId() <= 0) {
+            Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        chatRepository.createDirectConversation(this, match.getUserId(), new RepositoryCallback<Conversation>() {
+            @Override
+            public void onSuccess(Conversation data) {
+                Intent intent = new Intent(MatchmakingActivity.this, ChatActivity.class);
+                intent.putExtra(Constants.EXTRA_CONVERSATION, data);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(MatchmakingActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

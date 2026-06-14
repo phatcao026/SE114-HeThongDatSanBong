@@ -4,9 +4,13 @@ import android.content.Context;
 
 import com.example.timsanbong.data.api.ApiClient;
 import com.example.timsanbong.data.model.MatchPost;
-import com.example.timsanbong.data.model.PageResponse;
 import com.example.timsanbong.data.model.MatchPostRequest;
+import com.example.timsanbong.data.model.MatchRequestResponse;
 import com.example.timsanbong.utils.RepositoryCallback;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -14,10 +18,10 @@ import retrofit2.Response;
 
 public class MatchRepository {
 
-    public void getMatchPosts(Context context, int page, int size, String postType, RepositoryCallback<PageResponse<MatchPost>> callback) {
-        ApiClient.getService(context).getMatchPosts(page, size, postType).enqueue(new Callback<PageResponse<MatchPost>>() {
+    public void getMatchPosts(Context context, String postType, RepositoryCallback<List<MatchPost>> callback) {
+        ApiClient.getService(context).getMatchPosts(postType).enqueue(new Callback<List<MatchPost>>() {
             @Override
-            public void onResponse(Call<PageResponse<MatchPost>> call, Response<PageResponse<MatchPost>> response) {
+            public void onResponse(Call<List<MatchPost>> call, Response<List<MatchPost>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     callback.onSuccess(response.body());
                 } else {
@@ -26,7 +30,7 @@ public class MatchRepository {
             }
 
             @Override
-            public void onFailure(Call<PageResponse<MatchPost>> call, Throwable t) {
+            public void onFailure(Call<List<MatchPost>> call, Throwable t) {
                 callback.onError("Lỗi kết nối.");
             }
         });
@@ -46,6 +50,27 @@ public class MatchRepository {
             @Override
             public void onFailure(Call<MatchPost> call, Throwable t) {
                 callback.onError("Lỗi kết nối.");
+            }
+        });
+    }
+
+    public void createMatchRequest(Context context, long postId, String message,
+                                   RepositoryCallback<MatchRequestResponse> callback) {
+        Map<String, String> body = new HashMap<>();
+        body.put("message", message);
+        ApiClient.getService(context).createMatchRequest(postId, body).enqueue(new Callback<MatchRequestResponse>() {
+            @Override
+            public void onResponse(Call<MatchRequestResponse> call, Response<MatchRequestResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onError("KhÃ´ng thá»ƒ báº¯t kÃ¨o.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MatchRequestResponse> call, Throwable t) {
+                callback.onError("Lá»—i káº¿t ná»‘i.");
             }
         });
     }

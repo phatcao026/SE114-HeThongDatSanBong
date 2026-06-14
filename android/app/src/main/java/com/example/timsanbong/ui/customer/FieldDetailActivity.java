@@ -210,7 +210,7 @@ public class FieldDetailActivity extends AppCompatActivity {
         tvFieldName.setText(field.getName());
         tvAddress.setText(field.getAddress());
         tvDescription.setText(field.getDescription());
-        tvRating.setText("4.8"); // Mock rating
+        tvRating.setText(String.format("%.1f", field.getAverageRating() != null ? field.getAverageRating() : 0));
 
         double minPrice = field.getPricePerHour();
         if (minPrice > 0) {

@@ -5,21 +5,24 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.timsanbong.R;
 import com.example.timsanbong.data.model.Conversation;
 import com.example.timsanbong.data.model.MatchPost;
+import com.example.timsanbong.data.repository.ChatRepository;
 import com.example.timsanbong.utils.Constants;
+import com.example.timsanbong.utils.RepositoryCallback;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.Locale;
 
 public class MatchDetailActivity extends AppCompatActivity {
 
-    // ── Views ────────────────────────────────────────────
     private View viewDetailAvatarBg;
     private TextView tvDetailInitials;
     private TextView tvDetailTrust;
@@ -40,14 +43,18 @@ public class MatchDetailActivity extends AppCompatActivity {
     private MaterialButton btnDetailAccept;
     private MaterialButton btnDetailChat;
 
-    // ── Data ─────────────────────────────────────────────
     private MatchPost match;
+    private MatchViewModel matchViewModel;
+    private final ChatRepository chatRepository = new ChatRepository();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_match_detail);
-        match = (MatchPost) getIntent().getSerializableExtra(Constants.EXTRA_MATCH);
+        match = (MatchPost) getIntent().getSerializableExtra(Constants.EXTRA_MATCH_POST);
+        if (match == null) {
+            match = (MatchPost) getIntent().getSerializableExtra(Constants.EXTRA_MATCH);
+        }
         initViews();
         setupListeners();
         loadData();
@@ -74,32 +81,30 @@ public class MatchDetailActivity extends AppCompatActivity {
         btnDetailAccept = findViewById(R.id.btnDetailAccept);
         btnDetailChat = findViewById(R.id.btnDetailChat);
 
+        matchViewModel = new ViewModelProvider(this).get(MatchViewModel.class);
+
         findViewById(R.id.ivDetailBack).setOnClickListener(v -> finish());
     }
 
     private void setupListeners() {
         btnDetailAccept.setOnClickListener(v -> {
             if (match != null && !match.isAccepted()) {
-                match.setAccepted(true);
-                btnDetailAccept.setText(getString(R.string.match_cta_accepted));
-                btnDetailAccept.setEnabled(false);
+                matchViewModel.createMatchRequest(match.getId(), "");
             }
         });
 
-        btnDetailChat.setOnClickListener(v -> {
-            if (match == null) return;
-            Conversation conv = new Conversation(
-                    match.getIdString(),
-                    match.getTeam(),
-                    match.getCaptainInitials(),
-                    "Bắt đầu cuộc trò chuyện…",
-                    "Vừa xong",
-                    0,
-                    match.getTypeLabel() + " • " + match.getField(),
-                    false);
-            Intent intent = new Intent(this, ChatActivity.class);
-            intent.putExtra(Constants.EXTRA_CONVERSATION, conv);
-            startActivity(intent);
+        btnDetailChat.setOnClickListener(v -> openDirectConversation());
+
+        matchViewModel.matchRequestState.observe(this, resource -> {
+            if (resource == null) return;
+            if (resource.status == com.example.timsanbong.utils.Resource.Status.SUCCESS) {
+                match.setAccepted(true);
+                btnDetailAccept.setText(getString(R.string.match_cta_accepted));
+                btnDetailAccept.setEnabled(false);
+                Toast.makeText(this, "Da gui yeu cau bat keo.", Toast.LENGTH_SHORT).show();
+            } else if (resource.status == com.example.timsanbong.utils.Resource.Status.ERROR) {
+                Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
@@ -109,24 +114,20 @@ public class MatchDetailActivity extends AppCompatActivity {
             return;
         }
 
-        // Avatar
         int avatarColor = match.getType().equals(MatchPost.TYPE_FIND_OPPONENT)
                 ? R.color.primary : R.color.accent_orange;
         GradientDrawable avatarBg = (GradientDrawable) viewDetailAvatarBg.getBackground().mutate();
         avatarBg.setColor(ContextCompat.getColor(this, avatarColor));
         tvDetailInitials.setText(match.getCaptainInitials());
 
-        // Trust badge
         int trust = match.getTrustScore();
         int trustColor = trust >= 80 ? R.color.trust_high : (trust >= 60 ? R.color.trust_mid : R.color.trust_low);
         GradientDrawable trustBg = (GradientDrawable) tvDetailTrust.getBackground().mutate();
         trustBg.setColor(ContextCompat.getColor(this, trustColor));
-        tvDetailTrust.setText(trust + "");
+        tvDetailTrust.setText(String.valueOf(trust));
 
         tvDetailTeam.setText(match.getTeam());
         tvDetailCaptain.setText(match.getCaptain());
-
-        // Badges
         tvDetailLiveBadge.setVisibility(match.isHot() ? View.VISIBLE : View.GONE);
         tvDetailTypeBadge.setText(match.getTypeLabel());
         tvDetailTypeBadge.setBackgroundResource(match.getType().equals(MatchPost.TYPE_FIND_OPPONENT)
@@ -136,25 +137,41 @@ public class MatchDetailActivity extends AppCompatActivity {
                         ? R.color.badge_green_text : R.color.badge_orange_text));
         tvDetailLevelBadge.setText(match.getLevel());
 
-        // Match info
         tvDetailDate.setText(match.getDate());
         tvDetailTime.setText(match.getTime());
         tvDetailField.setText(match.getField());
         tvDetailMembers.setText(match.getMembersSlot());
         tvDetailCost.setText(match.getCost());
-
-        // Message
         tvDetailMessage.setText(match.getMessage());
 
-        // Trust stats (mock values derived from trust score)
         tvTrustMatches.setText(String.valueOf(trust * 2));
         tvTrustNoBail.setText(trust >= 80 ? "0" : "1");
         tvTrustRating.setText(String.format(Locale.getDefault(), "%.1f", trust / 20.0));
 
-        // CTA state
         if (match.isAccepted()) {
             btnDetailAccept.setText(getString(R.string.match_cta_accepted));
             btnDetailAccept.setEnabled(false);
         }
+    }
+
+    private void openDirectConversation() {
+        if (match == null || match.getUserId() <= 0) {
+            Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        chatRepository.createDirectConversation(this, match.getUserId(), new RepositoryCallback<Conversation>() {
+            @Override
+            public void onSuccess(Conversation data) {
+                Intent intent = new Intent(MatchDetailActivity.this, ChatActivity.class);
+                intent.putExtra(Constants.EXTRA_CONVERSATION, data);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(MatchDetailActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

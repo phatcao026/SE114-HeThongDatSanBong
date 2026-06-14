@@ -10,7 +10,6 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.timsanbong.data.model.ChatMessage;
 import com.example.timsanbong.data.model.Conversation;
 import com.example.timsanbong.data.model.MessageRequest;
-import com.example.timsanbong.data.model.PageResponse;
 import com.example.timsanbong.data.repository.ChatRepository;
 import com.example.timsanbong.utils.RepositoryCallback;
 import com.example.timsanbong.utils.Resource;
@@ -51,10 +50,10 @@ public class ChatViewModel extends AndroidViewModel {
 
     public void loadMessages(long conversationId, int page, int size) {
         _messagesState.setValue(Resource.loading(null));
-        chatRepository.getMessages(getApplication(), conversationId, page, size, new RepositoryCallback<PageResponse<ChatMessage>>() {
+        chatRepository.getMessages(getApplication(), conversationId, new RepositoryCallback<List<ChatMessage>>() {
             @Override
-            public void onSuccess(PageResponse<ChatMessage> data) {
-                _messagesState.postValue(Resource.success(data.getContent()));
+            public void onSuccess(List<ChatMessage> data) {
+                _messagesState.postValue(Resource.success(data));
             }
 
             @Override

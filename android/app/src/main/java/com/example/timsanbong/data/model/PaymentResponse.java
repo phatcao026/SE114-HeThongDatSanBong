@@ -3,6 +3,8 @@ package com.example.timsanbong.data.model;
 import java.math.BigDecimal;
 
 public class PaymentResponse {
+    private String url;
+    private String message;
     private Long id;
     private Long bookingId;
     private Long userId;
@@ -22,6 +24,10 @@ public class PaymentResponse {
         this.createdAt = createdAt;
     }
 
+    public String getUrl() { return url; }
+    public void setUrl(String url) { this.url = url; }
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Long getBookingId() { return bookingId; }
