@@ -23,12 +23,10 @@ import java.util.List;
 
 public class MessagesActivity extends AppCompatActivity {
 
-    // ── Views ────────────────────────────────────────────
     private EditText etSearch;
     private RecyclerView rvConversations;
     private TextView tvEmptyMessages;
 
-    // ── Data ─────────────────────────────────────────────
     private ConversationAdapter conversationAdapter;
     private List<Conversation> allConversations = new ArrayList<>();
     private ChatViewModel chatViewModel;
@@ -74,12 +72,9 @@ public class MessagesActivity extends AppCompatActivity {
             if (resource == null) return;
             if (resource.status == com.example.timsanbong.utils.Resource.Status.SUCCESS && resource.data != null) {
                 allConversations = resource.data;
-                if (allConversations.isEmpty()) {
-                    allConversations = buildMockConversations();
-                }
                 showConversations(allConversations);
             } else if (resource.status == com.example.timsanbong.utils.Resource.Status.ERROR) {
-                allConversations = buildMockConversations();
+                allConversations = new ArrayList<>();
                 showConversations(allConversations);
             }
         });
@@ -91,34 +86,21 @@ public class MessagesActivity extends AppCompatActivity {
             showConversations(allConversations);
             return;
         }
+
         List<Conversation> filtered = new ArrayList<>();
         String lower = query.toLowerCase();
-        for (Conversation c : allConversations) {
-            if (c.getName().toLowerCase().contains(lower)
-                    || c.getLastMessage().toLowerCase().contains(lower)) {
-                filtered.add(c);
+        for (Conversation conversation : allConversations) {
+            if (conversation.getName().toLowerCase().contains(lower)
+                    || conversation.getLastMessage().toLowerCase().contains(lower)) {
+                filtered.add(conversation);
             }
         }
         showConversations(filtered);
     }
 
-    private void showConversations(List<Conversation> list) {
-        conversationAdapter.updateConversations(list);
-        tvEmptyMessages.setVisibility(list.isEmpty() ? View.VISIBLE : View.GONE);
-        rvConversations.setVisibility(list.isEmpty() ? View.GONE : View.VISIBLE);
-    }
-
-    private List<Conversation> buildMockConversations() {
-        List<Conversation> list = new ArrayList<>();
-        list.add(new Conversation("1", "Bão Đông FC", "BĐ",
-                "Thứ 7 nào sân Thái Mỹ nhé!", "2 phút", 3,
-                "Tìm đối • Sân Thái Mỹ Q1", true));
-        list.add(new Conversation("2", "Sân Trần Bình", "TB",
-                "Còn slot 18:00 chủ nhật không bạn?", "15 phút", 0,
-                null, false));
-        list.add(new Conversation("3", "Phạm Quốc Khánh", "PK",
-                "Ok mình sẽ tới sớm hơn", "1 giờ", 0,
-                null, false));
-        return list;
+    private void showConversations(List<Conversation> conversations) {
+        conversationAdapter.updateConversations(conversations);
+        tvEmptyMessages.setVisibility(conversations.isEmpty() ? View.VISIBLE : View.GONE);
+        rvConversations.setVisibility(conversations.isEmpty() ? View.GONE : View.VISIBLE);
     }
 }

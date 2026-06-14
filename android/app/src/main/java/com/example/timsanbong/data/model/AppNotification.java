@@ -1,35 +1,29 @@
 package com.example.timsanbong.data.model;
 
+import com.example.timsanbong.R;
+import com.google.gson.annotations.SerializedName;
+
 public class AppNotification {
 
-    @com.google.gson.annotations.SerializedName("id")
+    @SerializedName("id")
     private long id;
 
-    @com.google.gson.annotations.SerializedName("title")
+    @SerializedName("title")
     private String title;
 
-    @com.google.gson.annotations.SerializedName("body")
+    @SerializedName(value = "body", alternate = {"content"})
     private String body;
 
-    @com.google.gson.annotations.SerializedName("read")
+    @SerializedName(value = "read", alternate = {"isRead"})
     private boolean read;
 
-    @com.google.gson.annotations.SerializedName("createdAt")
+    @SerializedName("type")
+    private String type;
+
+    @SerializedName("createdAt")
     private String createdAt;
 
-    private int iconRes;
-    private int iconTintRes;
-
     public AppNotification() {}
-
-    // Mock constructor
-    public AppNotification(int iconRes, int iconTintRes, String title, String body, String time) {
-        this.iconRes = iconRes;
-        this.iconTintRes = iconTintRes;
-        this.title = title;
-        this.body = body;
-        this.createdAt = time;
-    }
 
     public AppNotification(long id, String title, String body, boolean read, String createdAt) {
         this.id = id;
@@ -43,11 +37,12 @@ public class AppNotification {
     public String getTitle() { return title; }
     public String getBody() { return body; }
     public boolean isRead() { return read; }
+    public String getType() { return type; }
     public String getCreatedAt() { return createdAt; }
-    
+
     public void setRead(boolean read) { this.read = read; }
-    
-    public int getIconRes() { return iconRes != 0 ? iconRes : com.example.timsanbong.R.drawable.ic_bell; }
-    public int getIconTintRes() { return iconTintRes != 0 ? iconTintRes : com.example.timsanbong.R.color.primary; }
-    public String getTime() { return createdAt != null ? createdAt : "Vừa xong"; }
+
+    public int getIconRes() { return R.drawable.ic_bell; }
+    public int getIconTintRes() { return R.color.primary; }
+    public String getTime() { return createdAt != null ? createdAt : ""; }
 }

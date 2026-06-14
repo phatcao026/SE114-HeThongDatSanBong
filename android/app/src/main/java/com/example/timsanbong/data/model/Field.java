@@ -38,6 +38,12 @@ public class Field {
     @SerializedName("timeSlots")
     private List<TimeSlotResponse> timeSlots;
 
+    @SerializedName("averageRating")
+    private Double averageRating;
+
+    @SerializedName("reviewCount")
+    private Long reviewCount;
+
     public Field() {}
 
     public Field(long id, String name, String address, double pricePerHour, String imageUrl,
@@ -61,6 +67,8 @@ public class Field {
     public String getStatus() { return status; }
     public String getImageUrl() { return coverImage; }
     public List<TimeSlotResponse> getTimeSlots() { return timeSlots; }
+    public Double getAverageRating() { return averageRating; }
+    public Long getReviewCount() { return reviewCount; }
 
     public boolean isAvailable() {
         return available || status == null || "AVAILABLE".equalsIgnoreCase(status);

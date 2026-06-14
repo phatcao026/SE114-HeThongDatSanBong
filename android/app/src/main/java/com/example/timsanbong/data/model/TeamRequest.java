@@ -22,4 +22,5 @@ public class TeamRequest {
 
     public void setName(String name) { this.name = name; }
     public void setSkillLevel(String level) { this.level = level; }
+    public void setDescription(String description) { this.description = description; }
 }

@@ -265,15 +265,6 @@
     <string name="action_view_more">Xem thêm</string>
     <string name="suggested_field_type_5">Sân 5</string>
     <string name="suggested_field_type_7">Sân 7</string>
-    <string name="mock_avatar_initials">TDK</string>
-    <string name="mock_hot_match_initials">NHL</string>
-    <string name="mock_hot_match_score">92</string>
-    <string name="mock_upcoming_count">2</string>
-    <string name="mock_trust_score">92</string>
-    <string name="mock_message_count">3</string>
-    <string name="mock_field_name_1">Sân Trần Bình</string>
-    <string name="mock_field_name_2">Cỏ Nhân Tạo Phú Nhuận</string>
-    <string name="mock_field_name_3">Sân Gò Vấp Center</string>
     <string name="toast_select_field">Chọn sân để đặt</string>
 
     <!-- Content descriptions (Home) -->

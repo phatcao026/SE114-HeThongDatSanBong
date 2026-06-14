@@ -1,6 +1,7 @@
 package com.example.timsanbong.ui.customer;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -66,6 +67,7 @@ public class PaymentActivity extends AppCompatActivity {
                 tvStateMessage.setText(getString(R.string.payment_processing));
                 btnPay.setEnabled(false);
             } else if (state.status == PaymentViewModel.Status.SUCCESS) {
+                openCheckout(state.checkoutUrl);
                 navigateToResult(true, getString(R.string.payment_success_field_format, fieldName));
             } else if (state.status == PaymentViewModel.Status.FAILED) {
                 showErrorState(state.message);
@@ -90,6 +92,14 @@ public class PaymentActivity extends AppCompatActivity {
                 getIntent().getDoubleExtra(Constants.EXTRA_REMAINDER_AMOUNT, -1));
         startActivity(intent);
         finish();
+    }
+
+    private void openCheckout(String checkoutUrl) {
+        if (checkoutUrl == null || checkoutUrl.trim().isEmpty()) {
+            return;
+        }
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(checkoutUrl));
+        startActivity(intent);
     }
 
     private void showLoadingState() {

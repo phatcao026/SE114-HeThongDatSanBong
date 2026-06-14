@@ -8,7 +8,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.timsanbong.data.model.AppNotification;
-import com.example.timsanbong.data.model.PageResponse;
 import com.example.timsanbong.data.repository.NotificationRepository;
 import com.example.timsanbong.utils.RepositoryCallback;
 import com.example.timsanbong.utils.Resource;
@@ -31,10 +30,10 @@ public class NotificationViewModel extends AndroidViewModel {
 
     public void loadNotifications(int page, int size) {
         _notificationsState.setValue(Resource.loading(null));
-        notificationRepository.getNotifications(getApplication(), page, size, new RepositoryCallback<PageResponse<AppNotification>>() {
+        notificationRepository.getNotifications(getApplication(), new RepositoryCallback<List<AppNotification>>() {
             @Override
-            public void onSuccess(PageResponse<AppNotification> data) {
-                _notificationsState.postValue(Resource.success(data.getContent()));
+            public void onSuccess(List<AppNotification> data) {
+                _notificationsState.postValue(Resource.success(data));
             }
 
             @Override

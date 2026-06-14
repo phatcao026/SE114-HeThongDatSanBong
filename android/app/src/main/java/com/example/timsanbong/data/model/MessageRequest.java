@@ -16,6 +16,8 @@ public class MessageRequest {
         this.content = content;
     }
 
+    public long getConversationId() { return conversationId; }
+
     public void setConversationId(long conversationId) { this.conversationId = conversationId; }
     public void setContent(String content) { this.content = content; }
 }

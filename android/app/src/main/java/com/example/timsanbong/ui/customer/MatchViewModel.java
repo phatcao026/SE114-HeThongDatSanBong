@@ -9,7 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.timsanbong.data.model.MatchPost;
 import com.example.timsanbong.data.model.MatchPostRequest;
-import com.example.timsanbong.data.model.PageResponse;
+import com.example.timsanbong.data.model.MatchRequestResponse;
 import com.example.timsanbong.data.repository.MatchRepository;
 import com.example.timsanbong.utils.RepositoryCallback;
 import com.example.timsanbong.utils.Resource;
@@ -26,16 +26,19 @@ public class MatchViewModel extends AndroidViewModel {
     private final MutableLiveData<Resource<MatchPost>> _createMatchState = new MutableLiveData<>();
     public LiveData<Resource<MatchPost>> createMatchState = _createMatchState;
 
+    private final MutableLiveData<Resource<MatchRequestResponse>> _matchRequestState = new MutableLiveData<>();
+    public LiveData<Resource<MatchRequestResponse>> matchRequestState = _matchRequestState;
+
     public MatchViewModel(@NonNull Application application) {
         super(application);
     }
 
     public void loadMatchPosts(int page, int size, String postType) {
         _matchPostsState.setValue(Resource.loading(null));
-        matchRepository.getMatchPosts(getApplication(), page, size, postType, new RepositoryCallback<PageResponse<MatchPost>>() {
+        matchRepository.getMatchPosts(getApplication(), postType, new RepositoryCallback<List<MatchPost>>() {
             @Override
-            public void onSuccess(PageResponse<MatchPost> data) {
-                _matchPostsState.postValue(Resource.success(data.getContent()));
+            public void onSuccess(List<MatchPost> data) {
+                _matchPostsState.postValue(Resource.success(data));
             }
 
             @Override
@@ -56,6 +59,21 @@ public class MatchViewModel extends AndroidViewModel {
             @Override
             public void onError(String message) {
                 _createMatchState.postValue(Resource.error(message, null));
+            }
+        });
+    }
+
+    public void createMatchRequest(long postId, String message) {
+        _matchRequestState.setValue(Resource.loading(null));
+        matchRepository.createMatchRequest(getApplication(), postId, message, new RepositoryCallback<MatchRequestResponse>() {
+            @Override
+            public void onSuccess(MatchRequestResponse data) {
+                _matchRequestState.postValue(Resource.success(data));
+            }
+
+            @Override
+            public void onError(String message) {
+                _matchRequestState.postValue(Resource.error(message, null));
             }
         });
     }

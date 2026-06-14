@@ -70,13 +70,11 @@ public interface ApiService {
 
     // Payments
     @POST("payments/create-session/{bookingId}")
-    Call<CheckoutSessionResponse> createCheckoutSession(@Path("bookingId") long bookingId);
+    Call<PaymentResponse> createCheckoutSession(@Path("bookingId") long bookingId);
 
     // Match posts
     @GET("match-posts")
-    Call<PageResponse<MatchPost>> getMatchPosts(@Query("page") int page,
-                                                @Query("size") int size,
-                                                @Query("postType") String postType);
+    Call<List<MatchPost>> getMatchPosts(@Query("postType") String postType);
 
     @POST("match-posts")
     Call<MatchPost> createMatchPost(@Body MatchPostRequest request);
@@ -88,18 +86,18 @@ public interface ApiService {
     Call<Void> deleteMatchPost(@Path("id") long id);
 
     @GET("match-posts/me")
-    Call<PageResponse<MatchPost>> getMyMatchPosts(@Query("page") int page, @Query("size") int size);
+    Call<List<MatchPost>> getMyMatchPosts();
 
     // Match requests
-    @POST("match-requests")
-    Call<MatchRequestResponse> createMatchRequest(@Body Map<String, Long> body);
+    @POST("match-posts/{id}/requests")
+    Call<MatchRequestResponse> createMatchRequest(@Path("id") long postId, @Body Map<String, String> body);
 
     @PUT("match-requests/{id}/status")
     Call<MatchRequestResponse> updateMatchRequestStatus(@Path("id") long id,
                                                         @Body MatchRequestStatusUpdate update);
 
     // Teams
-    @GET("teams/me")
+    @GET("teams/my")
     Call<List<TeamResponse>> getMyTeams();
 
     @POST("teams")
@@ -111,7 +109,7 @@ public interface ApiService {
     @DELETE("teams/{id}")
     Call<Void> deleteTeam(@Path("id") long id);
 
-    @GET("teams/invitations/me")
+    @GET("teams/invitations/my")
     Call<List<InvitationResponse>> getInvitations();
 
     @PUT("teams/invitations/{id}")
@@ -121,20 +119,18 @@ public interface ApiService {
     @GET("conversations")
     Call<List<Conversation>> getConversations();
 
-    @GET("conversations/unread-count")
-    Call<UnreadCountResponse> getUnreadConversationCount();
+    @POST("conversations/direct")
+    Call<Conversation> createDirectConversation(@Body Map<String, Long> body);
 
-    @GET("messages")
-    Call<PageResponse<ChatMessage>> getMessages(@Query("conversationId") long conversationId,
-                                                @Query("page") int page,
-                                                @Query("size") int size);
+    @GET("conversations/{id}/messages")
+    Call<List<ChatMessage>> getMessages(@Path("id") long conversationId);
 
-    @POST("messages")
-    Call<ChatMessage> sendMessage(@Body MessageRequest request);
+    @POST("conversations/{id}/messages")
+    Call<ChatMessage> sendMessage(@Path("id") long conversationId, @Body MessageRequest request);
 
     // Notifications
     @GET("notifications")
-    Call<PageResponse<AppNotification>> getNotifications(@Query("page") int page, @Query("size") int size);
+    Call<List<AppNotification>> getNotifications(@Query("isRead") Boolean isRead);
 
     @GET("notifications/unread-count")
     Call<UnreadCountResponse> getUnreadNotificationCount();

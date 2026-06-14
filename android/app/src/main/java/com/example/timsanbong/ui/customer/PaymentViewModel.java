@@ -8,9 +8,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.timsanbong.data.model.PaymentRequest;
-import com.example.timsanbong.data.repository.MockPaymentRepository;
+import com.example.timsanbong.data.repository.BackendPaymentRepository;
 import com.example.timsanbong.data.repository.PaymentRepository;
-import com.example.timsanbong.utils.Constants;
 
 public class PaymentViewModel extends AndroidViewModel {
 
@@ -21,10 +20,16 @@ public class PaymentViewModel extends AndroidViewModel {
     public static class PaymentState {
         public final Status status;
         public final String message;
+        public final String checkoutUrl;
 
         public PaymentState(Status status, String message) {
+            this(status, message, null);
+        }
+
+        public PaymentState(Status status, String message, String checkoutUrl) {
             this.status = status;
             this.message = message;
+            this.checkoutUrl = checkoutUrl;
         }
     }
 
@@ -35,11 +40,7 @@ public class PaymentViewModel extends AndroidViewModel {
 
     public PaymentViewModel(@NonNull Application application) {
         super(application);
-        if (Constants.MOCK_PAYMENT_MODE) {
-            repository = new MockPaymentRepository();
-        } else {
-            repository = new MockPaymentRepository();
-        }
+        repository = new BackendPaymentRepository(application);
         _paymentState.setValue(new PaymentState(Status.INIT, null));
     }
 
@@ -47,8 +48,8 @@ public class PaymentViewModel extends AndroidViewModel {
         _paymentState.setValue(new PaymentState(Status.PROCESSING, null));
         repository.processPayment(request, new PaymentRepository.Callback() {
             @Override
-            public void onSuccess(String message) {
-                _paymentState.postValue(new PaymentState(Status.SUCCESS, message));
+            public void onSuccess(String message, String checkoutUrl) {
+                _paymentState.postValue(new PaymentState(Status.SUCCESS, message, checkoutUrl));
             }
 
             @Override

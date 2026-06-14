@@ -17,9 +17,11 @@ import java.util.List;
 public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.ViewHolder> {
 
     private final List<ChatMessage> messages;
+    private final long currentUserId;
 
-    public ChatMessageAdapter(List<ChatMessage> messages) {
+    public ChatMessageAdapter(List<ChatMessage> messages, long currentUserId) {
         this.messages = messages;
+        this.currentUserId = currentUserId;
     }
 
     @NonNull
@@ -38,7 +40,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         holder.layoutThem.setVisibility(View.GONE);
         holder.layoutMe.setVisibility(View.GONE);
 
-        switch (msg.getSide()) {
+        switch (msg.getSide(currentUserId)) {
             case ChatMessage.SIDE_SYSTEM:
                 holder.layoutSystem.setVisibility(View.VISIBLE);
                 holder.tvSystem.setText(msg.getText());
@@ -64,6 +66,12 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     public void addMessage(ChatMessage message) {
         messages.add(message);
         notifyItemInserted(messages.size() - 1);
+    }
+
+    public void updateMessages(List<ChatMessage> newMessages) {
+        messages.clear();
+        messages.addAll(newMessages);
+        notifyDataSetChanged();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

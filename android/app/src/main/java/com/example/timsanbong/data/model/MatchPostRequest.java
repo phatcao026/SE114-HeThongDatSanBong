@@ -7,40 +7,46 @@ public class MatchPostRequest {
     private String postType;
 
     @SerializedName("teamId")
-    private long teamId;
+    private Long teamId;
+
+    @SerializedName("fieldId")
+    private Long fieldId;
+
+    @SerializedName("bookingId")
+    private Long bookingId;
+
+    @SerializedName("date")
+    private String date;
+
+    @SerializedName("timeStart")
+    private String timeStart;
+
+    @SerializedName("timeEnd")
+    private String timeEnd;
 
     @SerializedName("skillLevel")
     private String skillLevel;
 
-    @SerializedName("description")
-    private String description;
+    @SerializedName("costSharing")
+    private String costSharing;
 
-    @SerializedName("playDate")
-    private String playDate;
-
-    @SerializedName("playTime")
-    private String playTime;
-
-    @SerializedName("location")
-    private String location;
+    @SerializedName("message")
+    private String message;
 
     public MatchPostRequest() {}
 
-    public MatchPostRequest(String postType, long teamId, String skillLevel, String description, String playDate, String playTime, String location) {
-        this.postType = postType;
-        this.teamId = teamId;
-        this.skillLevel = skillLevel;
-        this.description = description;
-        this.playDate = playDate;
-        this.playTime = playTime;
-        this.location = location;
-    }
-
     public void setPostType(String postType) { this.postType = postType; }
-    public void setTeamId(long teamId) { this.teamId = teamId; }
+    public void setTeamId(Long teamId) { this.teamId = teamId; }
+    public void setFieldId(Long fieldId) { this.fieldId = fieldId; }
+    public void setBookingId(Long bookingId) { this.bookingId = bookingId; }
+    public void setDate(String date) { this.date = date; }
+    public void setTimeStart(String timeStart) { this.timeStart = timeStart; }
+    public void setTimeEnd(String timeEnd) { this.timeEnd = timeEnd; }
     public void setSkillLevel(String skillLevel) { this.skillLevel = skillLevel; }
-    public void setDescription(String description) { this.description = description; }
-    public void setPlayDate(String playDate) { this.playDate = playDate; }
-    public void setPlayTime(String playTime) { this.playTime = playTime; }
-    public void setLocation(String location) { this.location = location; }
+    public void setCostSharing(String costSharing) { this.costSharing = costSharing; }
+    public void setMessage(String message) { this.message = message; }
+
+    public void setDescription(String description) { this.message = description; }
+    public void setPlayDate(String playDate) { this.date = playDate; }
+    public void setLocation(String location) {}
 }
