@@ -142,5 +142,17 @@
             android:name=".ui.admin.AdminFieldActivity"
             android:exported="false"
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
+        <activity
+            android:name=".ui.admin.AdminReviewActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+        <activity
+            android:name=".ui.admin.AdminMatchPostActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+        <activity
+            android:name=".ui.admin.AdminUserDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
     </application>
 </manifest>

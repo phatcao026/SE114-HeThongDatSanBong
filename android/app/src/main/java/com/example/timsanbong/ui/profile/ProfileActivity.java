@@ -9,9 +9,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.timsanbong.R;
+import com.example.timsanbong.ui.admin.AdminMainActivity;
 import com.example.timsanbong.ui.auth.LoginActivity;
 import com.example.timsanbong.utils.NavBarManager;
 import com.example.timsanbong.utils.Resource;
+import com.example.timsanbong.utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -20,7 +22,7 @@ public class ProfileActivity extends AppCompatActivity {
     private android.widget.ProgressBar pbTrustScore;
     private TextView tabPersonalInfo, tabBookingHistory;
     private android.view.View cardPersonalInfo, layoutBookingHistory;
-    private MaterialButton btnLogout;
+    private MaterialButton btnLogout, btnAdminMode;
     private ProfileViewModel profileViewModel;
 
     @Override
@@ -37,7 +39,17 @@ public class ProfileActivity extends AppCompatActivity {
         cardPersonalInfo = findViewById(R.id.cardPersonalInfo);
         layoutBookingHistory = findViewById(R.id.layoutBookingHistory);
         btnLogout = findViewById(R.id.btnLogout);
+        btnAdminMode = findViewById(R.id.btnAdminMode);
         android.widget.ImageView btnSettings = findViewById(R.id.btnSettings);
+
+        SessionManager sessionManager = new SessionManager(this);
+        if (sessionManager.isAdmin()) {
+            btnAdminMode.setVisibility(android.view.View.VISIBLE);
+            btnAdminMode.setOnClickListener(v -> {
+                Intent intent = new Intent(this, AdminMainActivity.class);
+                startActivity(intent);
+            });
+        }
 
         btnLogout.setOnClickListener(v -> profileViewModel.logout());
         btnSettings.setOnClickListener(v ->

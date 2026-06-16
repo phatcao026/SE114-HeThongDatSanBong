@@ -194,4 +194,16 @@ public interface ApiService {
 
     @GET("admin/fields")
     Call<List<Field>> getAdminFields();
+
+    @GET("admin/match-posts")
+    Call<List<MatchPost>> getAdminMatchPosts();
+
+    @GET("admin/reviews")
+    Call<List<ReviewResponse>> getAdminReviews();
+
+    @GET("admin/fairplay/pending")
+    Call<List<OpponentReviewResponse>> getAdminFairplayPending();
+
+    @PUT("admin/fairplay/resolve/{id}")
+    Call<Void> resolveFairplayReview(@Path("id") long id, @Body Map<String, Object> body);
 }

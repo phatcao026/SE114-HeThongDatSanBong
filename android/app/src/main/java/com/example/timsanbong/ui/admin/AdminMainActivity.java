@@ -57,6 +57,14 @@ public class AdminMainActivity extends AppCompatActivity {
             startActivity(new Intent(this, AdminBookingActivity.class));
         });
 
+        findViewById(R.id.cardAdminMatchPosts).setOnClickListener(v -> {
+            startActivity(new Intent(this, AdminMatchPostActivity.class));
+        });
+
+        findViewById(R.id.cardAdminReviews).setOnClickListener(v -> {
+            startActivity(new Intent(this, AdminReviewActivity.class));
+        });
+
         findViewById(R.id.btnViewAudit).setOnClickListener(v -> {
             startActivity(new Intent(this, AdminAuditActivity.class));
         });

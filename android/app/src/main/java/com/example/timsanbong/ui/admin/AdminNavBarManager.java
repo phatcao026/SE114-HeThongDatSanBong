@@ -2,10 +2,13 @@ package com.example.timsanbong.ui.admin;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.ImageViewCompat;
 
 import com.example.timsanbong.R;
 
@@ -32,11 +35,11 @@ public class AdminNavBarManager {
         LinearLayout navTransactions = activity.findViewById(R.id.adminNavTransactions);
         LinearLayout navProfile = activity.findViewById(R.id.adminNavProfile);
 
-        applyActiveState(navHome, R.id.ivNavHome, R.id.tvNavHome, activeItem == ITEM_OVERVIEW);
-        applyActiveState(navUsers, R.id.ivNavUsers, R.id.tvNavUsers, activeItem == ITEM_USERS);
-        applyActiveState(navAudit, R.id.ivNavAudit, R.id.tvNavAudit, activeItem == ITEM_AUDIT);
-        applyActiveState(navTransactions, R.id.ivNavTransactions, R.id.tvNavTransactions, activeItem == ITEM_TRANSACTIONS);
-        applyActiveState(navProfile, R.id.ivNavProfile, R.id.tvNavProfile, activeItem == ITEM_PROFILE);
+        applyActiveState(navHome, R.id.wrapNavHome, R.id.ivNavHome, R.id.tvNavHome, activeItem == ITEM_OVERVIEW);
+        applyActiveState(navUsers, R.id.wrapNavUsers, R.id.ivNavUsers, R.id.tvNavUsers, activeItem == ITEM_USERS);
+        applyActiveState(navAudit, R.id.wrapNavAudit, R.id.ivNavAudit, R.id.tvNavAudit, activeItem == ITEM_AUDIT);
+        applyActiveState(navTransactions, R.id.wrapNavTransactions, R.id.ivNavTransactions, R.id.tvNavTransactions, activeItem == ITEM_TRANSACTIONS);
+        applyActiveState(navProfile, R.id.wrapNavProfile, R.id.ivNavProfile, R.id.tvNavProfile, activeItem == ITEM_PROFILE);
 
         navHome.setOnClickListener(v -> {
             if (activeItem != ITEM_OVERVIEW) navigate(AdminMainActivity.class);
@@ -59,54 +62,19 @@ public class AdminNavBarManager {
         });
     }
 
-    private void applyActiveState(LinearLayout container, int ivId, int tvId, boolean active) {
-        if (active) {
-            container.setBackgroundResource(R.drawable.bg_nav_item_active);
-            container.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
-                androidx.core.content.ContextCompat.getColor(activity, android.R.color.white)));
-            
-            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) container.getLayoutParams();
-            params.weight = 1.2f;
-            params.setMargins(8, 8, 8, 8);
-            container.setLayoutParams(params);
-            container.setPadding(24, 0, 24, 0);
-            container.setOrientation(LinearLayout.HORIZONTAL);
+    private void applyActiveState(View container, int wrapId, int ivId, int tvId, boolean active) {
+        int iconColor = ContextCompat.getColor(
+            activity, active ? R.color.primary_dark : R.color.text_on_primary);
 
-            ImageView iv = container.findViewById(ivId);
-            TextView tv = container.findViewById(tvId);
-            
-            iv.setColorFilter(androidx.core.content.ContextCompat.getColor(activity, R.color.admin_nav_bg));
-            tv.setTextColor(androidx.core.content.ContextCompat.getColor(activity, R.color.admin_nav_bg));
-            tv.setTextSize(10);
-            tv.setTypeface(null, android.graphics.Typeface.BOLD);
-            
-            // Adjust margins for horizontal layout
-            LinearLayout.LayoutParams tvParams = (LinearLayout.LayoutParams) tv.getLayoutParams();
-            tvParams.setMarginStart(8);
-            tv.setLayoutParams(tvParams);
+        View wrap = container.findViewById(wrapId);
+        wrap.setBackground(active ? ContextCompat.getDrawable(activity, R.drawable.bg_nav_active_pill) : null);
 
-            // Ensure the container itself is visible and has correct weight
-            container.setVisibility(View.VISIBLE);
-        } else {
-            container.setBackground(null);
-            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) container.getLayoutParams();
-            params.weight = 1.0f;
-            params.setMargins(0, 0, 0, 0);
-            container.setLayoutParams(params);
-            container.setOrientation(LinearLayout.VERTICAL);
+        ImageViewCompat.setImageTintList(
+            container.findViewById(ivId),
+            ColorStateList.valueOf(iconColor));
 
-            ImageView iv = container.findViewById(ivId);
-            TextView tv = container.findViewById(tvId);
-            
-            iv.setColorFilter(androidx.core.content.ContextCompat.getColor(activity, R.color.admin_nav_unselected));
-            tv.setTextColor(androidx.core.content.ContextCompat.getColor(activity, R.color.admin_nav_unselected));
-            tv.setTextSize(9);
-            tv.setTypeface(null, android.graphics.Typeface.NORMAL);
-
-            LinearLayout.LayoutParams tvParams = (LinearLayout.LayoutParams) tv.getLayoutParams();
-            tvParams.setMarginStart(0);
-            tv.setLayoutParams(tvParams);
-        }
+        TextView label = container.findViewById(tvId);
+        label.setTextColor(ContextCompat.getColor(activity, R.color.text_on_primary));
     }
 
     private void navigate(Class<?> cls) {
