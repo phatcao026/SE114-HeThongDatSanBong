@@ -180,7 +180,7 @@ public interface ApiService {
     Call<Booking> cancelOwnerBooking(@Path("id") long id);
 
     // Admin
-    @GET("admin/overview")
+    @GET("admin/dashboard/overview")
     Call<AdminDashboardOverviewResponse> getAdminOverview();
 
     @GET("admin/users")

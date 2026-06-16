@@ -31,10 +31,9 @@ public class AdminFieldActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_booking); // Reusing booking layout for now
+        setContentView(R.layout.activity_admin_field);
 
-        ((TextView) findViewById(R.id.tvBookingCount)).setText("0 sân bóng");
-        RecyclerView rv = findViewById(R.id.rvAdminBookings); // Reusing ID from booking layout
+        RecyclerView rv = findViewById(R.id.rvAdminFields);
         rv.setLayoutManager(new LinearLayoutManager(this));
         
         allFields = new ArrayList<>();
@@ -60,7 +59,7 @@ public class AdminFieldActivity extends AppCompatActivity {
                     allFields.clear();
                     allFields.addAll(response.body());
                     adapter.notifyDataSetChanged();
-                    ((TextView) findViewById(R.id.tvBookingCount)).setText(allFields.size() + " sân bóng");
+                    ((TextView) findViewById(R.id.tvFieldCount)).setText(allFields.size() + " sân bóng");
                 } else {
                     Toast.makeText(AdminFieldActivity.this, "Không thể tải danh sách sân bóng", Toast.LENGTH_SHORT).show();
                 }
@@ -79,7 +78,7 @@ public class AdminFieldActivity extends AppCompatActivity {
         allFields.add(new Field(1, "Sân Trần Bình", "Quận 1", 250000, "", "Sân cỏ nhân tạo", "Sân 7", true));
         allFields.add(new Field(2, "Sân Phú Mỹ Hưng", "Quận 7", 400000, "", "Sân chuẩn quốc tế", "Sân 11", true));
         adapter.notifyDataSetChanged();
-        ((TextView) findViewById(R.id.tvBookingCount)).setText(allFields.size() + " sân bóng");
+        ((TextView) findViewById(R.id.tvFieldCount)).setText(allFields.size() + " sân bóng");
     }
 
     static class AdminFieldAdapter extends RecyclerView.Adapter<AdminFieldAdapter.ViewHolder> {

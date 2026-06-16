@@ -31,6 +31,9 @@ public class User {
     @Column(name = "trust_score")
     private Integer trustScore = 100;
 
+    @Column(name = "is_locked")
+    private Boolean isLocked = false;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -98,6 +101,9 @@ public class User {
 
     public Integer getTrustScore() { return trustScore; }
     public void setTrustScore(Integer trustScore) { this.trustScore = trustScore; }
+
+    public Boolean getIsLocked() { return isLocked; }
+    public void setIsLocked(Boolean isLocked) { this.isLocked = isLocked; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

@@ -33,7 +33,7 @@ public class AdminAuditActivity extends AppCompatActivity {
     private RecyclerView rvAudit;
     private View tabPending, tabProcessed;
     private View indicatorPending, indicatorProcessed;
-    private TextView tvPendingLabel, tvProcessedLabel, tvPendingBadge;
+    private TextView tvPendingLabel, tvProcessedLabel, tvPendingBadge, tvProcessedBadge;
     private final List<OpponentReviewResponse> currentReports = new ArrayList<>();
     private AuditAdapter adapter;
 
@@ -67,6 +67,7 @@ public class AdminAuditActivity extends AppCompatActivity {
         tvPendingLabel = findViewById(R.id.tvTabPendingLabel);
         tvProcessedLabel = findViewById(R.id.tvTabProcessedLabel);
         tvPendingBadge = findViewById(R.id.tvPendingBadge);
+        tvProcessedBadge = findViewById(R.id.tvProcessedBadge);
 
         adapter = new AuditAdapter(currentReports);
         rvAudit.setAdapter(adapter);
@@ -105,6 +106,7 @@ public class AdminAuditActivity extends AppCompatActivity {
                         currentReports.addAll(response.body());
                         adapter.notifyDataSetChanged();
                         tvPendingBadge.setText(String.valueOf(currentReports.size()));
+                        tvProcessedBadge.setText("0");
                     } else {
                         Toast.makeText(AdminAuditActivity.this, "Không thể tải dữ liệu", Toast.LENGTH_SHORT).show();
                     }

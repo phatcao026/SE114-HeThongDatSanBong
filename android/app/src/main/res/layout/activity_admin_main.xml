@@ -91,6 +91,7 @@
 
             <!-- GMV Card -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardWeeklyGmv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="24dp"
@@ -108,7 +109,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="GMV TUẦN NÀY"
+                            android:text="TỔNG DOANH THU"
                             android:textColor="@color/text_hint"
                             android:textSize="12sp"
                             android:textAllCaps="true" />
@@ -131,10 +132,11 @@
                     </RelativeLayout>
 
                     <TextView
+                        android:id="@+id/tvWeeklyGmv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="1,84 tỷ đ"
+                        android:text="0đ"
                         android:textColor="@android:color/white"
                         android:textSize="32sp"
                         android:textStyle="bold" />
@@ -143,7 +145,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="↗ +18.6% so với tuần trước"
+                        android:text="Dữ liệu tổng hợp từ hệ thống"
                         android:textColor="@color/primary"
                         android:textSize="12sp" />
 
@@ -217,16 +219,18 @@
                         android:layout_weight="1"
                         android:orientation="vertical">
                         <TextView
+                            android:id="@+id/tvAuditTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="4 báo cáo đang chờ"
+                            android:text="0 báo cáo đang chờ"
                             android:textColor="@color/admin_alert_text"
                             android:textSize="16sp"
                             android:textStyle="bold" />
                         <TextView
+                            android:id="@+id/tvAuditSubtitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="2 ưu tiên cao · 1 sân ảo nghi vấn"
+                            android:text="Cần được xử lý ngay"
                             android:textColor="#9B2C2C"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -343,13 +347,13 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:paddingHorizontal="16dp">
-                    <include layout="@layout/layout_admin_health_item" />
+                    <include android:id="@+id/healthConversations" layout="@layout/layout_admin_health_item" />
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border_gray" />
-                    <include layout="@layout/layout_admin_health_item" />
+                    <include android:id="@+id/healthMessages" layout="@layout/layout_admin_health_item" />
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border_gray" />
-                    <include layout="@layout/layout_admin_health_item" />
+                    <include android:id="@+id/healthFields" layout="@layout/layout_admin_health_item" />
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border_gray" />
-                    <include layout="@layout/layout_admin_health_item" />
+                    <include android:id="@+id/healthReviews" layout="@layout/layout_admin_health_item" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
