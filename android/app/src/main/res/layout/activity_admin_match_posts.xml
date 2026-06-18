@@ -19,42 +19,33 @@
             android:orientation="horizontal"
             android:paddingHorizontal="16dp">
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cvAdminAvatar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="@color/text_heading"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="0dp">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="PK"
-                    android:textColor="@android:color/white"
-                    android:textStyle="bold" />
-            </com.google.android.material.card.MaterialCardView>
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_admin_chevron_right"
+                android:rotation="180"
+                app:tint="@color/text_heading"
+                android:contentDescription="Back" />
 
             <TextView
+                android:id="@+id/tvTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="16dp"
                 android:layout_weight="1"
-                android:text="Lượt đặt"
+                android:text="Quản lý kèo đấu"
                 android:textColor="@color/text_heading"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_search"
-                app:tint="@color/text_heading"
-                android:contentDescription="Search" />
-
+            <TextView
+                android:id="@+id/tvPostCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 kèo"
+                android:textColor="@color/text_hint"
+                android:textSize="14sp" />
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -71,24 +62,15 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <TextView
-                android:id="@+id/tvBookingCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0 lượt đặt"
-                android:textColor="@color/text_hint"
-                android:textSize="14sp" />
-
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvAdminBookings"
+                android:id="@+id/rvAdminMatchPosts"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp" />
+                tools:listitem="@android:layout/simple_list_item_2" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Admin Bottom Navigation -->
     <include
         layout="@layout/layout_admin_bottom_nav"
         android:layout_width="match_parent"

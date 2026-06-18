@@ -35,7 +35,7 @@ public class Conversation implements Serializable {
     private String createdAt;
 
     private String stringId;
-    private String name;
+    private String localName;
     private String initials;
     private String lastMessageString;
     private String timeAgo;
@@ -47,7 +47,7 @@ public class Conversation implements Serializable {
     public Conversation(String stringId, String name, String initials, String lastMessageString,
                         String timeAgo, int unreadCount, String subtitle, boolean isOnline) {
         this.stringId = stringId;
-        this.name = name;
+        this.localName = name;
         this.initials = initials;
         this.lastMessageString = lastMessageString;
         this.timeAgo = timeAgo;
@@ -85,7 +85,7 @@ public class Conversation implements Serializable {
     }
 
     public String getName() {
-        if (name != null) return name;
+        if (localName != null) return localName;
         if (apiName != null) return apiName;
         if (otherUser != null) return otherUser.getName();
         if (memberNames != null && !memberNames.isEmpty()) return memberNames.get(0);

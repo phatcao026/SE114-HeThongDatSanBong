@@ -38,12 +38,11 @@ public class AdminUserDetailActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.tvInitials)).setText(initials);
 
         findViewById(R.id.btnLockUser).setOnClickListener(v -> {
-            Toast.makeText(this, "Đã khóa người dùng " + fullName, Toast.LENGTH_SHORT).show();
-            finish();
+            Toast.makeText(this, "Tính năng Khóa tài khoản đang chờ Backend hỗ trợ", Toast.LENGTH_LONG).show();
         });
 
         findViewById(R.id.btnResetPassword).setOnClickListener(v -> {
-            Toast.makeText(this, "Đã gửi email đặt lại mật khẩu", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Tính năng Đặt lại mật khẩu đang chờ Backend hỗ trợ", Toast.LENGTH_LONG).show();
         });
     }
 }

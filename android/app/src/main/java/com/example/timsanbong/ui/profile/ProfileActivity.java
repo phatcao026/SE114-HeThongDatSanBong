@@ -16,11 +16,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.timsanbong.R;
 import com.example.timsanbong.data.model.Booking;
 import com.example.timsanbong.data.model.User;
+import com.example.timsanbong.ui.admin.AdminMainActivity;
 import com.example.timsanbong.ui.auth.LoginActivity;
 import com.example.timsanbong.ui.customer.BookingAdapter;
 import com.example.timsanbong.ui.customer.BookingViewModel;
 import com.example.timsanbong.utils.NavBarManager;
 import com.example.timsanbong.utils.Resource;
+import com.example.timsanbong.utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
@@ -37,7 +39,7 @@ public class ProfileActivity extends AppCompatActivity implements BookingAdapter
     private View cardPersonalInfo, layoutBookingHistory;
     private TextView tvEmptyBookings;
     private TextInputLayout tilName, tilPhone;
-    private MaterialButton btnSaveProfile, btnLogout;
+    private MaterialButton btnSaveProfile, btnLogout, btnAdminMode;
     private ProfileViewModel profileViewModel;
     private BookingViewModel bookingViewModel;
     private BookingAdapter bookingAdapter;
@@ -75,10 +77,16 @@ public class ProfileActivity extends AppCompatActivity implements BookingAdapter
         tilPhone = findViewById(R.id.tilPhone);
         btnSaveProfile = findViewById(R.id.btnSaveProfile);
         btnLogout = findViewById(R.id.btnLogout);
+        btnAdminMode = findViewById(R.id.btnAdminMode);
 
         View btnSettings = findViewById(R.id.btnSettings);
         if (btnSettings != null) {
             btnSettings.setVisibility(View.GONE);
+        }
+
+        SessionManager sessionManager = new SessionManager(this);
+        if (sessionManager.isAdmin()) {
+            btnAdminMode.setVisibility(View.VISIBLE);
         }
 
         RecyclerView rvBookingHistory = findViewById(R.id.rvBookingHistory);
@@ -93,6 +101,7 @@ public class ProfileActivity extends AppCompatActivity implements BookingAdapter
     private void setupListeners() {
         btnLogout.setOnClickListener(v -> profileViewModel.logout());
         btnSaveProfile.setOnClickListener(v -> saveProfile());
+        btnAdminMode.setOnClickListener(v -> startActivity(new Intent(this, AdminMainActivity.class)));
     }
 
     private void setupObservers() {

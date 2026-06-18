@@ -17,17 +17,25 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.timsanbong.R;
+import com.example.timsanbong.data.api.ApiClient;
+import com.example.timsanbong.data.model.OpponentReviewResponse;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AdminAuditActivity extends AppCompatActivity {
 
     private RecyclerView rvAudit;
     private View tabPending, tabProcessed;
     private View indicatorPending, indicatorProcessed;
-    private TextView tvPendingLabel, tvProcessedLabel;
+    private TextView tvPendingLabel, tvProcessedLabel, tvPendingBadge, tvProcessedBadge;
+    private final List<OpponentReviewResponse> currentReports = new ArrayList<>();
+    private AuditAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +66,11 @@ public class AdminAuditActivity extends AppCompatActivity {
         indicatorProcessed = findViewById(R.id.indicatorProcessed);
         tvPendingLabel = findViewById(R.id.tvTabPendingLabel);
         tvProcessedLabel = findViewById(R.id.tvTabProcessedLabel);
+        tvPendingBadge = findViewById(R.id.tvPendingBadge);
+        tvProcessedBadge = findViewById(R.id.tvProcessedBadge);
+
+        adapter = new AuditAdapter(currentReports);
+        rvAudit.setAdapter(adapter);
     }
 
     private void setupTabs() {
@@ -84,46 +97,35 @@ public class AdminAuditActivity extends AppCompatActivity {
     }
 
     private void loadData(boolean pending) {
-        List<AuditReport> reports = new ArrayList<>();
         if (pending) {
-            // High Priority - Red (#E53E3E / #FEF2F2)
-            reports.add(new AuditReport("Bài đăng có ngôn từ kích động", "12 phút", "Ưu tiên cao", "Bài đăng", 
-                "“Tìm đối nào dám chiến, đội nào nhát thì né ra cho rộng đường…”", "Của Đỗ Văn Sang · 4 người đã báo cáo", 
-                R.drawable.ic_message, "#E53E3E", "#FEF2F2"));
-            
-            reports.add(new AuditReport("Sân Phú Mỹ Hưng – nghi vấn sân ảo", "1 giờ", "Ưu tiên cao", "Sân", 
-                "“3 khách phản ánh đến nơi không có sân. Cọc đã thu.”", "3 người đã báo cáo", 
-                R.drawable.ic_bolt, "#E53E3E", "#FEF2F2"));
+            ApiClient.getService(this).getAdminFairplayPending().enqueue(new Callback<List<OpponentReviewResponse>>() {
+                @Override
+                public void onResponse(@NonNull Call<List<OpponentReviewResponse>> call, @NonNull Response<List<OpponentReviewResponse>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        currentReports.clear();
+                        currentReports.addAll(response.body());
+                        adapter.notifyDataSetChanged();
+                        tvPendingBadge.setText(String.valueOf(currentReports.size()));
+                        tvProcessedBadge.setText("0");
+                    } else {
+                        Toast.makeText(AdminAuditActivity.this, "Không thể tải dữ liệu", Toast.LENGTH_SHORT).show();
+                    }
+                }
 
-            // Medium Priority - Yellow (#F59E0B / #FFFBEB)
-            reports.add(new AuditReport("Hoàng Tấn Lực – bùng kèo 4 lần liên tiếp", "3 giờ", "Trung bình", "Người dùng", 
-                "“Trust score tụt từ 64 → 14 trong 30 ngày. Đề xuất ban.”", "6 người đã báo cáo", 
-                R.drawable.ic_person, "#F59E0B", "#FFFBEB"));
-            
-            // Low Priority - Blue (#3B82F6 / #EFF6FF)
-            reports.add(new AuditReport("Bài đăng trùng lặp", "Hôm qua", "Thấp", "Bài đăng", 
-                "“Người dùng đăng 5 kèo giống nhau trong 1 giờ.”", "Của Phạm Quốc Khánh · 2 người đã báo cáo", 
-                R.drawable.ic_message, "#3B82F6", "#EFF6FF"));
+                @Override
+                public void onFailure(@NonNull Call<List<OpponentReviewResponse>> call, @NonNull Throwable t) {
+                    Toast.makeText(AdminAuditActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                }
+            });
         } else {
-            // Dummy for processed - Green (#10B981 / #ECFDF5)
-            reports.add(new AuditReport("Nội dung không phù hợp (Đã khóa)", "2 ngày trước", "Xong", "Hệ thống", 
-                "Tài khoản vi phạm chính sách cộng đồng nhiều lần.", "Xử lý bởi: Admin_01", 
-                R.drawable.ic_admin_shield, "#10B981", "#ECFDF5"));
-        }
-        rvAudit.setAdapter(new AuditAdapter(reports));
-    }
-
-    static class AuditReport {
-        String title, time, priority, category, content, reporter, color, bgColor;
-        int iconRes;
-        AuditReport(String t, String tm, String p, String cat, String con, String rep, int ic, String col, String bg) {
-            title = t; time = tm; priority = p; category = cat; content = con; reporter = rep; iconRes = ic; color = col; bgColor = bg;
+            currentReports.clear();
+            adapter.notifyDataSetChanged();
         }
     }
 
     static class AuditAdapter extends RecyclerView.Adapter<AuditAdapter.ViewHolder> {
-        private final List<AuditReport> reports;
-        AuditAdapter(List<AuditReport> reports) { this.reports = reports; }
+        private final List<OpponentReviewResponse> reports;
+        AuditAdapter(List<OpponentReviewResponse> reports) { this.reports = reports; }
 
         @NonNull
         @Override
@@ -134,17 +136,17 @@ public class AdminAuditActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            AuditReport report = reports.get(position);
-            holder.tvTitle.setText(report.title);
-            holder.tvTime.setText(report.time);
-            holder.tvPriority.setText(report.priority);
-            holder.tvCategory.setText(report.category);
-            holder.tvContent.setText(report.content);
-            holder.tvReporter.setText(report.reporter);
-            holder.ivIcon.setImageResource(report.iconRes);
+            OpponentReviewResponse report = reports.get(position);
+            holder.tvTitle.setText(report.getRatingType());
+            holder.tvTime.setText(report.getCreatedAt());
+            holder.tvPriority.setText(report.getStatus());
+            holder.tvCategory.setText("Fairplay");
+            holder.tvContent.setText(report.getComment());
+            holder.tvReporter.setText(String.format("Từ: %s -> %s", report.getReviewerName(), report.getRevieweeName()));
+            holder.ivIcon.setImageResource(R.drawable.ic_admin_shield);
 
-            int colorInt = Color.parseColor(report.color);
-            int bgColorInt = Color.parseColor(report.bgColor);
+            int colorInt = Color.parseColor("#E53E3E");
+            int bgColorInt = Color.parseColor("#FEF2F2");
 
             holder.ivIcon.setImageTintList(ColorStateList.valueOf(colorInt));
             holder.cvIcon.setCardBackgroundColor(bgColorInt);
@@ -153,8 +155,37 @@ public class AdminAuditActivity extends AppCompatActivity {
             
             holder.vAccent.setBackgroundColor(colorInt);
 
+            holder.btnBlock.setOnClickListener(v -> resolveReport(report.getId(), "APPROVED", v));
+            holder.btnIgnore.setOnClickListener(v -> resolveReport(report.getId(), "DISMISSED", v));
+            holder.btnHide.setOnClickListener(v -> resolveReport(report.getId(), "DISMISSED", v));
+
             holder.itemView.setOnClickListener(v -> {
-                Toast.makeText(v.getContext(), "Xem chi tiết: " + report.title, Toast.LENGTH_SHORT).show();
+                // Show detail if needed
+            });
+        }
+
+        private void resolveReport(Long id, String status, View v) {
+            java.util.Map<String, Object> body = new java.util.HashMap<>();
+            body.put("status", status);
+            body.put("resolutionNote", status.equals("APPROVED") ? "Vi phạm đã được xử lý" : "Bỏ qua báo cáo");
+
+            ApiClient.getService(v.getContext()).resolveFairplayReview(id, body).enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(v.getContext(), "Đã cập nhật trạng thái", Toast.LENGTH_SHORT).show();
+                        if (v.getContext() instanceof AdminAuditActivity) {
+                            ((AdminAuditActivity) v.getContext()).loadData(true);
+                        }
+                    } else {
+                        Toast.makeText(v.getContext(), "Lỗi: " + response.code(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                    Toast.makeText(v.getContext(), "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                }
             });
         }
 
@@ -166,6 +197,7 @@ public class AdminAuditActivity extends AppCompatActivity {
             ImageView ivIcon;
             MaterialCardView cvIcon;
             View vAccent;
+            View btnBlock, btnHide, btnIgnore;
             ViewHolder(View v) {
                 super(v);
                 tvTitle = v.findViewById(R.id.tvAuditTitle);
@@ -177,6 +209,9 @@ public class AdminAuditActivity extends AppCompatActivity {
                 ivIcon = v.findViewById(R.id.ivAuditTypeIcon);
                 cvIcon = (MaterialCardView) v.findViewById(R.id.cvAuditIcon);
                 vAccent = v.findViewById(R.id.vAuditAccent);
+                btnBlock = v.findViewById(R.id.btnBlock);
+                btnHide = v.findViewById(R.id.btnHide);
+                btnIgnore = v.findViewById(R.id.btnIgnore);
             }
         }
     }

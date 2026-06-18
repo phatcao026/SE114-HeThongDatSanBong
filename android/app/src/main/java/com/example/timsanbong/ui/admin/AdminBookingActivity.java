@@ -90,27 +90,38 @@ public class AdminBookingActivity extends AppCompatActivity {
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            // Reusing item_admin_transaction style or similar if possible, but let's just create a simple view
-            View v = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_2, parent, false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_admin_booking, parent, false);
             return new ViewHolder(v);
         }
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Booking b = bookings.get(position);
-            holder.text1.setText(b.getFieldName() + " - " + b.getStatus());
-            holder.text2.setText(b.getBookingDate() + " | " + b.getStartTime() + " - " + b.getEndTime());
+            holder.tvFieldName.setText(b.getFieldName());
+            holder.tvTime.setText(String.format("%s | %s - %s", b.getBookingDate(), b.getStartTime(), b.getEndTime()));
+            holder.tvPrice.setText(String.format(java.util.Locale.getDefault(), "%,.0fđ", (double)b.getTotalPrice()));
+            holder.tvStatus.setText(b.getStatus());
+
+            if ("PENDING".equalsIgnoreCase(b.getStatus())) {
+                holder.tvStatus.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#FEF3C7")));
+                holder.tvStatus.setTextColor(android.graphics.Color.parseColor("#92400E"));
+            } else if ("CANCELLED".equalsIgnoreCase(b.getStatus())) {
+                holder.tvStatus.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#FEF2F2")));
+                holder.tvStatus.setTextColor(android.graphics.Color.parseColor("#EF4444"));
+            }
         }
 
         @Override
         public int getItemCount() { return bookings.size(); }
 
         static class ViewHolder extends RecyclerView.ViewHolder {
-            TextView text1, text2;
+            TextView tvFieldName, tvTime, tvPrice, tvStatus;
             ViewHolder(View v) {
                 super(v);
-                text1 = v.findViewById(android.R.id.text1);
-                text2 = v.findViewById(android.R.id.text2);
+                tvFieldName = v.findViewById(R.id.tvBookingFieldName);
+                tvTime = v.findViewById(R.id.tvBookingTime);
+                tvPrice = v.findViewById(R.id.tvBookingPrice);
+                tvStatus = v.findViewById(R.id.tvBookingStatus);
             }
         }
     }

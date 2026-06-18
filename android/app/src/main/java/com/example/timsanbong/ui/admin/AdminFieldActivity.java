@@ -31,10 +31,9 @@ public class AdminFieldActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_booking); // Reusing booking layout for now
+        setContentView(R.layout.activity_admin_field);
 
-        ((TextView) findViewById(R.id.tvBookingCount)).setText("0 sân bóng");
-        RecyclerView rv = findViewById(R.id.rvAdminBookings); // Reusing ID from booking layout
+        RecyclerView rv = findViewById(R.id.rvAdminFields);
         rv.setLayoutManager(new LinearLayoutManager(this));
         
         allFields = new ArrayList<>();
@@ -60,7 +59,7 @@ public class AdminFieldActivity extends AppCompatActivity {
                     allFields.clear();
                     allFields.addAll(response.body());
                     adapter.notifyDataSetChanged();
-                    ((TextView) findViewById(R.id.tvBookingCount)).setText(allFields.size() + " sân bóng");
+                    ((TextView) findViewById(R.id.tvFieldCount)).setText(allFields.size() + " sân bóng");
                 } else {
                     Toast.makeText(AdminFieldActivity.this, "Không thể tải danh sách sân bóng", Toast.LENGTH_SHORT).show();
                 }
@@ -79,7 +78,7 @@ public class AdminFieldActivity extends AppCompatActivity {
         allFields.add(new Field(1, "Sân Trần Bình", "Quận 1", 250000, "", "Sân cỏ nhân tạo", "Sân 7", true));
         allFields.add(new Field(2, "Sân Phú Mỹ Hưng", "Quận 7", 400000, "", "Sân chuẩn quốc tế", "Sân 11", true));
         adapter.notifyDataSetChanged();
-        ((TextView) findViewById(R.id.tvBookingCount)).setText(allFields.size() + " sân bóng");
+        ((TextView) findViewById(R.id.tvFieldCount)).setText(allFields.size() + " sân bóng");
     }
 
     static class AdminFieldAdapter extends RecyclerView.Adapter<AdminFieldAdapter.ViewHolder> {
@@ -89,26 +88,35 @@ public class AdminFieldActivity extends AppCompatActivity {
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_2, parent, false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_admin_field, parent, false);
             return new ViewHolder(v);
         }
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Field f = fields.get(position);
-            holder.text1.setText(f.getName());
-            holder.text2.setText(f.getAddress() + " | " + (f.isAvailable() ? "Hoạt động" : "Ngừng hoạt động"));
+            holder.tvFieldName.setText(f.getName());
+            holder.tvFieldAddress.setText(f.getAddress());
+            holder.tvFieldInfo.setText(String.format(java.util.Locale.getDefault(), "%s · %,.0fđ", f.getTypeLabel(), f.getPricePerHour()));
+            holder.tvFieldStatus.setText(f.isAvailable() ? "Hoạt động" : "Ngừng hoạt động");
+            
+            if (!f.isAvailable()) {
+                holder.tvFieldStatus.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#FEF2F2")));
+                holder.tvFieldStatus.setTextColor(android.graphics.Color.parseColor("#EF4444"));
+            }
         }
 
         @Override
         public int getItemCount() { return fields.size(); }
 
         static class ViewHolder extends RecyclerView.ViewHolder {
-            TextView text1, text2;
+            TextView tvFieldName, tvFieldAddress, tvFieldInfo, tvFieldStatus;
             ViewHolder(View v) {
                 super(v);
-                text1 = v.findViewById(android.R.id.text1);
-                text2 = v.findViewById(android.R.id.text2);
+                tvFieldName = v.findViewById(R.id.tvFieldName);
+                tvFieldAddress = v.findViewById(R.id.tvFieldAddress);
+                tvFieldInfo = v.findViewById(R.id.tvFieldInfo);
+                tvFieldStatus = v.findViewById(R.id.tvFieldStatus);
             }
         }
     }

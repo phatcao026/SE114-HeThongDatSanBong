@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
-                android:text="Lượt đặt"
+                android:text="Sân bóng"
                 android:textColor="@color/text_heading"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -72,15 +72,15 @@
             android:padding="16dp">
 
             <TextView
-                android:id="@+id/tvBookingCount"
+                android:id="@+id/tvFieldCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0 lượt đặt"
+                android:text="0 sân bóng"
                 android:textColor="@color/text_hint"
                 android:textSize="14sp" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvAdminBookings"
+                android:id="@+id/rvAdminFields"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp" />

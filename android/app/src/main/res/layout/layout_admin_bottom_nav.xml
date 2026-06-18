@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/adminNavContainer"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
-    android:layout_gravity="bottom"
-    android:layout_margin="16dp"
-    app:cardBackgroundColor="@color/admin_nav_bg"
-    app:cardCornerRadius="36dp"
-    app:cardElevation="8dp">
+    android:layout_height="wrap_content">
 
     <LinearLayout
+        android:id="@+id/adminNavContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical"
+        android:layout_height="@dimen/nav_container_height"
+        android:layout_gravity="bottom"
         android:orientation="horizontal"
-        android:paddingHorizontal="8dp">
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:background="@color/primary">
 
         <!-- Overview -->
         <LinearLayout
@@ -23,22 +21,35 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:orientation="vertical"
             android:gravity="center"
-            android:orientation="vertical">
-            <ImageView
-                android:id="@+id/ivNavHome"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_admin_dashboard"
-                app:tint="@color/admin_nav_unselected"
-                android:contentDescription="Overview icon" />
+            android:clickable="true"
+            android:focusable="true">
+
+            <FrameLayout
+                android:id="@+id/wrapNavHome"
+                android:layout_width="@dimen/nav_active_pill_width"
+                android:layout_height="@dimen/nav_active_pill_height">
+
+                <ImageView
+                    android:id="@+id/ivNavHome"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_admin_dashboard"
+                    android:contentDescription="Overview icon" />
+            </FrameLayout>
+
             <TextView
                 android:id="@+id/tvNavHome"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_1"
                 android:text="Tổng quan"
-                android:textColor="@color/admin_nav_unselected"
-                android:textSize="9sp" />
+                android:textColor="@color/text_on_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/be_vietnam_pro" />
         </LinearLayout>
 
         <!-- Users -->
@@ -47,22 +58,35 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:orientation="vertical"
             android:gravity="center"
-            android:orientation="vertical">
-            <ImageView
-                android:id="@+id/ivNavUsers"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_admin_users"
-                app:tint="@color/admin_nav_unselected"
-                android:contentDescription="Users icon" />
+            android:clickable="true"
+            android:focusable="true">
+
+            <FrameLayout
+                android:id="@+id/wrapNavUsers"
+                android:layout_width="@dimen/nav_active_pill_width"
+                android:layout_height="@dimen/nav_active_pill_height">
+
+                <ImageView
+                    android:id="@+id/ivNavUsers"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_admin_users"
+                    android:contentDescription="Users icon" />
+            </FrameLayout>
+
             <TextView
                 android:id="@+id/tvNavUsers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_1"
                 android:text="Người dùng"
-                android:textColor="@color/admin_nav_unselected"
-                android:textSize="9sp" />
+                android:textColor="@color/text_on_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/be_vietnam_pro" />
         </LinearLayout>
 
         <!-- Audit -->
@@ -71,22 +95,35 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:orientation="vertical"
             android:gravity="center"
-            android:orientation="vertical">
-            <ImageView
-                android:id="@+id/ivNavAudit"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_admin_shield"
-                app:tint="@color/admin_nav_unselected"
-                android:contentDescription="Audit icon" />
+            android:clickable="true"
+            android:focusable="true">
+
+            <FrameLayout
+                android:id="@+id/wrapNavAudit"
+                android:layout_width="@dimen/nav_active_pill_width"
+                android:layout_height="@dimen/nav_active_pill_height">
+
+                <ImageView
+                    android:id="@+id/ivNavAudit"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_admin_shield"
+                    android:contentDescription="Audit icon" />
+            </FrameLayout>
+
             <TextView
                 android:id="@+id/tvNavAudit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_1"
                 android:text="Kiểm duyệt"
-                android:textColor="@color/admin_nav_unselected"
-                android:textSize="9sp" />
+                android:textColor="@color/text_on_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/be_vietnam_pro" />
         </LinearLayout>
 
         <!-- Transactions -->
@@ -95,22 +132,35 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:orientation="vertical"
             android:gravity="center"
-            android:orientation="vertical">
-            <ImageView
-                android:id="@+id/ivNavTransactions"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_admin_wallet"
-                app:tint="@color/admin_nav_unselected"
-                android:contentDescription="Transactions icon" />
+            android:clickable="true"
+            android:focusable="true">
+
+            <FrameLayout
+                android:id="@+id/wrapNavTransactions"
+                android:layout_width="@dimen/nav_active_pill_width"
+                android:layout_height="@dimen/nav_active_pill_height">
+
+                <ImageView
+                    android:id="@+id/ivNavTransactions"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_admin_wallet"
+                    android:contentDescription="Transactions icon" />
+            </FrameLayout>
+
             <TextView
                 android:id="@+id/tvNavTransactions"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_1"
                 android:text="Giao dịch"
-                android:textColor="@color/admin_nav_unselected"
-                android:textSize="9sp" />
+                android:textColor="@color/text_on_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/be_vietnam_pro" />
         </LinearLayout>
 
         <!-- Profile -->
@@ -119,23 +169,35 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:orientation="vertical"
             android:gravity="center"
-            android:orientation="vertical">
-            <ImageView
-                android:id="@+id/ivNavProfile"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_admin_account"
-                app:tint="@color/admin_nav_unselected"
-                android:contentDescription="Account icon" />
+            android:clickable="true"
+            android:focusable="true">
+
+            <FrameLayout
+                android:id="@+id/wrapNavProfile"
+                android:layout_width="@dimen/nav_active_pill_width"
+                android:layout_height="@dimen/nav_active_pill_height">
+
+                <ImageView
+                    android:id="@+id/ivNavProfile"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_admin_account"
+                    android:contentDescription="Account icon" />
+            </FrameLayout>
+
             <TextView
                 android:id="@+id/tvNavProfile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_1"
                 android:text="Tài khoản"
-                android:textColor="@color/admin_nav_unselected"
-                android:textSize="9sp" />
+                android:textColor="@color/text_on_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/be_vietnam_pro" />
         </LinearLayout>
-
     </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+</FrameLayout>

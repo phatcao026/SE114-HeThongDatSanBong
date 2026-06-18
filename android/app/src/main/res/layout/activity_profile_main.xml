@@ -321,6 +321,22 @@
                 app:cornerRadius="@dimen/radius_button"
                 app:strokeColor="@color/error" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAdminMode"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginHorizontal="@dimen/spacing_4"
+                android:layout_marginTop="@dimen/spacing_3"
+                android:layout_marginBottom="@dimen/spacing_6"
+                android:text="Chế độ ADMIN"
+                android:textSize="@dimen/text_body_large"
+                android:textColor="@color/primary"
+                android:fontFamily="@font/be_vietnam_pro"
+                app:cornerRadius="@dimen/radius_button"
+                app:strokeColor="@color/primary"
+                android:visibility="gone" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

@@ -60,6 +60,17 @@ public class AdminTransactionActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     allTransactions = response.body();
                     adapter.updateList(allTransactions);
+                    
+                    // Calculate GMV
+                    double total = 0;
+                    for (PaymentResponse p : allTransactions) {
+                        if ("SUCCESS".equalsIgnoreCase(p.getStatus())) {
+                            total += p.getAmount() != null ? p.getAmount().doubleValue() : 0;
+                        }
+                    }
+                    java.text.NumberFormat currencyFormat = java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("vi", "VN"));
+                    View cardGmv = findViewById(R.id.cardGmv);
+                    ((TextView) cardGmv.findViewById(R.id.tvStatValue)).setText(currencyFormat.format(total));
                 } else {
                     Toast.makeText(AdminTransactionActivity.this, "Không thể tải danh sách giao dịch", Toast.LENGTH_SHORT).show();
                 }
