@@ -39,7 +39,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 Long userId = TokenUtils.getUserIdFromToken(token, jwtSecret);
 
-                userRepository.findById(userId).ifPresent(user -> authenticate(request, user));
+                userRepository.findById(userId).ifPresent(user -> {
+                    if (!Boolean.TRUE.equals(user.getIsLocked())) {
+                        authenticate(request, user);
+                    }
+                });
             }
         } catch (Exception ex) {
             logger.warn("Invalid JWT token: " + ex.getMessage());

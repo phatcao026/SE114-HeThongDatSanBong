@@ -11,6 +11,8 @@ import com.example.backend.service.AdminDashboardService;
 import com.example.backend.utils.Enums;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -66,5 +68,17 @@ public class AdminController {
     public ResponseEntity<List<ReviewResponse>> getReviews(
             @RequestParam(required = false) Enums.ReviewStatus status) {
         return ResponseEntity.ok(adminDashboardService.getReviews(status));
+    }
+
+    @PutMapping("/users/{id}/lock")
+    public ResponseEntity<Void> lockUser(@PathVariable Long id) {
+        adminDashboardService.lockUser(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/users/{id}/unlock")
+    public ResponseEntity<Void> unlockUser(@PathVariable Long id) {
+        adminDashboardService.unlockUser(id);
+        return ResponseEntity.ok().build();
     }
 }

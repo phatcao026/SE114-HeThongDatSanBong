@@ -7,6 +7,7 @@ import com.example.backend.dto.response.RecommendedMatchResponse;
 import com.example.backend.utils.Enums;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 public interface MatchPostService {
@@ -26,5 +27,14 @@ public interface MatchPostService {
 
     MatchPostResponse closeMatchPost(Long id);
 
-    List<RecommendedMatchResponse> getSmartRecommendations(String playstyleNote);
+    List<RecommendedMatchResponse> getSmartRecommendations(
+            String playstyleNote,
+            LocalDate date,
+            LocalTime timeStart,
+            LocalTime timeEnd,
+            Enums.TeamLevel skillLevel,
+            Boolean hasField,
+            Enums.PostType postType,
+            String position
+    );
 }

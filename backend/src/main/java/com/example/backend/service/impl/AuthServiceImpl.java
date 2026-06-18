@@ -98,6 +98,10 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new AppException(401, "Invalid email or password"));
 
+        if (Boolean.TRUE.equals(user.getIsLocked())) {
+            throw new AppException(403, "Tài khoản của bạn đã bị khóa bởi quản trị viên.");
+        }
+
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new AppException(401, "Invalid email or password");
         }
@@ -155,6 +159,11 @@ public class AuthServiceImpl implements AuthService {
             UserRole userRole = UserRole.valueOf(role.trim().toUpperCase(Locale.ROOT));
             if (userRole == UserRole.ADMIN) {
                 throw new AppException(400, "Admin account cannot be registered here");
+            }
+            if (userRole == UserRole.OWNER) {
+                if (userRepository.countByRole(UserRole.OWNER) > 0) {
+                    throw new AppException(400, "Owner account already exists. Only one owner is allowed in the system.");
+                }
             }
             return userRole;
         } catch (IllegalArgumentException ex) {

@@ -6,13 +6,11 @@ import com.example.backend.dto.response.ReviewResponse;
 import com.example.backend.entity.MatchPost;
 import com.example.backend.entity.MatchRequest;
 import com.example.backend.entity.Review;
-import com.example.backend.entity.Team;
 import com.example.backend.entity.User;
 import com.example.backend.exception.AppException;
 import com.example.backend.repository.MatchPostRepository;
 import com.example.backend.repository.MatchRequestRepository;
 import com.example.backend.repository.ReviewRepository;
-import com.example.backend.repository.TeamRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.service.ReviewService;
 import com.example.backend.utils.Enums;
@@ -40,18 +38,15 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final MatchRequestRepository matchRequestRepository;
     private final MatchPostRepository matchPostRepository;
-    private final TeamRepository teamRepository;
     private final UserRepository userRepository;
 
     public ReviewServiceImpl(ReviewRepository reviewRepository,
                              MatchRequestRepository matchRequestRepository,
                              MatchPostRepository matchPostRepository,
-                             TeamRepository teamRepository,
                              UserRepository userRepository) {
         this.reviewRepository = reviewRepository;
         this.matchRequestRepository = matchRequestRepository;
         this.matchPostRepository = matchPostRepository;
-        this.teamRepository = teamRepository;
         this.userRepository = userRepository;
     }
 
@@ -195,17 +190,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     private boolean canManagePost(MatchPost post, Long userId) {
-        if (post.getUserId() != null && post.getUserId().equals(userId)) {
-            return true;
-        }
-        if (post.getTeamId() == null) {
-            return false;
-        }
-
-        return teamRepository.findById(post.getTeamId())
-                .map(Team::getCaptainId)
-                .filter(captainId -> captainId.equals(userId))
-                .isPresent();
+        return post.getUserId() != null && post.getUserId().equals(userId);
     }
 
     private Enums.ReviewStatus resolveInitialStatus(Integer scoreChange) {

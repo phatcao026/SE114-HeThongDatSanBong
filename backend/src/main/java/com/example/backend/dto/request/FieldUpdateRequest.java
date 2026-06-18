@@ -5,7 +5,6 @@ import com.example.backend.utils.Enums;
 public class FieldUpdateRequest {
     private String name;
     private Enums.FieldType type;
-    private String address;
     private String description;
     private String coverImage;
     private Enums.FieldStatus status;
@@ -24,14 +23,6 @@ public class FieldUpdateRequest {
 
     public void setType(Enums.FieldType type) {
         this.type = type;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     public String getDescription() {

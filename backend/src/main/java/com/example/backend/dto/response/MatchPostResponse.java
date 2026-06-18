@@ -10,8 +10,6 @@ public class MatchPostResponse {
     private Long id;
     private Long userId;
     private String userName;
-    private Long teamId;
-    private String teamName;
     private Long fieldId;
     private String fieldName;
     private Long bookingId;
@@ -26,6 +24,12 @@ public class MatchPostResponse {
     private long requestCount;
     private Long acceptedRequestId;
     private LocalDateTime createdAt;
+    private Integer neededMembers;
+    private Integer joinedMembers;
+    private Long conversationId;
+    private Boolean hasField;
+    private String targetPositions;
+    private String ageRange;
 
     public Long getId() {
         return id;
@@ -51,21 +55,6 @@ public class MatchPostResponse {
         this.userName = userName;
     }
 
-    public Long getTeamId() {
-        return teamId;
-    }
-
-    public void setTeamId(Long teamId) {
-        this.teamId = teamId;
-    }
-
-    public String getTeamName() {
-        return teamName;
-    }
-
-    public void setTeamName(String teamName) {
-        this.teamName = teamName;
-    }
 
     public Long getFieldId() {
         return fieldId;
@@ -177,5 +166,53 @@ public class MatchPostResponse {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Integer getNeededMembers() {
+        return neededMembers;
+    }
+
+    public void setNeededMembers(Integer neededMembers) {
+        this.neededMembers = neededMembers;
+    }
+
+    public Integer getJoinedMembers() {
+        return joinedMembers;
+    }
+
+    public void setJoinedMembers(Integer joinedMembers) {
+        this.joinedMembers = joinedMembers;
+    }
+
+    public Long getConversationId() {
+        return conversationId;
+    }
+
+    public void setConversationId(Long conversationId) {
+        this.conversationId = conversationId;
+    }
+
+    public Boolean getHasField() {
+        return hasField;
+    }
+
+    public void setHasField(Boolean hasField) {
+        this.hasField = hasField;
+    }
+
+    public String getTargetPositions() {
+        return targetPositions;
+    }
+
+    public void setTargetPositions(String targetPositions) {
+        this.targetPositions = targetPositions;
+    }
+
+    public String getAgeRange() {
+        return ageRange;
+    }
+
+    public void setAgeRange(String ageRange) {
+        this.ageRange = ageRange;
     }
 }

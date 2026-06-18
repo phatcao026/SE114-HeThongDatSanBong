@@ -22,4 +22,8 @@ public interface NotificationService {
     NotificationResponse deleteNotification(Long id);
 
     void deleteReadNotifications();
+
+    void registerFcmToken(String fcmToken);
+
+    void deregisterFcmToken(String fcmToken);
 }

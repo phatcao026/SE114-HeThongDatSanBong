@@ -6,6 +6,9 @@ import com.example.backend.entity.Notification;
 import com.example.backend.exception.AppException;
 import com.example.backend.repository.NotificationRepository;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.repository.UserFcmTokenRepository;
+import com.example.backend.entity.UserFcmToken;
+import com.example.backend.service.FcmPushService;
 import com.example.backend.service.NotificationService;
 import com.example.backend.utils.Enums;
 import com.example.backend.utils.TokenUtils;
@@ -15,16 +18,23 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final UserFcmTokenRepository userFcmTokenRepository;
+    private final FcmPushService fcmPushService;
 
     public NotificationServiceImpl(NotificationRepository notificationRepository,
-                                   UserRepository userRepository) {
+                                   UserRepository userRepository,
+                                   UserFcmTokenRepository userFcmTokenRepository,
+                                   FcmPushService fcmPushService) {
         this.notificationRepository = notificationRepository;
         this.userRepository = userRepository;
+        this.userFcmTokenRepository = userFcmTokenRepository;
+        this.fcmPushService = fcmPushService;
     }
 
     @Override
@@ -72,7 +82,9 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setIsRead(false);
         notification.setCreatedAt(LocalDateTime.now());
 
-        return toResponse(notificationRepository.save(notification));
+        Notification saved = notificationRepository.save(notification);
+        fcmPushService.sendPushNotification(userId, title, content);
+        return toResponse(saved);
     }
 
     @Override
@@ -145,5 +157,32 @@ public class NotificationServiceImpl implements NotificationService {
         }
 
         return value.trim();
+    }
+
+    @Override
+    @Transactional
+    public void registerFcmToken(String fcmToken) {
+        Long currentUserId = TokenUtils.getCurrentUserId();
+        Optional<UserFcmToken> existing = userFcmTokenRepository.findByFcmToken(fcmToken);
+        if (existing.isPresent()) {
+            UserFcmToken tokenEntity = existing.get();
+            if (!tokenEntity.getUserId().equals(currentUserId)) {
+                tokenEntity.setUserId(currentUserId);
+                tokenEntity.setCreatedAt(LocalDateTime.now());
+                userFcmTokenRepository.save(tokenEntity);
+            }
+        } else {
+            UserFcmToken tokenEntity = new UserFcmToken();
+            tokenEntity.setUserId(currentUserId);
+            tokenEntity.setFcmToken(fcmToken);
+            tokenEntity.setCreatedAt(LocalDateTime.now());
+            userFcmTokenRepository.save(tokenEntity);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deregisterFcmToken(String fcmToken) {
+        userFcmTokenRepository.deleteByFcmToken(fcmToken);
     }
 }

@@ -17,8 +17,6 @@ public class MatchPost {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "team_id")
-    private Long teamId;
 
     @Column(name = "field_id")
     private Long fieldId;
@@ -50,13 +48,28 @@ public class MatchPost {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "needed_members")
+    private Integer neededMembers = 1;
+
+    @Column(name = "joined_members")
+    private Integer joinedMembers = 0;
+
+    @Column(name = "conversation_id")
+    private Long conversationId;
+
+    @Column(name = "has_field")
+    private Boolean hasField = true;
+
+    @Column(name = "target_positions")
+    private String targetPositions;
+
+    @Column(name = "age_range")
+    private String ageRange;
+
     @ManyToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "team_id", insertable = false, updatable = false)
-    private Team team;
 
     @ManyToOne
     @JoinColumn(name = "field_id", insertable = false, updatable = false)
@@ -77,8 +90,6 @@ public class MatchPost {
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
 
-    public Long getTeamId() { return teamId; }
-    public void setTeamId(Long teamId) { this.teamId = teamId; }
 
     public Long getFieldId() { return fieldId; }
     public void setFieldId(Long fieldId) { this.fieldId = fieldId; }
@@ -116,8 +127,6 @@ public class MatchPost {
     public List<MatchRequest> getRequests() { return requests; }
     public void setRequests(List<MatchRequest> requests) { this.requests = requests; }
 
-    public Team getTeam() { return team; }
-    public void setTeam(Team team) { this.team = team; }
 
     public Field getField() { return field; }
     public void setField(Field field) { this.field = field; }
@@ -127,4 +136,22 @@ public class MatchPost {
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
+
+    public Integer getNeededMembers() { return neededMembers; }
+    public void setNeededMembers(Integer neededMembers) { this.neededMembers = neededMembers; }
+
+    public Integer getJoinedMembers() { return joinedMembers; }
+    public void setJoinedMembers(Integer joinedMembers) { this.joinedMembers = joinedMembers; }
+
+    public Long getConversationId() { return conversationId; }
+    public void setConversationId(Long conversationId) { this.conversationId = conversationId; }
+
+    public Boolean getHasField() { return hasField; }
+    public void setHasField(Boolean hasField) { this.hasField = hasField; }
+
+    public String getTargetPositions() { return targetPositions; }
+    public void setTargetPositions(String targetPositions) { this.targetPositions = targetPositions; }
+
+    public String getAgeRange() { return ageRange; }
+    public void setAgeRange(String ageRange) { this.ageRange = ageRange; }
 }

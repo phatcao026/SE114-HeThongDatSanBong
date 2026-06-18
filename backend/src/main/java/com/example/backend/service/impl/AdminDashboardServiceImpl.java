@@ -13,7 +13,6 @@ import com.example.backend.entity.MatchPost;
 import com.example.backend.entity.MatchRequest;
 import com.example.backend.entity.Payment;
 import com.example.backend.entity.Review;
-import com.example.backend.entity.Team;
 import com.example.backend.entity.TimeSlot;
 import com.example.backend.entity.User;
 import com.example.backend.exception.AppException;
@@ -25,7 +24,6 @@ import com.example.backend.repository.MatchRequestRepository;
 import com.example.backend.repository.MessageRepository;
 import com.example.backend.repository.PaymentRepository;
 import com.example.backend.repository.ReviewRepository;
-import com.example.backend.repository.TeamRepository;
 import com.example.backend.repository.TimeSlotRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.service.AdminDashboardService;
@@ -53,7 +51,6 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
     private final PaymentRepository paymentRepository;
     private final MatchPostRepository matchPostRepository;
     private final MatchRequestRepository matchRequestRepository;
-    private final TeamRepository teamRepository;
     private final ReviewRepository reviewRepository;
     private final ConversationRepository conversationRepository;
     private final MessageRepository messageRepository;
@@ -65,7 +62,6 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                                      PaymentRepository paymentRepository,
                                      MatchPostRepository matchPostRepository,
                                      MatchRequestRepository matchRequestRepository,
-                                     TeamRepository teamRepository,
                                      ReviewRepository reviewRepository,
                                      ConversationRepository conversationRepository,
                                      MessageRepository messageRepository) {
@@ -76,7 +72,6 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         this.paymentRepository = paymentRepository;
         this.matchPostRepository = matchPostRepository;
         this.matchRequestRepository = matchRequestRepository;
-        this.teamRepository = teamRepository;
         this.reviewRepository = reviewRepository;
         this.conversationRepository = conversationRepository;
         this.messageRepository = messageRepository;
@@ -205,9 +200,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
     private FieldResponse toFieldResponse(Field field) {
         FieldResponse response = new FieldResponse();
         response.setId(field.getId());
-        response.setOwnerId(field.getOwnerId());
         response.setName(field.getName());
-        response.setAddress(field.getAddress());
         response.setDescription(field.getDescription());
         response.setType(field.getType());
         response.setStatus(field.getStatus());
@@ -268,24 +261,20 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         }
 
         Map<Long, User> users = mapById(userRepository.findAllById(collectIds(posts, MatchPost::getUserId)), User::getId);
-        Map<Long, Team> teams = mapById(teamRepository.findAllById(collectIds(posts, MatchPost::getTeamId)), Team::getId);
         Map<Long, Field> fields = mapById(fieldRepository.findAllById(collectIds(posts, MatchPost::getFieldId)), Field::getId);
 
         return posts.stream()
-                .map(post -> toMatchPostResponse(post, users, teams, fields))
+                .map(post -> toMatchPostResponse(post, users, fields))
                 .toList();
     }
 
     private MatchPostResponse toMatchPostResponse(MatchPost post,
                                                   Map<Long, User> users,
-                                                  Map<Long, Team> teams,
                                                   Map<Long, Field> fields) {
         MatchPostResponse response = new MatchPostResponse();
         response.setId(post.getId());
         response.setUserId(post.getUserId());
         response.setUserName(users.containsKey(post.getUserId()) ? users.get(post.getUserId()).getFullName() : null);
-        response.setTeamId(post.getTeamId());
-        response.setTeamName(teams.containsKey(post.getTeamId()) ? teams.get(post.getTeamId()).getName() : null);
         response.setFieldId(post.getFieldId());
         response.setFieldName(fields.containsKey(post.getFieldId()) ? fields.get(post.getFieldId()).getName() : null);
         response.setBookingId(post.getBookingId());
@@ -367,5 +356,26 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();
+    }
+
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public void lockUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(404, "Không tìm thấy người dùng"));
+        if (user.getRole() == Enums.UserRole.ADMIN) {
+            throw new AppException(400, "Không thể khóa tài khoản quản trị viên");
+        }
+        user.setIsLocked(true);
+        userRepository.save(user);
+    }
+
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public void unlockUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(404, "Không tìm thấy người dùng"));
+        user.setIsLocked(false);
+        userRepository.save(user);
     }
 }

@@ -41,8 +41,6 @@ public class User {
     private LocalDateTime updatedAt;
 
     // Relations
-    @OneToMany(mappedBy = "captain")
-    private List<Team> teams;
 
     @OneToMany(mappedBy = "owner")
     private List<Field> fields;
@@ -111,8 +109,6 @@ public class User {
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 
-    public List<Team> getTeams() { return teams; }
-    public void setTeams(List<Team> teams) { this.teams = teams; }
 
     public List<Field> getFields() { return fields; }
     public void setFields(List<Field> fields) { this.fields = fields; }

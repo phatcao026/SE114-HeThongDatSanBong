@@ -96,7 +96,6 @@ public class FieldServiceImpl implements FieldService {
         field.setOwnerId(TokenUtils.getCurrentUserId());
         field.setName(cleanRequired(request.getName(), "Field name is required"));
         field.setType(request.getType());
-        field.setAddress(cleanOptional(request.getAddress()));
         field.setDescription(cleanOptional(request.getDescription()));
         field.setCoverImage(cleanOptional(request.getCoverImage()));
         field.setStatus(request.getStatus() != null ? request.getStatus() : Enums.FieldStatus.AVAILABLE);
@@ -117,9 +116,6 @@ public class FieldServiceImpl implements FieldService {
         }
         if (request.getType() != null) {
             field.setType(request.getType());
-        }
-        if (request.getAddress() != null) {
-            field.setAddress(cleanOptional(request.getAddress()));
         }
         if (request.getDescription() != null) {
             field.setDescription(cleanOptional(request.getDescription()));
@@ -263,9 +259,7 @@ public class FieldServiceImpl implements FieldService {
     private FieldResponse toFieldResponse(Field field) {
         FieldResponse response = new FieldResponse();
         response.setId(field.getId());
-        response.setOwnerId(field.getOwnerId());
         response.setName(field.getName());
-        response.setAddress(field.getAddress());
         response.setDescription(field.getDescription());
         response.setType(field.getType());
         response.setStatus(field.getStatus());
@@ -280,9 +274,7 @@ public class FieldServiceImpl implements FieldService {
     private FieldDetailResponse toFieldDetailResponse(Field field) {
         FieldDetailResponse response = new FieldDetailResponse();
         response.setId(field.getId());
-        response.setOwnerId(field.getOwnerId());
         response.setName(field.getName());
-        response.setAddress(field.getAddress());
         response.setDescription(field.getDescription());
         response.setType(field.getType());
         response.setStatus(field.getStatus());

@@ -9,6 +9,7 @@ import com.example.backend.repository.MatchPostRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.service.ai.GroqAiService;
 import com.example.backend.service.impl.MatchPostServiceImpl;
+import com.example.backend.utils.Enums;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -78,12 +79,25 @@ public class MatchPostRecommendationTest {
         post1.setUser(user2);
 
         Page<MatchPost> matchPage = new PageImpl<>(List.of(post1));
-        when(matchPostRepository.findPotentialMatches(eq(currentUserId), any())).thenReturn(matchPage);
+        when(matchPostRepository.findPotentialMatches(eq(currentUserId), eq(Enums.PostType.FIND_OPPONENT), any())).thenReturn(matchPage);
 
         AiRecommendationResult aiResult = new AiRecommendationResult(10L, "Highly compatible playstyle");
-        when(groqAiService.recommendOpponents(eq("Fast paced"), eq(90), anyList())).thenReturn(List.of(aiResult));
+        when(groqAiService.recommendMatches(
+                eq("Fast paced"),
+                eq(90),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                eq(Enums.PostType.FIND_OPPONENT),
+                any(),
+                anyList()
+        )).thenReturn(List.of(aiResult));
 
-        List<RecommendedMatchResponse> recommendations = matchPostService.getSmartRecommendations("Fast paced");
+        List<RecommendedMatchResponse> recommendations = matchPostService.getSmartRecommendations(
+                "Fast paced", null, null, null, null, null, Enums.PostType.FIND_OPPONENT, null
+        );
 
         assertNotNull(recommendations);
         assertEquals(1, recommendations.size());
@@ -102,12 +116,16 @@ public class MatchPostRecommendationTest {
         currentUser.setTrustScore(90);
         when(userRepository.findById(currentUserId)).thenReturn(Optional.of(currentUser));
 
-        when(matchPostRepository.findPotentialMatches(eq(currentUserId), any())).thenReturn(Page.empty());
+        when(matchPostRepository.findPotentialMatches(eq(currentUserId), eq(Enums.PostType.FIND_OPPONENT), any())).thenReturn(Page.empty());
 
-        List<RecommendedMatchResponse> recommendations = matchPostService.getSmartRecommendations("Fast paced");
+        List<RecommendedMatchResponse> recommendations = matchPostService.getSmartRecommendations(
+                "Fast paced", null, null, null, null, null, Enums.PostType.FIND_OPPONENT, null
+        );
 
         assertNotNull(recommendations);
         assertTrue(recommendations.isEmpty());
-        verify(groqAiService, never()).recommendOpponents(anyString(), anyInt(), anyList());
+        verify(groqAiService, never()).recommendMatches(
+                anyString(), anyInt(), any(), any(), any(), any(), any(), any(), any(), anyList()
+        );
     }
 }

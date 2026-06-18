@@ -20,6 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import com.example.backend.utils.Enums;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -139,22 +140,59 @@ public class GroqAiService {
         }
     }
 
-    public List<AiRecommendationResult> recommendOpponents(
+    public List<AiRecommendationResult> recommendMatches(
             String currentTeamPlaystyle,
             int currentTrustScore,
+            String hostDate,
+            String hostTimeStart,
+            String hostTimeEnd,
+            String hostSkillLevel,
+            Boolean hostHasField,
+            Enums.PostType postType,
+            String hostPosition,
             List<AiOpponentDto> potentialOpponents) {
 
         try {
             String opponentsJson = objectMapper.writeValueAsString(potentialOpponents);
 
+            // Xây dựng hướng dẫn ưu tiên so khớp dựa trên loại bài đăng
+            String priorityInstruction;
+            if (postType == Enums.PostType.FIND_MEMBER) {
+                priorityInstruction = 
+                    "Nhiệm vụ: Phân tích danh sách đối thủ và chọn ra đúng 5 bài đăng tuyển cầu lẻ phù hợp nhất với vị trí thi đấu và thời gian của cầu lẻ này.\n" +
+                    "QUY TẮC ƯU TIÊN khi xét duyệt (từ cao xuống thấp):\n" +
+                    "1. THỜI GIAN thi đấu (Ưu tiên trùng hoặc lệch ít nhất về Ngày, Giờ bắt đầu và Giờ kết thúc).\n" +
+                    "2. VỊ TRÍ thi đấu (Khớp giữa vị trí sở trường của cầu lẻ '" + (hostPosition != null ? hostPosition : "Bất kỳ") + "' với danh sách các vị trí cần tuyển 'targetPositions' của bài đăng).\n" +
+                    "3. ĐỘ UY TÍN (Điểm trust score của chủ bài đăng, càng cao càng tốt).\n" +
+                    "4. TRÌNH ĐỘ YÊU CẦU (Khớp trình độ 'skillLevel', lệch tối đa 1 cấp).\n" +
+                    "5. CÁC TIÊU CHÍ KHÁC (Chi phí đóng góp 'costSharing', lối đá 'playStyleNote', độ tuổi 'ageRange').";
+            } else {
+                priorityInstruction = 
+                    "Nhiệm vụ: Phân tích danh sách đối thủ và chọn ra đúng 5 bài đăng tìm đối thủ phù hợp nhất với đội chủ nhà.\n" +
+                    "QUY TẮC ƯU TIÊN khi xét duyệt (từ cao xuống thấp):\n" +
+                    "1. THỜI GIAN thi đấu (Ưu tiên trùng hoặc lệch ít nhất về Ngày, Giờ bắt đầu và Giờ kết thúc).\n" +
+                    "2. ĐỘ UY TÍN (Điểm trust score của đối thủ, ưu tiên tương đồng hoặc cao hơn chủ nhà).\n" +
+                    "3. TRÌNH ĐỘ YÊU CẦU (Khớp trình độ 'skillLevel', lệch tối đa 1 cấp).\n" +
+                    "4. CÁC TIÊU CHÍ KHÁC (Lối đá 'playStyleNote', độ tuổi 'ageRange', tình trạng Sân bóng - có sân hay chưa 'hasField').";
+            }
+
             String prompt = String.format(
                     "Bạn là một hệ thống AI ghép kèo bóng đá. Tuyệt đối KHÔNG giao tiếp như con người. " +
-                            "Thông tin đội chủ nhà: Lối đá: '%s', Uy tín: %d/100. " +
-                            "Danh sách đối thủ (JSON): %s. " +
-                            "Nhiệm vụ: Chọn 3 đội phù hợp nhất. " +
-                            "QUY TẮC BẮT BUỘC: Chỉ trả về duy nhất một mảng JSON có định dạng [{\"matchId\": <ID trận đấu dạng số>, \"aiReason\": \"<lý do ngắn gọn bằng tiếng Việt>\"}]. " +
-                            "Tuyệt đối không thêm bất kỳ từ ngữ nào ngoài JSON. Nếu danh sách đối thủ trống, trả về [].",
-                    currentTeamPlaystyle, currentTrustScore, opponentsJson
+                            "Thông tin yêu cầu của Đội/Người chơi chủ nhà: Lối đá mong muốn: '%s', Uy tín: %d/100, Ngày thi đấu: '%s', Giờ đá: '%s' - '%s', Trình độ: '%s', Có sân chưa: %s, Vị trí đá: '%s'. " +
+                            "Danh sách bài đăng tuyển tiềm năng (JSON): %s. " +
+                            "%s " +
+                            "QUY TẮC BẮT BUỘC: Chỉ trả về duy nhất một mảng JSON chứa tối đa 5 phần tử có định dạng [{\"matchId\": <ID trận đấu dạng số>, \"aiReason\": \"<lý do ngắn gọn bằng tiếng Việt giải thích rõ độ tương thích dựa trên các tiêu chí ưu tiên ở trên>\"}]. " +
+                            "Tuyệt đối không thêm bất kỳ từ ngữ hay ký tự Markdown bọc ngoài (như ```json) ngoài JSON. Nếu danh sách đối thủ trống, trả về [].",
+                    currentTeamPlaystyle != null ? currentTeamPlaystyle : "Tự do",
+                    currentTrustScore,
+                    hostDate != null ? hostDate : "Tự do",
+                    hostTimeStart != null ? hostTimeStart : "Tự do",
+                    hostTimeEnd != null ? hostTimeEnd : "Tự do",
+                    hostSkillLevel != null ? hostSkillLevel : "Tự do",
+                    hostHasField != null ? hostHasField.toString() : "Tự do",
+                    hostPosition != null ? hostPosition : "Tự do",
+                    opponentsJson,
+                    priorityInstruction
             ).replace("\"", "\\\"");
 
             String requestBody = """
