@@ -84,6 +84,20 @@
                 app:cornerRadius="@dimen/radius_button"
                 app:elevation="0dp" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnViewBookings"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginTop="@dimen/spacing_3"
+                android:fontFamily="@font/be_vietnam_pro"
+                android:text="@string/action_view_bookings"
+                android:textColor="@color/primary"
+                android:textSize="@dimen/text_body_medium"
+                android:visibility="gone"
+                app:cornerRadius="@dimen/radius_button"
+                app:strokeColor="@color/primary" />
+
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

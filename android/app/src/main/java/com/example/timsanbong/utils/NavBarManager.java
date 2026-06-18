@@ -14,9 +14,9 @@ import androidx.core.widget.ImageViewCompat;
 import com.example.timsanbong.R;
 import com.example.timsanbong.ui.customer.FindPitchActivity;
 import com.example.timsanbong.ui.customer.MainActivity;
-import com.example.timsanbong.ui.customer.MatchmakingActivity;
-import com.example.timsanbong.ui.customer.MessagesActivity;
 import com.example.timsanbong.ui.customer.MyBookingsActivity;
+import com.example.timsanbong.ui.customer.NotificationsActivity;
+import com.example.timsanbong.ui.profile.ProfileActivity;
 import com.google.android.material.shape.CornerFamily;
 import com.google.android.material.shape.MaterialShapeDrawable;
 import com.google.android.material.shape.ShapeAppearanceModel;
@@ -25,9 +25,11 @@ public class NavBarManager {
 
     public static final int ITEM_HOME = 0;
     public static final int ITEM_SEARCH = 1;
-    public static final int ITEM_MATCH = 2;
-    public static final int ITEM_BOOKINGS = 3;
-    public static final int ITEM_MESSAGES = 4;
+    public static final int ITEM_BOOKINGS = 2;
+    public static final int ITEM_NOTIFICATIONS = 3;
+    public static final int ITEM_PROFILE = 4;
+    public static final int ITEM_MATCH = ITEM_SEARCH;
+    public static final int ITEM_MESSAGES = ITEM_NOTIFICATIONS;
 
     private final Activity activity;
     private final int activeItem;
@@ -41,17 +43,18 @@ public class NavBarManager {
         LinearLayout navContainer = activity.findViewById(R.id.navContainer);
         LinearLayout navHome = activity.findViewById(R.id.navHome);
         LinearLayout navSearch = activity.findViewById(R.id.navSearch);
-        LinearLayout navMatch = activity.findViewById(R.id.navMatch);
         LinearLayout navBookings = activity.findViewById(R.id.navBookings);
-        LinearLayout navMessages = activity.findViewById(R.id.navMessages);
+        LinearLayout navNotifications = activity.findViewById(R.id.navNotifications);
+        LinearLayout navProfile = activity.findViewById(R.id.navProfile);
 
         applyNavBarShape(navContainer);
 
         applyActiveState(navHome, R.id.wrapNavHome, R.id.ivNavHome, R.id.tvNavHome, activeItem == ITEM_HOME);
         applyActiveState(navSearch, R.id.wrapNavSearch, R.id.ivNavSearch, R.id.tvNavSearch, activeItem == ITEM_SEARCH);
-        applyActiveState(navMatch, R.id.wrapNavMatch, R.id.ivNavMatch, R.id.tvNavMatch, activeItem == ITEM_MATCH);
         applyActiveState(navBookings, R.id.wrapNavBookings, R.id.ivNavBookings, R.id.tvNavBookings, activeItem == ITEM_BOOKINGS);
-        applyActiveState(navMessages, R.id.wrapNavMessages, R.id.ivNavMessages, R.id.tvNavMessages, activeItem == ITEM_MESSAGES);
+        applyActiveState(navNotifications, R.id.wrapNavNotifications, R.id.ivNavNotifications, R.id.tvNavNotifications,
+                activeItem == ITEM_NOTIFICATIONS);
+        applyActiveState(navProfile, R.id.wrapNavProfile, R.id.ivNavProfile, R.id.tvNavProfile, activeItem == ITEM_PROFILE);
 
         navHome.setOnClickListener(v -> {
             if (activeItem != ITEM_HOME) navigate(MainActivity.class);
@@ -59,14 +62,14 @@ public class NavBarManager {
         navSearch.setOnClickListener(v -> {
             if (activeItem != ITEM_SEARCH) navigate(FindPitchActivity.class);
         });
-        navMatch.setOnClickListener(v -> {
-            if (activeItem != ITEM_MATCH) navigate(MatchmakingActivity.class);
-        });
         navBookings.setOnClickListener(v -> {
             if (activeItem != ITEM_BOOKINGS) navigate(MyBookingsActivity.class);
         });
-        navMessages.setOnClickListener(v -> {
-            if (activeItem != ITEM_MESSAGES) navigate(MessagesActivity.class);
+        navNotifications.setOnClickListener(v -> {
+            if (activeItem != ITEM_NOTIFICATIONS) navigate(NotificationsActivity.class);
+        });
+        navProfile.setOnClickListener(v -> {
+            if (activeItem != ITEM_PROFILE) navigate(ProfileActivity.class);
         });
     }
 

@@ -16,7 +16,7 @@ public class TimeSlotAdapter extends RecyclerView.Adapter<TimeSlotAdapter.TimeSl
 
     private List<TimeSlot> timeSlots;
     private int selectedPosition = -1;
-    private OnTimeSlotSelectedListener listener;
+    private final OnTimeSlotSelectedListener listener;
 
     public interface OnTimeSlotSelectedListener {
         void onTimeSlotSelected(TimeSlot timeSlot);
@@ -24,8 +24,8 @@ public class TimeSlotAdapter extends RecyclerView.Adapter<TimeSlotAdapter.TimeSl
 
     public static class TimeSlot {
         public long id;
-        public String startTime; // e.g., "18:00"
-        public String endTime;   // e.g., "19:30"
+        public String startTime;
+        public String endTime;
         public boolean isAvailable;
         public double price;
 
@@ -49,7 +49,7 @@ public class TimeSlotAdapter extends RecyclerView.Adapter<TimeSlotAdapter.TimeSl
 
     public void updateSlots(List<TimeSlot> newSlots) {
         this.timeSlots = newSlots;
-        this.selectedPosition = -1; // Reset selection on update
+        this.selectedPosition = -1;
         notifyDataSetChanged();
     }
 
@@ -65,18 +65,20 @@ public class TimeSlotAdapter extends RecyclerView.Adapter<TimeSlotAdapter.TimeSl
     public void onBindViewHolder(@NonNull TimeSlotViewHolder holder, int position) {
         TimeSlot slot = timeSlots.get(position);
         holder.tvSlotTime.setText(slot.startTime);
-        holder.tvSlotEnd.setText("→ " + slot.endTime);
+        holder.tvSlotEnd.setText(holder.itemView.getContext().getString(R.string.time_range_arrow, slot.endTime));
 
         String priceText = slot.price > 0
-                ? String.format("%,.0f đ", slot.price)
-                : "Còn trống";
+                ? String.format("%,.0f %s", slot.price, holder.itemView.getContext().getString(R.string.currency_vnd))
+                : holder.itemView.getContext().getString(R.string.available);
+
         if (!slot.isAvailable) {
             holder.itemView.setBackgroundResource(R.drawable.bg_time_slot_booked);
             holder.tvSlotTime.setTextColor(holder.itemView.getContext().getColor(R.color.slot_booked_text));
             holder.tvSlotEnd.setTextColor(holder.itemView.getContext().getColor(R.color.slot_booked_text));
             holder.tvSlotStatus.setTextColor(holder.itemView.getContext().getColor(R.color.slot_booked_text));
-            holder.tvSlotStatus.setText("Đã đặt");
+            holder.tvSlotStatus.setText(R.string.booked);
             holder.itemView.setEnabled(false);
+            holder.itemView.setAlpha(0.7f);
         } else if (position == selectedPosition) {
             holder.itemView.setBackgroundResource(R.drawable.bg_time_slot_selected);
             holder.tvSlotTime.setTextColor(holder.itemView.getContext().getColor(R.color.text_on_primary));
@@ -84,6 +86,7 @@ public class TimeSlotAdapter extends RecyclerView.Adapter<TimeSlotAdapter.TimeSl
             holder.tvSlotStatus.setTextColor(holder.itemView.getContext().getColor(R.color.text_on_primary));
             holder.tvSlotStatus.setText(priceText);
             holder.itemView.setEnabled(true);
+            holder.itemView.setAlpha(1f);
         } else {
             holder.itemView.setBackgroundResource(R.drawable.bg_time_slot_available);
             holder.tvSlotTime.setTextColor(holder.itemView.getContext().getColor(R.color.text_primary));
@@ -91,6 +94,7 @@ public class TimeSlotAdapter extends RecyclerView.Adapter<TimeSlotAdapter.TimeSl
             holder.tvSlotStatus.setTextColor(holder.itemView.getContext().getColor(R.color.text_secondary));
             holder.tvSlotStatus.setText(priceText);
             holder.itemView.setEnabled(true);
+            holder.itemView.setAlpha(1f);
         }
 
         holder.itemView.setOnClickListener(v -> {
@@ -98,8 +102,12 @@ public class TimeSlotAdapter extends RecyclerView.Adapter<TimeSlotAdapter.TimeSl
 
             int previous = selectedPosition;
             selectedPosition = holder.getAdapterPosition();
-            notifyItemChanged(previous);
-            notifyItemChanged(selectedPosition);
+            if (previous != -1) {
+                notifyItemChanged(previous);
+            }
+            if (selectedPosition != -1) {
+                notifyItemChanged(selectedPosition);
+            }
 
             if (listener != null) {
                 listener.onTimeSlotSelected(slot);
@@ -117,7 +125,7 @@ public class TimeSlotAdapter extends RecyclerView.Adapter<TimeSlotAdapter.TimeSl
         TextView tvSlotEnd;
         TextView tvSlotStatus;
 
-        public TimeSlotViewHolder(@NonNull View itemView) {
+        TimeSlotViewHolder(@NonNull View itemView) {
             super(itemView);
             tvSlotTime = itemView.findViewById(R.id.tvSlotTime);
             tvSlotEnd = itemView.findViewById(R.id.tvSlotEnd);

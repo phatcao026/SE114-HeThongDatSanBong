@@ -15,6 +15,7 @@ import com.example.timsanbong.R;
 import com.example.timsanbong.utils.Constants;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class BookingActivity extends AppCompatActivity {
 
@@ -31,6 +32,7 @@ public class BookingActivity extends AppCompatActivity {
     private MaterialCardView cardMethodMomo, cardMethodStripe, cardMethodBank;
     private RadioButton rbMomo, rbStripe, rbBank;
     private BookingViewModel bookingViewModel;
+    private boolean isSubmitting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,17 +89,34 @@ public class BookingActivity extends AppCompatActivity {
         tvPayNowAmount.setText(depositFormatted);
         tvBarAmount.setText(depositFormatted);
 
-        btnConfirm.setOnClickListener(v ->
-                bookingViewModel.createBooking(fieldId, timeSlotId, bookingDate));
+        btnConfirm.setOnClickListener(v -> {
+            if (isSubmitting) {
+                return;
+            }
+            if (fieldId == -1 || timeSlotId == -1 || bookingDate == null || bookingDate.trim().isEmpty()) {
+                Toast.makeText(this, R.string.empty_booking_info, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.booking_confirm_title)
+                    .setMessage(getString(R.string.booking_confirm_message,
+                            fieldName, tvBookingDate.getText(), bookingTime, depositFormatted))
+                    .setNegativeButton(R.string.action_keep, null)
+                    .setPositiveButton(R.string.confirm_booking, (dialog, which) ->
+                            bookingViewModel.createBooking(fieldId, timeSlotId, bookingDate))
+                    .show();
+        });
 
         bookingViewModel.bookingCreateState.observe(this, resource -> {
             if (resource == null) return;
             switch (resource.status) {
                 case LOADING:
+                    isSubmitting = true;
                     btnConfirm.setEnabled(false);
                     layoutLoading.setVisibility(View.VISIBLE);
                     break;
                 case SUCCESS:
+                    isSubmitting = false;
                     layoutLoading.setVisibility(View.GONE);
                     double deposit = resource.data.getDepositAmount() > 0
                             ? resource.data.getDepositAmount()
@@ -115,6 +134,7 @@ public class BookingActivity extends AppCompatActivity {
                     finish();
                     break;
                 case ERROR:
+                    isSubmitting = false;
                     btnConfirm.setEnabled(true);
                     layoutLoading.setVisibility(View.GONE);
                     Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
@@ -131,9 +151,10 @@ public class BookingActivity extends AppCompatActivity {
         rbStripe = findViewById(R.id.rbStripe);
         rbBank = findViewById(R.id.rbBank);
 
-        cardMethodMomo.setOnClickListener(v -> selectMethod(0));
+        cardMethodMomo.setVisibility(View.GONE);
+        cardMethodBank.setVisibility(View.GONE);
         cardMethodStripe.setOnClickListener(v -> selectMethod(1));
-        cardMethodBank.setOnClickListener(v -> selectMethod(2));
+        selectMethod(1);
     }
 
     private void selectMethod(int index) {

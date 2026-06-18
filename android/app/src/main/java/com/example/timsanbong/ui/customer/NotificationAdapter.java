@@ -18,7 +18,12 @@ import java.util.List;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
 
+    public interface OnNotificationClickListener {
+        void onNotificationClick(AppNotification notification);
+    }
+
     private final List<AppNotification> notifications;
+    private final OnNotificationClickListener listener;
 
     public void updateNotifications(List<AppNotification> newList) {
         notifications.clear();
@@ -26,8 +31,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         notifyDataSetChanged();
     }
 
-    public NotificationAdapter(List<AppNotification> notifications) {
+    public NotificationAdapter(List<AppNotification> notifications, OnNotificationClickListener listener) {
         this.notifications = notifications;
+        this.listener = listener;
     }
 
     @NonNull
@@ -48,6 +54,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.tvTitle.setText(notif.getTitle());
         holder.tvBody.setText(notif.getBody());
         holder.tvTime.setText(notif.getTime());
+        holder.itemView.setAlpha(notif.isRead() ? 0.65f : 1f);
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onNotificationClick(notif);
+            }
+        });
     }
 
     @Override

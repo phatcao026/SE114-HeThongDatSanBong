@@ -22,6 +22,9 @@ public class ProfileViewModel extends AndroidViewModel {
     private final MutableLiveData<Resource<User>> _profileState = new MutableLiveData<>();
     public LiveData<Resource<User>> profileState = _profileState;
 
+    private final MutableLiveData<Resource<User>> _profileUpdateState = new MutableLiveData<>();
+    public LiveData<Resource<User>> profileUpdateState = _profileUpdateState;
+
     private final MutableLiveData<Boolean> _logoutEvent = new MutableLiveData<>();
     public LiveData<Boolean> logoutEvent = _logoutEvent;
 
@@ -41,6 +44,25 @@ public class ProfileViewModel extends AndroidViewModel {
             @Override
             public void onError(String message) {
                 _profileState.postValue(Resource.error(message, null));
+            }
+        });
+    }
+
+    public void updateProfile(long userId, String fullName, String phone) {
+        _profileUpdateState.setValue(Resource.loading(null));
+        User user = new User();
+        user.setFullName(fullName);
+        user.setPhone(phone);
+        userRepository.updateUser(getApplication(), userId, user, new RepositoryCallback<User>() {
+            @Override
+            public void onSuccess(User data) {
+                _profileUpdateState.postValue(Resource.success(data));
+                _profileState.postValue(Resource.success(data));
+            }
+
+            @Override
+            public void onError(String message) {
+                _profileUpdateState.postValue(Resource.error(message, null));
             }
         });
     }

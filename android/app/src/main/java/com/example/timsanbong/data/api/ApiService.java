@@ -69,6 +69,12 @@ public interface ApiService {
     Call<Booking> cancelBooking(@Path("id") long id);
 
     // Payments
+    @GET("payments")
+    Call<List<PaymentResponse>> getMyPayments();
+
+    @GET("payments/booking/{bookingId}")
+    Call<List<PaymentResponse>> getBookingPayments(@Path("bookingId") long bookingId);
+
     @POST("payments/create-session/{bookingId}")
     Call<PaymentResponse> createCheckoutSession(@Path("bookingId") long bookingId);
 

@@ -15,6 +15,7 @@ import com.example.timsanbong.data.model.Field;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
+import java.util.Locale;
 
 public class FieldAdapter extends RecyclerView.Adapter<FieldAdapter.FieldViewHolder> {
 
@@ -49,12 +50,12 @@ public class FieldAdapter extends RecyclerView.Adapter<FieldAdapter.FieldViewHol
 
     @Override
     public int getItemCount() {
-        return fields.size();
+        return fields == null ? 0 : fields.size();
     }
 
     class FieldViewHolder extends RecyclerView.ViewHolder {
         private final ImageView ivFieldImage;
-        private final TextView tvFieldName, tvFieldAddress, tvFieldType, tvPrice, tvPriceHint;
+        private final TextView tvFieldName, tvFieldAddress, tvFieldType, tvPrice, tvPriceHint, tvRating;
         private final MaterialButton btnBook;
 
         FieldViewHolder(@NonNull View itemView) {
@@ -65,16 +66,25 @@ public class FieldAdapter extends RecyclerView.Adapter<FieldAdapter.FieldViewHol
             tvFieldType = itemView.findViewById(R.id.tvFieldType);
             tvPrice = itemView.findViewById(R.id.tvPrice);
             tvPriceHint = itemView.findViewById(R.id.tvPriceHint);
+            tvRating = itemView.findViewById(R.id.tvRating);
             btnBook = itemView.findViewById(R.id.btnBook);
         }
 
         void bind(Field field) {
-            tvFieldName.setText(field.getName());
-            tvFieldAddress.setText(field.getAddress());
-            tvFieldType.setText(field.getTypeLabel() + " · Cỏ nhân tạo");
+            tvFieldName.setText(field.getName() == null ? "" : field.getName());
+            tvFieldAddress.setText(field.getAddress() == null ? "" : field.getAddress());
+            tvFieldType.setText(field.getTypeLabel() + " - "
+                    + itemView.getContext().getString(R.string.field_surface_artificial));
+
+            double rating = field.getAverageRating() != null ? field.getAverageRating() : 0;
+            tvRating.setText(String.format(Locale.US, "%.1f", rating));
+
             double price = field.getPricePerHour();
             if (price > 0) {
-                tvPrice.setText(String.format("Từ %,.0f đ", price));
+                tvPrice.setText(itemView.getContext().getString(
+                        R.string.price_from_format,
+                        String.format(Locale.US, "%,.0f", price),
+                        itemView.getContext().getString(R.string.currency_vnd)));
                 tvPriceHint.setVisibility(View.VISIBLE);
             } else {
                 tvPrice.setText(R.string.price_by_slot);
@@ -88,8 +98,16 @@ public class FieldAdapter extends RecyclerView.Adapter<FieldAdapter.FieldViewHol
                     .centerCrop()
                     .into(ivFieldImage);
 
-            btnBook.setOnClickListener(v -> listener.onBook(field));
-            itemView.setOnClickListener(v -> listener.onBook(field));
+            boolean available = field.isAvailable();
+            itemView.setAlpha(available ? 1f : 0.55f);
+            btnBook.setEnabled(available);
+            btnBook.setText(available ? R.string.action_book : R.string.booked);
+            btnBook.setOnClickListener(v -> {
+                if (available) listener.onBook(field);
+            });
+            itemView.setOnClickListener(v -> {
+                if (available) listener.onBook(field);
+            });
         }
     }
 }
