@@ -19,6 +19,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class FieldViewModel extends AndroidViewModel {
 
@@ -55,7 +56,7 @@ public class FieldViewModel extends AndroidViewModel {
         fieldRepository.getFields(getApplication(), new RepositoryCallback<List<Field>>() {
             @Override
             public void onSuccess(List<Field> data) {
-                allFields = data;
+                allFields = data == null ? new ArrayList<>() : data;
                 _fieldsState.postValue(Resource.success(allFields));
                 applyFilters();
             }
@@ -116,9 +117,11 @@ public class FieldViewModel extends AndroidViewModel {
 
         if (!currentKeyword.isEmpty()) {
             List<Field> searched = new ArrayList<>();
+            String normalizedKeyword = currentKeyword.toLowerCase(Locale.US);
             for (Field f : result) {
-                if (f.getName().toLowerCase().contains(currentKeyword.toLowerCase()) ||
-                        f.getAddress().toLowerCase().contains(currentKeyword.toLowerCase())) {
+                String name = f.getName() == null ? "" : f.getName().toLowerCase(Locale.US);
+                String address = f.getAddress() == null ? "" : f.getAddress().toLowerCase(Locale.US);
+                if (name.contains(normalizedKeyword) || address.contains(normalizedKeyword)) {
                     searched.add(f);
                 }
             }

@@ -19,6 +19,7 @@ public class PaymentActivity extends AppCompatActivity {
     private TextView tvAmount;
     private TextView tvStateMessage;
     private MaterialButton btnPay;
+    private MaterialButton btnViewBookings;
     private android.widget.ProgressBar pbLoading;
     private android.widget.TextView tvEmptyState;
     private android.widget.TextView tvErrorState;
@@ -26,6 +27,7 @@ public class PaymentActivity extends AppCompatActivity {
     private long bookingId;
     private String fieldName;
     private double totalPrice;
+    private String checkoutUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +38,7 @@ public class PaymentActivity extends AppCompatActivity {
         tvAmount = findViewById(R.id.tvAmount);
         tvStateMessage = findViewById(R.id.tvStateMessage);
         btnPay = findViewById(R.id.btnPay);
+        btnViewBookings = findViewById(R.id.btnViewBookings);
         pbLoading = findViewById(R.id.pbLoading);
         tvEmptyState = findViewById(R.id.tvEmptyState);
         tvErrorState = findViewById(R.id.tvErrorState);
@@ -67,8 +70,9 @@ public class PaymentActivity extends AppCompatActivity {
                 tvStateMessage.setText(getString(R.string.payment_processing));
                 btnPay.setEnabled(false);
             } else if (state.status == PaymentViewModel.Status.SUCCESS) {
+                checkoutUrl = state.checkoutUrl;
                 openCheckout(state.checkoutUrl);
-                navigateToResult(true, getString(R.string.payment_success_field_format, fieldName));
+                showPendingCheckoutState();
             } else if (state.status == PaymentViewModel.Status.FAILED) {
                 showErrorState(state.message);
                 btnPay.setEnabled(true);
@@ -76,22 +80,19 @@ public class PaymentActivity extends AppCompatActivity {
         });
 
         btnPay.setOnClickListener(v -> {
+            if (checkoutUrl != null && !checkoutUrl.trim().isEmpty()) {
+                openCheckout(checkoutUrl);
+                return;
+            }
             PaymentRequest request = new PaymentRequest(bookingId, fieldName, totalPrice);
             paymentViewModel.startPayment(request);
         });
-    }
 
-    private void navigateToResult(boolean success, String message) {
-        Intent intent = new Intent(this, PaymentResultActivity.class);
-        intent.putExtra(Constants.EXTRA_PAYMENT_SUCCESS, success);
-        intent.putExtra(Constants.EXTRA_PAYMENT_MESSAGE, message);
-        intent.putExtra(Constants.EXTRA_BOOKING_ID, bookingId);
-        intent.putExtra(Constants.EXTRA_DEPOSIT_AMOUNT,
-                getIntent().getDoubleExtra(Constants.EXTRA_DEPOSIT_AMOUNT, -1));
-        intent.putExtra(Constants.EXTRA_REMAINDER_AMOUNT,
-                getIntent().getDoubleExtra(Constants.EXTRA_REMAINDER_AMOUNT, -1));
-        startActivity(intent);
-        finish();
+        btnViewBookings.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MyBookingsActivity.class);
+            startActivity(intent);
+            finish();
+        });
     }
 
     private void openCheckout(String checkoutUrl) {
@@ -106,6 +107,7 @@ public class PaymentActivity extends AppCompatActivity {
         pbLoading.setVisibility(android.view.View.VISIBLE);
         tvEmptyState.setVisibility(android.view.View.GONE);
         tvErrorState.setVisibility(android.view.View.GONE);
+        btnViewBookings.setVisibility(android.view.View.GONE);
     }
 
     private void showContentState() {
@@ -114,10 +116,19 @@ public class PaymentActivity extends AppCompatActivity {
         tvErrorState.setVisibility(android.view.View.GONE);
     }
 
+    private void showPendingCheckoutState() {
+        showContentState();
+        tvStateMessage.setText(R.string.payment_pending_message);
+        btnPay.setText(R.string.action_reopen_checkout);
+        btnPay.setEnabled(true);
+        btnViewBookings.setVisibility(android.view.View.VISIBLE);
+    }
+
     private void showEmptyState() {
         pbLoading.setVisibility(android.view.View.GONE);
         tvEmptyState.setVisibility(android.view.View.VISIBLE);
         tvErrorState.setVisibility(android.view.View.GONE);
+        btnViewBookings.setVisibility(android.view.View.GONE);
     }
 
     private void showErrorState(String message) {
@@ -125,6 +136,7 @@ public class PaymentActivity extends AppCompatActivity {
         tvEmptyState.setVisibility(android.view.View.GONE);
         tvErrorState.setVisibility(android.view.View.VISIBLE);
         tvErrorState.setText(message);
+        btnViewBookings.setVisibility(android.view.View.GONE);
     }
 }
 

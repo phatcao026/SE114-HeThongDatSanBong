@@ -308,4 +308,30 @@
     <string name="subtitle_booking_history">Theo dõi và xử lý các đơn đặt sân.</string>
     <string name="nav_dashboard">Tổng quan</string>
     <string name="nav_fields">Sân</string>
+    <!-- Player UX refresh -->
+    <string name="nav_notifications">Tin</string>
+    <string name="home_ready_to_book">Ready for your next booking</string>
+    <string name="home_greeting_name">Ready to book, %1$s</string>
+    <string name="home_booking_headline">Book a reliable field in minutes</string>
+    <string name="home_booking_subtitle">Browse available slots, reserve with a deposit, and track your booking from one place.</string>
+    <string name="home_next_booking_title">Next booking</string>
+    <string name="home_next_booking_empty">No upcoming booking</string>
+    <string name="home_next_booking_empty_time">Find a field and reserve your next slot.</string>
+    <string name="home_payment_due_title">Deposit required</string>
+    <string name="home_payment_due_body">%1$s needs a deposit of %2$s to hold the slot.</string>
+    <string name="home_payment_clear_title">No payment action needed</string>
+    <string name="home_payment_clear_body">Your active bookings are up to date.</string>
+    <string name="home_booking_tip_title">Peak hours fill quickly</string>
+    <string name="home_booking_tip_body">Evening slots are usually reserved first. Book early to keep the best time.</string>
+    <string name="stat_notifications_label">Alerts</string>
+    <string name="action_pay_deposit">Pay</string>
+    <string name="action_reopen_checkout">Open checkout</string>
+    <string name="payment_pending_message">Checkout opened in your browser. Return to bookings after payment to refresh the status.</string>
+    <string name="booking_confirm_title">Confirm booking</string>
+    <string name="booking_confirm_message">Create booking for %1$s on %2$s at %3$s. Deposit due: %4$s.</string>
+    <string name="profile_saved">Profile updated.</string>
+    <string name="trust_score_value">%1$d/100</string>
+    <string name="field_surface_artificial">Artificial turf</string>
+    <string name="price_from_format">From %1$s %2$s</string>
+    <string name="time_range_arrow">-&gt; %1$s</string>
 </resources>

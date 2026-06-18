@@ -29,4 +29,22 @@ public class UserRepository {
             }
         });
     }
+
+    public void updateUser(Context context, long userId, User user, RepositoryCallback<User> callback) {
+        ApiClient.getService(context).updateUser(userId, user).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onError("Khong the cap nhat ho so.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                callback.onError("Khong the ket noi may chu.");
+            }
+        });
+    }
 }

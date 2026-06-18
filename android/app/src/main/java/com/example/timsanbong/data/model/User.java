@@ -38,4 +38,11 @@ public class User {
     public String getPhone() { return phone; }
     public String getRole() { return role; }
     public int getTrustScore() { return trustScore; }
+
+    public void setId(long id) { this.id = id; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
+    public void setEmail(String email) { this.email = email; }
+    public void setPhone(String phone) { this.phone = phone; }
+    public void setRole(String role) { this.role = role; }
+    public void setTrustScore(int trustScore) { this.trustScore = trustScore; }
 }

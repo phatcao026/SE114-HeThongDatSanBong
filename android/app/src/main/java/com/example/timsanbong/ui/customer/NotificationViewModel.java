@@ -21,11 +21,29 @@ public class NotificationViewModel extends AndroidViewModel {
     private final MutableLiveData<Resource<List<AppNotification>>> _notificationsState = new MutableLiveData<>();
     public LiveData<Resource<List<AppNotification>>> notificationsState = _notificationsState;
 
+    private final MutableLiveData<Resource<Integer>> _unreadCountState = new MutableLiveData<>();
+    public LiveData<Resource<Integer>> unreadCountState = _unreadCountState;
+
     private final MutableLiveData<Resource<Void>> _markReadState = new MutableLiveData<>();
     public LiveData<Resource<Void>> markReadState = _markReadState;
 
     public NotificationViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public void loadUnreadCount() {
+        _unreadCountState.setValue(Resource.loading(null));
+        notificationRepository.getUnreadCount(getApplication(), new RepositoryCallback<Integer>() {
+            @Override
+            public void onSuccess(Integer data) {
+                _unreadCountState.postValue(Resource.success(data));
+            }
+
+            @Override
+            public void onError(String message) {
+                _unreadCountState.postValue(Resource.error(message, null));
+            }
+        });
     }
 
     public void loadNotifications(int page, int size) {

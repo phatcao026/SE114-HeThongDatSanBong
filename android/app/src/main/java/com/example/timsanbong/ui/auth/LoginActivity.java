@@ -1,7 +1,6 @@
 package com.example.timsanbong.ui.auth;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -9,7 +8,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.timsanbong.R;
@@ -70,40 +68,23 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        setupGoogleLogin();
+        hideUnsupportedGoogleLogin();
         setupForgotPasswordFlow();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Uri uri = getIntent().getData();
-        if (uri != null && uri.toString().startsWith("timsanbong://auth")) {
-            String token = uri.getQueryParameter("token");
-            if (token != null) {
-                authViewModel.googleSync(token);
-                getIntent().setData(null);
-            }
-        }
-    }
-
-    private void setupGoogleLogin() {
+    private void hideUnsupportedGoogleLogin() {
         MaterialButton btnGoogle = findViewById(R.id.btnGoogle);
-        btnGoogle.setOnClickListener(v -> authViewModel.getGoogleUrl());
-
-        authViewModel.googleUrlState.observe(this, state -> {
-            if (state == null) return;
-            if (state.status == Resource.Status.SUCCESS && state.data != null) {
-                CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder().build();
-                customTabsIntent.launchUrl(this, Uri.parse(state.data));
-            } else if (state.status == Resource.Status.ERROR) {
-                Toast.makeText(this, state.message, Toast.LENGTH_SHORT).show();
-            }
-        });
+        if (btnGoogle != null) {
+            btnGoogle.setVisibility(android.view.View.GONE);
+        }
     }
 
     private void setupForgotPasswordFlow() {
         TextView tvForgotPassword = findViewById(R.id.tvForgotPassword);
+        TextInputLayout tilForgotEmail = findViewById(R.id.tilForgotEmail);
+        TextInputLayout tilOtp = findViewById(R.id.tilOtp);
+        TextInputLayout tilNewPassword = findViewById(R.id.tilNewPassword);
+        TextInputLayout tilConfirmPassword = findViewById(R.id.tilConfirmPassword);
         android.widget.ImageView btnBackFromForgot = findViewById(R.id.btnBackFromForgot);
         android.widget.ImageView btnBackFromOtp = findViewById(R.id.btnBackFromOtp);
         android.widget.ImageView btnBackFromReset = findViewById(R.id.btnBackFromReset);
@@ -112,24 +93,56 @@ public class LoginActivity extends AppCompatActivity {
         MaterialButton btnResetPassword = findViewById(R.id.btnResetPassword);
 
         tvForgotPassword.setOnClickListener(v -> {
+            clearForgotErrors(tilForgotEmail, tilOtp, tilNewPassword, tilConfirmPassword);
             viewFlipper.setInAnimation(this, R.anim.slide_in_right);
             viewFlipper.setOutAnimation(this, R.anim.slide_out_left);
             viewFlipper.setDisplayedChild(1);
         });
 
-        btnBackFromForgot.setOnClickListener(v -> {
-            viewFlipper.setInAnimation(this, R.anim.slide_in_left);
-            viewFlipper.setOutAnimation(this, R.anim.slide_out_right);
-            viewFlipper.setDisplayedChild(0);
-        });
+        btnBackFromForgot.setOnClickListener(v -> showFlipperChild(0, false));
+        btnBackFromOtp.setOnClickListener(v -> showFlipperChild(1, false));
+        btnBackFromReset.setOnClickListener(v -> showFlipperChild(2, false));
 
         btnSendOtp.setOnClickListener(v -> {
-            String email = getTextValue(tilEmail);
+            clearForgotErrors(tilForgotEmail, tilOtp, tilNewPassword, tilConfirmPassword);
+            String email = getTextValue(tilForgotEmail);
             if (email.isEmpty()) {
-                tilEmail.setError("Vui lòng nhập email");
+                tilForgotEmail.setError("Vui long nhap email");
                 return;
             }
             authViewModel.forgotPassword(email);
+        });
+
+        btnVerifyOtp.setOnClickListener(v -> {
+            clearForgotErrors(tilForgotEmail, tilOtp, tilNewPassword, tilConfirmPassword);
+            String email = getTextValue(tilForgotEmail);
+            String otp = getTextValue(tilOtp);
+            if (email.isEmpty()) {
+                tilForgotEmail.setError("Vui long nhap email");
+                return;
+            }
+            if (otp.isEmpty()) {
+                tilOtp.setError("Vui long nhap OTP");
+                return;
+            }
+            authViewModel.verifyOtp(email, otp);
+        });
+
+        btnResetPassword.setOnClickListener(v -> {
+            clearForgotErrors(tilForgotEmail, tilOtp, tilNewPassword, tilConfirmPassword);
+            String email = getTextValue(tilForgotEmail);
+            String otp = getTextValue(tilOtp);
+            String newPassword = getTextValue(tilNewPassword);
+            String confirmPassword = getTextValue(tilConfirmPassword);
+            if (newPassword.isEmpty()) {
+                tilNewPassword.setError("Vui long nhap mat khau moi");
+                return;
+            }
+            if (!newPassword.equals(confirmPassword)) {
+                tilConfirmPassword.setError("Mat khau khong khop");
+                return;
+            }
+            authViewModel.resetPassword(email, otp, newPassword);
         });
 
         authViewModel.forgotPasswordState.observe(this, state -> {
@@ -137,19 +150,13 @@ public class LoginActivity extends AppCompatActivity {
             switch (state.status) {
                 case SUCCESS:
                     if (viewFlipper.getDisplayedChild() == 1) {
-                        Toast.makeText(this, "Đã gửi mã OTP", Toast.LENGTH_SHORT).show();
-                        viewFlipper.setInAnimation(this, R.anim.slide_in_right);
-                        viewFlipper.setOutAnimation(this, R.anim.slide_out_left);
-                        viewFlipper.setDisplayedChild(2);
+                        Toast.makeText(this, "Da gui ma OTP", Toast.LENGTH_SHORT).show();
+                        showFlipperChild(2, true);
                     } else if (viewFlipper.getDisplayedChild() == 2) {
-                        viewFlipper.setInAnimation(this, R.anim.slide_in_right);
-                        viewFlipper.setOutAnimation(this, R.anim.slide_out_left);
-                        viewFlipper.setDisplayedChild(3);
+                        showFlipperChild(3, true);
                     } else if (viewFlipper.getDisplayedChild() == 3) {
-                        Toast.makeText(this, "Đặt lại mật khẩu thành công!", Toast.LENGTH_SHORT).show();
-                        viewFlipper.setInAnimation(this, R.anim.slide_in_left);
-                        viewFlipper.setOutAnimation(this, R.anim.slide_out_right);
-                        viewFlipper.setDisplayedChild(0);
+                        Toast.makeText(this, "Dat lai mat khau thanh cong", Toast.LENGTH_SHORT).show();
+                        showFlipperChild(0, false);
                     }
                     break;
                 case ERROR:
@@ -159,28 +166,18 @@ public class LoginActivity extends AppCompatActivity {
                     break;
             }
         });
+    }
 
-        btnBackFromOtp.setOnClickListener(v -> {
-            viewFlipper.setInAnimation(this, R.anim.slide_in_left);
-            viewFlipper.setOutAnimation(this, R.anim.slide_out_right);
-            viewFlipper.setDisplayedChild(1);
-        });
+    private void showFlipperChild(int child, boolean forward) {
+        viewFlipper.setInAnimation(this, forward ? R.anim.slide_in_right : R.anim.slide_in_left);
+        viewFlipper.setOutAnimation(this, forward ? R.anim.slide_out_left : R.anim.slide_out_right);
+        viewFlipper.setDisplayedChild(child);
+    }
 
-        btnVerifyOtp.setOnClickListener(v -> {
-            String email = getTextValue(tilEmail);
-            authViewModel.verifyOtp(email, "123456");
-        });
-
-        btnBackFromReset.setOnClickListener(v -> {
-            viewFlipper.setInAnimation(this, R.anim.slide_in_left);
-            viewFlipper.setOutAnimation(this, R.anim.slide_out_right);
-            viewFlipper.setDisplayedChild(2);
-        });
-
-        btnResetPassword.setOnClickListener(v -> {
-            String email = getTextValue(tilEmail);
-            authViewModel.resetPassword(email, "123456", "newpassword123");
-        });
+    private void clearForgotErrors(TextInputLayout... layouts) {
+        for (TextInputLayout layout : layouts) {
+            layout.setError(null);
+        }
     }
 
     private void attemptLogin() {
@@ -191,15 +188,15 @@ public class LoginActivity extends AppCompatActivity {
 
         boolean hasError = false;
         if (email.isEmpty()) {
-            tilEmail.setError("Vui lòng nhập email");
+            tilEmail.setError("Vui long nhap email");
             hasError = true;
         } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            tilEmail.setError("Email không hợp lệ");
+            tilEmail.setError("Email khong hop le");
             hasError = true;
         }
 
         if (password.isEmpty()) {
-            tilPassword.setError("Vui lòng nhập mật khẩu");
+            tilPassword.setError("Vui long nhap mat khau");
             hasError = true;
         }
 
