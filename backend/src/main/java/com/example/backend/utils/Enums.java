@@ -3,7 +3,7 @@ package com.example.backend.utils;
 public class Enums {
     public enum UserRole { PLAYER, OWNER, ADMIN }
     public enum TeamLevel { BEGINNER, INTERMEDIATE, ADVANCED }
-    public enum FieldType { FIVE_A_SIDE, SEVEN_A_SIDE, ELEVEN_A_SIDE }
+    public enum FieldType { FIVE_A_SIDE, SEVEN_A_SIDE }
     public enum FieldStatus { AVAILABLE, MAINTENANCE, BOOKED }
     public enum TimeSlotStatus { AVAILABLE, PENDING, BOOKED }
     public enum BookingStatus { PENDING, DEPOSIT_PAID, CONFIRMED, CANCELLED, COMPLETED }
@@ -12,10 +12,9 @@ public class Enums {
     public enum PostType { FIND_OPPONENT, FIND_MEMBER }
     public enum PostStatus { OPEN, MATCHED, CLOSED, EXPIRED }
     public enum RequestStatus { PENDING, ACCEPTED, REJECTED }
-    public enum ConversationType { DIRECT, MATCH_GROUP, TEAM }
-    public enum NotificationType { SYSTEM, BOOKING_UPDATE, MATCH_REQUEST, NEW_MESSAGE, USER_UPDATE, PAYMENT_UPDATE, TEAM_INVITE }
+    public enum ConversationType { DIRECT, MATCH_GROUP }
+    public enum NotificationType { SYSTEM, BOOKING_UPDATE, MATCH_REQUEST, NEW_MESSAGE, USER_UPDATE, PAYMENT_UPDATE }
     public enum ReviewStatus {AUTO_PASSED, PENDING_ADMIN_REVIEW, PENALIZED}
-    public enum TeamMemberStatus { PENDING, ACCEPTED, REJECTED }
     public enum OpponentRatingType { GOOD, NO_SHOW, BAD_BEHAVIOR }
     public enum FairplayStatus { PENDING, RESOLVED, REJECTED }
 }

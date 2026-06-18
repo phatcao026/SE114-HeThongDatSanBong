@@ -5,12 +5,10 @@ import com.example.backend.dto.request.MatchRequestStatusUpdateRequest;
 import com.example.backend.dto.response.MatchRequestResponse;
 import com.example.backend.entity.MatchPost;
 import com.example.backend.entity.MatchRequest;
-import com.example.backend.entity.Team;
 import com.example.backend.entity.User;
 import com.example.backend.exception.AppException;
 import com.example.backend.repository.MatchPostRepository;
 import com.example.backend.repository.MatchRequestRepository;
-import com.example.backend.repository.TeamRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.service.ConversationService;
 import com.example.backend.service.MatchRequestService;
@@ -34,20 +32,17 @@ import java.util.stream.Collectors;
 public class MatchRequestServiceImpl implements MatchRequestService {
     private final MatchRequestRepository matchRequestRepository;
     private final MatchPostRepository matchPostRepository;
-    private final TeamRepository teamRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final ConversationService conversationService;
 
     public MatchRequestServiceImpl(MatchRequestRepository matchRequestRepository,
                                    MatchPostRepository matchPostRepository,
-                                   TeamRepository teamRepository,
                                    UserRepository userRepository,
                                    NotificationService notificationService,
                                    ConversationService conversationService) {
         this.matchRequestRepository = matchRequestRepository;
         this.matchPostRepository = matchPostRepository;
-        this.teamRepository = teamRepository;
         this.userRepository = userRepository;
         this.notificationService = notificationService;
         this.conversationService = conversationService;
@@ -138,18 +133,36 @@ public class MatchRequestServiceImpl implements MatchRequestService {
         matchRequestRepository.save(acceptedRequest);
         notifyMatchRequestStatus(acceptedRequest, Enums.RequestStatus.ACCEPTED);
 
-        List<MatchRequest> pendingRequests = matchRequestRepository.findByPostIdAndStatus(post.getId(), Enums.RequestStatus.PENDING);
-        pendingRequests.stream()
-                .filter(request -> !request.getId().equals(acceptedRequest.getId()))
-                .forEach(request -> request.setStatus(Enums.RequestStatus.REJECTED));
-        matchRequestRepository.saveAll(pendingRequests);
-        pendingRequests.stream()
-                .filter(request -> !request.getId().equals(acceptedRequest.getId()))
-                .forEach(request -> notifyMatchRequestStatus(request, Enums.RequestStatus.REJECTED));
+        // Cập nhật/Tạo phòng chat nhóm
+        if (post.getConversationId() == null) {
+            com.example.backend.dto.response.ConversationResponse conv =
+                    conversationService.createMatchConversation(post.getUserId(), acceptedRequest.getRequesterId());
+            post.setConversationId(conv.getId());
+        } else {
+            conversationService.addMemberToConversation(post.getConversationId(), acceptedRequest.getRequesterId());
+        }
 
-        post.setStatus(Enums.PostStatus.MATCHED);
+        // Tăng số lượng thành viên đã ghép thành công
+        int joined = post.getJoinedMembers() != null ? post.getJoinedMembers() : 0;
+        int needed = post.getNeededMembers() != null ? post.getNeededMembers() : 1;
+        joined++;
+        post.setJoinedMembers(joined);
+
+        // Nếu đã đủ số lượng, chuyển trạng thái bài đăng và từ chối các yêu cầu khác
+        if (joined >= needed) {
+            post.setStatus(Enums.PostStatus.MATCHED);
+
+            List<MatchRequest> pendingRequests = matchRequestRepository.findByPostIdAndStatus(post.getId(), Enums.RequestStatus.PENDING);
+            pendingRequests.stream()
+                    .filter(request -> !request.getId().equals(acceptedRequest.getId()))
+                    .forEach(request -> request.setStatus(Enums.RequestStatus.REJECTED));
+            matchRequestRepository.saveAll(pendingRequests);
+            pendingRequests.stream()
+                    .filter(request -> !request.getId().equals(acceptedRequest.getId()))
+                    .forEach(request -> notifyMatchRequestStatus(request, Enums.RequestStatus.REJECTED));
+        }
+
         matchPostRepository.save(post);
-        conversationService.createMatchConversation(post.getUserId(), acceptedRequest.getRequesterId());
     }
 
     private void notifyNewMatchRequest(MatchPost post, MatchRequest request) {
@@ -209,17 +222,7 @@ public class MatchRequestServiceImpl implements MatchRequestService {
     }
 
     private boolean canManagePost(MatchPost post, Long currentUserId) {
-        if (post.getUserId() != null && post.getUserId().equals(currentUserId)) {
-            return true;
-        }
-        if (post.getTeamId() == null) {
-            return false;
-        }
-
-        return teamRepository.findById(post.getTeamId())
-                .map(Team::getCaptainId)
-                .filter(captainId -> captainId.equals(currentUserId))
-                .isPresent();
+        return post.getUserId() != null && post.getUserId().equals(currentUserId);
     }
 
     private MatchRequestResponse toResponse(MatchRequest request) {
@@ -255,7 +258,6 @@ public class MatchRequestServiceImpl implements MatchRequestService {
         response.setStatus(request.getStatus());
         response.setPostStatus(post != null ? post.getStatus() : null);
         response.setPostOwnerId(post != null ? post.getUserId() : null);
-        response.setPostTeamId(post != null ? post.getTeamId() : null);
         response.setPostDate(post != null ? post.getDate() : null);
         response.setCreatedAt(request.getCreatedAt());
         return response;

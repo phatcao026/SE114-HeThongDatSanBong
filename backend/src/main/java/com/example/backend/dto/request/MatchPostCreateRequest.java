@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class MatchPostCreateRequest {
-    private Long teamId;
     private Long fieldId;
     private Long bookingId;
     private LocalDate date;
@@ -16,14 +15,11 @@ public class MatchPostCreateRequest {
     private Enums.TeamLevel skillLevel;
     private String costSharing;
     private String message;
+    private Integer neededMembers;
+    private Boolean hasField;
+    private String targetPositions;
+    private String ageRange;
 
-    public Long getTeamId() {
-        return teamId;
-    }
-
-    public void setTeamId(Long teamId) {
-        this.teamId = teamId;
-    }
 
     public Long getFieldId() {
         return fieldId;
@@ -95,5 +91,37 @@ public class MatchPostCreateRequest {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public Integer getNeededMembers() {
+        return neededMembers;
+    }
+
+    public void setNeededMembers(Integer neededMembers) {
+        this.neededMembers = neededMembers;
+    }
+
+    public Boolean getHasField() {
+        return hasField;
+    }
+
+    public void setHasField(Boolean hasField) {
+        this.hasField = hasField;
+    }
+
+    public String getTargetPositions() {
+        return targetPositions;
+    }
+
+    public void setTargetPositions(String targetPositions) {
+        this.targetPositions = targetPositions;
+    }
+
+    public String getAgeRange() {
+        return ageRange;
+    }
+
+    public void setAgeRange(String ageRange) {
+        this.ageRange = ageRange;
     }
 }

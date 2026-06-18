@@ -380,4 +380,26 @@ public class ConversationServiceImpl implements ConversationService {
 
         return value.trim();
     }
+
+    @Override
+    @Transactional
+    public void addMemberToConversation(Long conversationId, Long userId) {
+        if (conversationId == null || userId == null) {
+            throw new AppException(400, "Invalid conversation or user id");
+        }
+
+        conversationRepository.findById(conversationId)
+                .orElseThrow(() -> new AppException(404, "Conversation not found"));
+        userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(404, "User not found"));
+
+        if (conversationMemberRepository.existsByConversationIdAndUserId(conversationId, userId)) {
+            return;
+        }
+
+        ConversationMember member = new ConversationMember();
+        member.setConversationId(conversationId);
+        member.setUserId(userId);
+        conversationMemberRepository.save(member);
+    }
 }

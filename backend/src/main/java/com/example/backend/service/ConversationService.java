@@ -19,4 +19,6 @@ public interface ConversationService {
     List<MessageResponse> getMessages(Long conversationId);
 
     MessageResponse sendMessage(Long conversationId, MessageCreateRequest request);
+
+    void addMemberToConversation(Long conversationId, Long userId);
 }

@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -49,8 +50,16 @@ public class MatchPostController {
 
     @GetMapping("/recommendations")
     public ResponseEntity<List<RecommendedMatchResponse>> getSmartRecommendations(
-            @RequestParam String playstyleNote) {
-        return ResponseEntity.ok(matchPostService.getSmartRecommendations(playstyleNote));
+            @RequestParam(required = false) String playstyleNote,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime timeStart,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime timeEnd,
+            @RequestParam(required = false) Enums.TeamLevel skillLevel,
+            @RequestParam(required = false) Boolean hasField,
+            @RequestParam(required = false) Enums.PostType postType,
+            @RequestParam(required = false) String position) {
+        return ResponseEntity.ok(matchPostService.getSmartRecommendations(
+                playstyleNote, date, timeStart, timeEnd, skillLevel, hasField, postType, position));
     }
 
     @GetMapping("/my")

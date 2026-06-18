@@ -14,7 +14,6 @@ public class MatchRequestResponse {
     private Enums.RequestStatus status;
     private Enums.PostStatus postStatus;
     private Long postOwnerId;
-    private Long postTeamId;
     private LocalDate postDate;
     private LocalDateTime createdAt;
 
@@ -82,13 +81,6 @@ public class MatchRequestResponse {
         this.postOwnerId = postOwnerId;
     }
 
-    public Long getPostTeamId() {
-        return postTeamId;
-    }
-
-    public void setPostTeamId(Long postTeamId) {
-        this.postTeamId = postTeamId;
-    }
 
     public LocalDate getPostDate() {
         return postDate;

@@ -25,4 +25,8 @@ public interface AdminDashboardService {
     List<MatchPostResponse> getMatchPosts(Enums.PostStatus status);
 
     List<ReviewResponse> getReviews(Enums.ReviewStatus status);
+
+    void lockUser(Long id);
+
+    void unlockUser(Long id);
 }

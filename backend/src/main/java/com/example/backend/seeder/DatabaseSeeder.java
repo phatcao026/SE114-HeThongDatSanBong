@@ -1,11 +1,9 @@
 package com.example.backend.seeder;
 
 import com.example.backend.entity.Field;
-import com.example.backend.entity.Team;
 import com.example.backend.entity.TimeSlot;
 import com.example.backend.entity.User;
 import com.example.backend.repository.FieldRepository;
-import com.example.backend.repository.TeamRepository;
 import com.example.backend.repository.TimeSlotRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.utils.Enums;
@@ -32,8 +30,8 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final UserRepository userRepository;
     private final FieldRepository fieldRepository;
     private final TimeSlotRepository timeSlotRepository;
-    private final TeamRepository teamRepository;
     private final PasswordEncoder passwordEncoder;
+    private final jakarta.persistence.EntityManager entityManager;
 
     @Value("${app.seed.admin.email}")
     private String adminEmail;
@@ -62,13 +60,13 @@ public class DatabaseSeeder implements CommandLineRunner {
     public DatabaseSeeder(UserRepository userRepository,
                           FieldRepository fieldRepository,
                           TimeSlotRepository timeSlotRepository,
-                          TeamRepository teamRepository,
-                          PasswordEncoder passwordEncoder) {
+                          PasswordEncoder passwordEncoder,
+                          jakarta.persistence.EntityManager entityManager) {
         this.userRepository = userRepository;
         this.fieldRepository = fieldRepository;
         this.timeSlotRepository = timeSlotRepository;
-        this.teamRepository = teamRepository;
         this.passwordEncoder = passwordEncoder;
+        this.entityManager = entityManager;
     }
 
     @Override
@@ -76,17 +74,24 @@ public class DatabaseSeeder implements CommandLineRunner {
     public void run(String... args) {
         validateSeedCredentials();
 
+        // 0. Clean up any old fields (and their cascade references) that are not in Sân 1 - Sân 10
+        log.info("Cleaning up old fields and associated records...");
+        entityManager.createNativeQuery("DELETE FROM public.opponent_reviews WHERE match_id IN (SELECT id FROM public.match_posts WHERE field_id NOT IN (SELECT id FROM public.fields WHERE name IN ('Sân 1', 'Sân 2', 'Sân 3', 'Sân 4', 'Sân 5', 'Sân 6', 'Sân 7', 'Sân 8', 'Sân 9', 'Sân 10')))").executeUpdate();
+        entityManager.createNativeQuery("DELETE FROM public.match_requests WHERE post_id IN (SELECT id FROM public.match_posts WHERE field_id NOT IN (SELECT id FROM public.fields WHERE name IN ('Sân 1', 'Sân 2', 'Sân 3', 'Sân 4', 'Sân 5', 'Sân 6', 'Sân 7', 'Sân 8', 'Sân 9', 'Sân 10')))").executeUpdate();
+        entityManager.createNativeQuery("DELETE FROM public.match_posts WHERE field_id NOT IN (SELECT id FROM public.fields WHERE name IN ('Sân 1', 'Sân 2', 'Sân 3', 'Sân 4', 'Sân 5', 'Sân 6', 'Sân 7', 'Sân 8', 'Sân 9', 'Sân 10'))").executeUpdate();
+        entityManager.createNativeQuery("DELETE FROM public.payments WHERE booking_id IN (SELECT id FROM public.bookings WHERE field_id NOT IN (SELECT id FROM public.fields WHERE name IN ('Sân 1', 'Sân 2', 'Sân 3', 'Sân 4', 'Sân 5', 'Sân 6', 'Sân 7', 'Sân 8', 'Sân 9', 'Sân 10')))").executeUpdate();
+        entityManager.createNativeQuery("DELETE FROM public.field_reviews WHERE field_id NOT IN (SELECT id FROM public.fields WHERE name IN ('Sân 1', 'Sân 2', 'Sân 3', 'Sân 4', 'Sân 5', 'Sân 6', 'Sân 7', 'Sân 8', 'Sân 9', 'Sân 10'))").executeUpdate();
+        entityManager.createNativeQuery("DELETE FROM public.bookings WHERE field_id NOT IN (SELECT id FROM public.fields WHERE name IN ('Sân 1', 'Sân 2', 'Sân 3', 'Sân 4', 'Sân 5', 'Sân 6', 'Sân 7', 'Sân 8', 'Sân 9', 'Sân 10'))").executeUpdate();
+        entityManager.createNativeQuery("DELETE FROM public.time_slots WHERE field_id NOT IN (SELECT id FROM public.fields WHERE name IN ('Sân 1', 'Sân 2', 'Sân 3', 'Sân 4', 'Sân 5', 'Sân 6', 'Sân 7', 'Sân 8', 'Sân 9', 'Sân 10'))").executeUpdate();
+        entityManager.createNativeQuery("DELETE FROM public.fields WHERE name NOT IN ('Sân 1', 'Sân 2', 'Sân 3', 'Sân 4', 'Sân 5', 'Sân 6', 'Sân 7', 'Sân 8', 'Sân 9', 'Sân 10')").executeUpdate();
+
         // 1. Seed main users from environment variables
         User admin = ensureUser(adminEmail, adminPassword, Enums.UserRole.ADMIN, "SE114 Admin", "0901000000");
-        User owner1 = ensureUser(ownerEmail, ownerPassword, Enums.UserRole.OWNER, "SE114 Owner 1", "0901000001");
+        User owner1 = ensureUser(ownerEmail, ownerPassword, Enums.UserRole.OWNER, "SE114 Owner", "0901000001");
         User player1 = ensureUser(playerEmail, playerPassword, Enums.UserRole.PLAYER, "SE114 Player 1", "0902000001");
         User player2 = ensureUser(opponentEmail, opponentPassword, Enums.UserRole.PLAYER, "SE114 Player 2", "0902000002");
 
-        // 2. Seed additional owners programmatically (total 3 owners)
-        User owner2 = ensureUser("owner2@example.com", "123456", Enums.UserRole.OWNER, "Chủ sân Nguyễn Văn A", "0901000002");
-        User owner3 = ensureUser("owner3@example.com", "123456", Enums.UserRole.OWNER, "Chủ sân Trần Thị B", "0901000003");
-
-        // 3. Seed additional players (total 10 player accounts including player1 and player2)
+        // 2. Seed additional players (total 10 player accounts including player1 and player2)
         User player3 = ensureUser("player3@example.com", "123456", Enums.UserRole.PLAYER, "Nguyễn Minh Triết", "0902000003");
         User player4 = ensureUser("player4@example.com", "123456", Enums.UserRole.PLAYER, "Trần Anh Tuấn", "0902000004");
         User player5 = ensureUser("player5@example.com", "123456", Enums.UserRole.PLAYER, "Lê Hoàng Nam", "0902000005");
@@ -96,31 +101,22 @@ public class DatabaseSeeder implements CommandLineRunner {
         User player9 = ensureUser("player9@example.com", "123456", Enums.UserRole.PLAYER, "Đỗ Gia Bảo", "0902000009");
         User player10 = ensureUser("player10@example.com", "123456", Enums.UserRole.PLAYER, "Bùi Tiến Dũng", "0902000010");
 
-        // 4. Seed 10 Fields across the 3 owners
-        Field f1 = ensureField(owner1, "Sân Bóng Thống Nhất", "138 Đào Duy Từ, Phường 6, Quận 10, TP.HCM", "Sân bóng cỏ nhân tạo mát mẻ, đèn chiếu sáng hiện đại.", Enums.FieldType.SEVEN_A_SIDE);
-        Field f2 = ensureField(owner1, "Sân Bóng Hoa Lư", "2 Đinh Tiên Hoàng, Đa Kao, Quận 1, TP.HCM", "Sân trung tâm quận 1, thuận tiện đi lại, dịch vụ tốt.", Enums.FieldType.FIVE_A_SIDE);
-        Field f3 = ensureField(owner1, "Sân Bóng Kỳ Hòa", "824 Sư Vạn Hạnh, Phường 12, Quận 10, TP.HCM", "Sân 7 người tiêu chuẩn, mặt cỏ êm, có lưới chắn bóng cao.", Enums.FieldType.SEVEN_A_SIDE);
-        Field f4 = ensureField(owner1, "Sân Bóng Khánh Hội", "Đường số 48, Phường 5, Quận 4, TP.HCM", "Nằm trong công viên Khánh Hội, không khí trong lành, mát mẻ.", Enums.FieldType.FIVE_A_SIDE);
+        // 3. Seed 10 Fields all owned by owner1
+        Field f1 = ensureField(owner1, "Sân 1", "Sân bóng cỏ nhân tạo 7 người, mát mẻ, đèn chiếu sáng hiện đại.", Enums.FieldType.SEVEN_A_SIDE);
+        Field f2 = ensureField(owner1, "Sân 2", "Sân bóng 5 người, chất lượng cỏ nhân tạo tốt.", Enums.FieldType.FIVE_A_SIDE);
+        Field f3 = ensureField(owner1, "Sân 3", "Sân bóng 7 người tiêu chuẩn, mặt cỏ êm, có lưới chắn bóng cao.", Enums.FieldType.SEVEN_A_SIDE);
+        Field f4 = ensureField(owner1, "Sân 4", "Sân bóng 5 người thoáng mát, không khí trong lành.", Enums.FieldType.FIVE_A_SIDE);
+        Field f5 = ensureField(owner1, "Sân 5", "Sân bóng 5 người trung tâm cụm sân, có bãi giữ xe rộng rãi.", Enums.FieldType.FIVE_A_SIDE);
+        Field f6 = ensureField(owner1, "Sân 6", "Sân bóng 7 người chất lượng cao, kích thước tiêu chuẩn.", Enums.FieldType.SEVEN_A_SIDE);
+        Field f7 = ensureField(owner1, "Sân 7", "Sân bóng 5 người chất lượng, có khán đài và mái che một phần.", Enums.FieldType.FIVE_A_SIDE);
+        Field f8 = ensureField(owner1, "Sân 8", "Sân bóng 7 người hiện đại, yên tĩnh.", Enums.FieldType.SEVEN_A_SIDE);
+        Field f9 = ensureField(owner1, "Sân 9", "Sân bóng 5 người, mặt cỏ mới làm lại, hệ thống thoát nước cực tốt.", Enums.FieldType.FIVE_A_SIDE);
+        Field f10 = ensureField(owner1, "Sân 10", "Sân bóng 5 người giá rẻ, phù hợp cho học sinh sinh viên.", Enums.FieldType.FIVE_A_SIDE);
 
-        Field f5 = ensureField(owner2, "Sân Bóng Tao Đàn", "1 Huyền Trân Công Chúa, Bến Thành, Quận 1, TP.HCM", "Sân cỏ nhân tạo trung tâm thành phố, có bãi giữ xe rộng rãi.", Enums.FieldType.FIVE_A_SIDE);
-        Field f6 = ensureField(owner2, "Sân Bóng Phú Thọ", "2 Lữ Gia, Phường 15, Quận 11, TP.HCM", "Sân 11 người kích thước tiêu chuẩn thi đấu quốc tế.", Enums.FieldType.ELEVEN_A_SIDE);
-        Field f7 = ensureField(owner2, "Sân Bóng Rạch Miễu", "1 Hoa Phượng, Phường 2, Phú Nhuận, TP.HCM", "Sân bóng chất lượng, có khán đài và mái che một phần.", Enums.FieldType.FIVE_A_SIDE);
-
-        Field f8 = ensureField(owner3, "Sân Bóng Celadon City", "Đường D2, Sơn Kỳ, Tân Phu, TP.HCM", "Nằm trong khu đô thị Celadon, yên tĩnh và hiện đại.", Enums.FieldType.SEVEN_A_SIDE);
-        Field f9 = ensureField(owner3, "Sân Bóng Bình Thạnh", "324 Chu Văn An, Phường 12, Bình Thạnh, TP.HCM", "Mặt cỏ mới làm lại, hệ thống thoát nước cực tốt.", Enums.FieldType.FIVE_A_SIDE);
-        Field f10 = ensureField(owner3, "Sân Bóng Cát Lái", "Đường 35, Cát Lái, Quận 2, TP.HCM", "Sân bóng giá rẻ, phù hợp cho học sinh sinh viên.", Enums.FieldType.FIVE_A_SIDE);
-
-        // 5. Seed Time Slots for all 10 Fields
+        // 4. Seed Time Slots for all 10 Fields
         List.of(f1, f2, f3, f4, f5, f6, f7, f8, f9, f10).forEach(this::ensureTimeSlots);
 
-        // 6. Seed Teams for some players (total 5 teams)
-        ensureTeam(player1, "SE114 Demo Team", "Đội bóng thử nghiệm của SE114", Enums.TeamLevel.BEGINNER);
-        ensureTeam(player2, "FC Dragon", "Đội bóng của các chiến binh rồng bay", Enums.TeamLevel.INTERMEDIATE);
-        ensureTeam(player3, "FC Brotherhood", "Tinh thần anh em chiến hữu là trên hết", Enums.TeamLevel.ADVANCED);
-        ensureTeam(player4, "FC Young Boys", "Đội tuyển trẻ nhiệt huyết năng động", Enums.TeamLevel.BEGINNER);
-        ensureTeam(player5, "FC Golden Star", "Đội bóng hướng tới các ngôi sao vàng", Enums.TeamLevel.INTERMEDIATE);
-
-        log.info("Database Seeder completed successfully. Seeded 10+ users, 10 fields, 60 time slots, and 5 teams.");
+        log.info("Database Seeder completed successfully. Seeded 10+ users, 10 fields under 1 owner, 60 time slots.");
     }
 
     private void validateSeedCredentials() {
@@ -156,15 +152,21 @@ public class DatabaseSeeder implements CommandLineRunner {
                 });
     }
 
-    private Field ensureField(User owner, String name, String address, String description, Enums.FieldType type) {
+    private Field ensureField(User owner, String name, String description, Enums.FieldType type) {
         return fieldRepository.findAll().stream()
                 .filter(f -> f.getName().equalsIgnoreCase(name))
                 .findFirst()
+                .map(existingField -> {
+                    if (!owner.getId().equals(existingField.getOwnerId())) {
+                        existingField.setOwnerId(owner.getId());
+                        return fieldRepository.save(existingField);
+                    }
+                    return existingField;
+                })
                 .orElseGet(() -> {
                     Field field = new Field();
                     field.setOwnerId(owner.getId());
                     field.setName(name);
-                    field.setAddress(address);
                     field.setDescription(description);
                     field.setType(type);
                     field.setStatus(Enums.FieldStatus.AVAILABLE);
@@ -201,19 +203,5 @@ public class DatabaseSeeder implements CommandLineRunner {
         return timeSlot;
     }
 
-    private void ensureTeam(User captain, String name, String description, Enums.TeamLevel level) {
-        boolean teamExists = teamRepository.findAll().stream()
-                .anyMatch(t -> t.getName().equalsIgnoreCase(name));
-        if (teamExists) {
-            return;
-        }
 
-        Team team = new Team();
-        team.setCaptainId(captain.getId());
-        team.setName(name);
-        team.setDescription(description);
-        team.setLevel(level);
-        team.setCreatedAt(LocalDateTime.now());
-        teamRepository.save(team);
-    }
 }

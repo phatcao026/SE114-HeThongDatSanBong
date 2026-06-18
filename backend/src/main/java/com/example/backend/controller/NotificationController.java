@@ -65,4 +65,16 @@ public class NotificationController {
         notificationService.deleteReadNotifications();
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/fcm-token")
+    public ResponseEntity<Void> registerFcmToken(@RequestParam String fcmToken) {
+        notificationService.registerFcmToken(fcmToken);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/fcm-token")
+    public ResponseEntity<Void> deregisterFcmToken(@RequestParam String fcmToken) {
+        notificationService.deregisterFcmToken(fcmToken);
+        return ResponseEntity.ok().build();
+    }
 }

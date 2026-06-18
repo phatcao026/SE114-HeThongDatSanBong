@@ -7,7 +7,6 @@ import com.example.backend.entity.Booking;
 import com.example.backend.entity.Field;
 import com.example.backend.entity.MatchPost;
 import com.example.backend.entity.MatchRequest;
-import com.example.backend.entity.Team;
 import com.example.backend.entity.TimeSlot;
 import com.example.backend.entity.User;
 import com.example.backend.exception.AppException;
@@ -15,7 +14,6 @@ import com.example.backend.repository.BookingRepository;
 import com.example.backend.repository.FieldRepository;
 import com.example.backend.repository.MatchPostRepository;
 import com.example.backend.repository.MatchRequestRepository;
-import com.example.backend.repository.TeamRepository;
 import com.example.backend.repository.TimeSlotRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.dto.ai.AiOpponentDto;
@@ -57,7 +55,6 @@ public class MatchPostServiceImpl implements MatchPostService {
     private final BookingRepository bookingRepository;
     private final FieldRepository fieldRepository;
     private final TimeSlotRepository timeSlotRepository;
-    private final TeamRepository teamRepository;
     private final UserRepository userRepository;
     private final GroqAiService groqAiService;
 
@@ -66,7 +63,6 @@ public class MatchPostServiceImpl implements MatchPostService {
                                 BookingRepository bookingRepository,
                                 FieldRepository fieldRepository,
                                 TimeSlotRepository timeSlotRepository,
-                                TeamRepository teamRepository,
                                 UserRepository userRepository,
                                 GroqAiService groqAiService) {
         this.matchPostRepository = matchPostRepository;
@@ -74,7 +70,6 @@ public class MatchPostServiceImpl implements MatchPostService {
         this.bookingRepository = bookingRepository;
         this.fieldRepository = fieldRepository;
         this.timeSlotRepository = timeSlotRepository;
-        this.teamRepository = teamRepository;
         this.userRepository = userRepository;
         this.groqAiService = groqAiService;
     }
@@ -128,11 +123,36 @@ public class MatchPostServiceImpl implements MatchPostService {
         post.setStatus(Enums.PostStatus.OPEN);
         post.setCreatedAt(LocalDateTime.now());
 
-        applyTeam(post, request.getTeamId(), currentUserId);
+        boolean hasField = request.getHasField() == null || request.getHasField();
+        post.setHasField(hasField);
+
+        Long bookingId = request.getBookingId();
+        Long fieldId = request.getFieldId();
+
+        if (hasField) {
+            if (bookingId == null && fieldId == null) {
+                throw new AppException(400, "Field or Booking is required when hasField is true");
+            }
+        } else {
+            bookingId = null;
+            fieldId = null;
+        }
+
+        if (request.getPostType() == Enums.PostType.FIND_OPPONENT) {
+            post.setNeededMembers(1);
+            post.setTargetPositions(null);
+        } else {
+            Integer needed = request.getNeededMembers();
+            post.setNeededMembers((needed == null || needed <= 0) ? 1 : needed);
+            post.setTargetPositions(cleanOptional(request.getTargetPositions()));
+        }
+        post.setJoinedMembers(0);
+        post.setAgeRange(cleanOptional(request.getAgeRange()));
+
         applyBookingOrManualSchedule(
                 post,
-                request.getBookingId(),
-                request.getFieldId(),
+                bookingId,
+                fieldId,
                 request.getDate(),
                 request.getTimeStart(),
                 request.getTimeEnd(),
@@ -157,26 +177,58 @@ public class MatchPostServiceImpl implements MatchPostService {
         }
 
         Long currentUserId = TokenUtils.getCurrentUserId();
-        if (request.getTeamId() != null) {
-            applyTeam(post, request.getTeamId(), currentUserId);
+
+        if (request.getHasField() != null) {
+            post.setHasField(request.getHasField());
         }
-        if (request.getBookingId() != null) {
-            applyBookingOrManualSchedule(
-                    post,
-                    request.getBookingId(),
-                    request.getFieldId(),
-                    request.getDate(),
-                    request.getTimeStart(),
-                    request.getTimeEnd(),
-                    currentUserId,
-                    false
-            );
+
+        if (post.getHasField()) {
+            if (request.getBookingId() != null) {
+                applyBookingOrManualSchedule(
+                        post,
+                        request.getBookingId(),
+                        request.getFieldId(),
+                        request.getDate(),
+                        request.getTimeStart(),
+                        request.getTimeEnd(),
+                        currentUserId,
+                        false
+                );
+            } else {
+                applyManualUpdates(post, request);
+            }
+            if (post.getBookingId() == null && post.getFieldId() == null) {
+                throw new AppException(400, "Field or Booking is required when hasField is true");
+            }
         } else {
-            applyManualUpdates(post, request);
+            post.setBookingId(null);
+            post.setFieldId(null);
+            if (request.getDate() != null) post.setDate(request.getDate());
+            if (request.getTimeStart() != null) post.setTimeStart(request.getTimeStart());
+            if (request.getTimeEnd() != null) post.setTimeEnd(request.getTimeEnd());
         }
+
         if (request.getPostType() != null) {
             post.setPostType(request.getPostType());
         }
+
+        Enums.PostType activeType = post.getPostType();
+        if (activeType == Enums.PostType.FIND_OPPONENT) {
+            post.setNeededMembers(1);
+            post.setTargetPositions(null);
+        } else {
+            if (request.getNeededMembers() != null) {
+                post.setNeededMembers(request.getNeededMembers() <= 0 ? 1 : request.getNeededMembers());
+            }
+            if (request.getTargetPositions() != null) {
+                post.setTargetPositions(cleanOptional(request.getTargetPositions()));
+            }
+        }
+
+        if (request.getAgeRange() != null) {
+            post.setAgeRange(cleanOptional(request.getAgeRange()));
+        }
+
         if (request.getSkillLevel() != null) {
             post.setSkillLevel(request.getSkillLevel());
         }
@@ -233,19 +285,6 @@ public class MatchPostServiceImpl implements MatchPostService {
         return spec;
     }
 
-    private void applyTeam(MatchPost post, Long teamId, Long currentUserId) {
-        if (teamId == null) {
-            return;
-        }
-
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new AppException(404, "Team not found"));
-        if (!TokenUtils.hasRole("ADMIN") && (team.getCaptainId() == null || !team.getCaptainId().equals(currentUserId))) {
-            throw new AppException(403, "Only the team captain can post for this team");
-        }
-
-        post.setTeamId(team.getId());
-    }
 
     private void applyBookingOrManualSchedule(MatchPost post,
                                               Long bookingId,
@@ -350,8 +389,7 @@ public class MatchPostServiceImpl implements MatchPostService {
     }
 
     private boolean hasContentUpdate(MatchPostUpdateRequest request) {
-        return request.getTeamId() != null
-                || request.getFieldId() != null
+        return request.getFieldId() != null
                 || request.getBookingId() != null
                 || request.getDate() != null
                 || request.getTimeStart() != null
@@ -359,7 +397,11 @@ public class MatchPostServiceImpl implements MatchPostService {
                 || request.getPostType() != null
                 || request.getSkillLevel() != null
                 || request.getCostSharing() != null
-                || request.getMessage() != null;
+                || request.getMessage() != null
+                || request.getNeededMembers() != null
+                || request.getHasField() != null
+                || request.getTargetPositions() != null
+                || request.getAgeRange() != null;
     }
 
     private MatchPost findPost(Long id) {
@@ -376,22 +418,14 @@ public class MatchPostServiceImpl implements MatchPostService {
         if (post.getUserId() != null && post.getUserId().equals(currentUserId)) {
             return;
         }
-        if (post.getTeamId() != null) {
-            Team team = teamRepository.findById(post.getTeamId())
-                    .orElseThrow(() -> new AppException(404, "Team not found"));
-            if (team.getCaptainId() != null && team.getCaptainId().equals(currentUserId)) {
-                return;
-            }
-        }
 
         throw new AppException(403, "Only the post owner can manage this match post");
     }
 
     private MatchPostResponse toResponse(MatchPost post) {
         Map<Long, User> users = mapById(userRepository.findAllById(nonNullList(post.getUserId())), User::getId);
-        Map<Long, Team> teams = mapById(teamRepository.findAllById(nonNullList(post.getTeamId())), Team::getId);
         Map<Long, Field> fields = mapById(fieldRepository.findAllById(nonNullList(post.getFieldId())), Field::getId);
-        return toResponse(post, users, teams, fields);
+        return toResponse(post, users, fields);
     }
 
     private List<MatchPostResponse> toResponses(List<MatchPost> posts) {
@@ -400,24 +434,20 @@ public class MatchPostServiceImpl implements MatchPostService {
         }
 
         Map<Long, User> users = mapById(userRepository.findAllById(collectIds(posts, MatchPost::getUserId)), User::getId);
-        Map<Long, Team> teams = mapById(teamRepository.findAllById(collectIds(posts, MatchPost::getTeamId)), Team::getId);
         Map<Long, Field> fields = mapById(fieldRepository.findAllById(collectIds(posts, MatchPost::getFieldId)), Field::getId);
 
         return posts.stream()
-                .map(post -> toResponse(post, users, teams, fields))
+                .map(post -> toResponse(post, users, fields))
                 .toList();
     }
 
     private MatchPostResponse toResponse(MatchPost post,
                                          Map<Long, User> users,
-                                         Map<Long, Team> teams,
                                          Map<Long, Field> fields) {
         MatchPostResponse response = new MatchPostResponse();
         response.setId(post.getId());
         response.setUserId(post.getUserId());
         response.setUserName(users.containsKey(post.getUserId()) ? users.get(post.getUserId()).getFullName() : null);
-        response.setTeamId(post.getTeamId());
-        response.setTeamName(teams.containsKey(post.getTeamId()) ? teams.get(post.getTeamId()).getName() : null);
         response.setFieldId(post.getFieldId());
         response.setFieldName(fields.containsKey(post.getFieldId()) ? fields.get(post.getFieldId()).getName() : null);
         response.setBookingId(post.getBookingId());
@@ -434,6 +464,12 @@ public class MatchPostServiceImpl implements MatchPostService {
                 .map(MatchRequest::getId)
                 .orElse(null));
         response.setCreatedAt(post.getCreatedAt());
+        response.setNeededMembers(post.getNeededMembers());
+        response.setJoinedMembers(post.getJoinedMembers());
+        response.setConversationId(post.getConversationId());
+        response.setHasField(post.getHasField());
+        response.setTargetPositions(post.getTargetPositions());
+        response.setAgeRange(post.getAgeRange());
         return response;
     }
 
@@ -470,36 +506,68 @@ public class MatchPostServiceImpl implements MatchPostService {
     }
 
     @Override
-    public List<RecommendedMatchResponse> getSmartRecommendations(String playstyleNote) {
+    public List<RecommendedMatchResponse> getSmartRecommendations(
+            String playstyleNote,
+            LocalDate date,
+            LocalTime timeStart,
+            LocalTime timeEnd,
+            Enums.TeamLevel skillLevel,
+            Boolean hasField,
+            Enums.PostType postType,
+            String position) {
+
         Long currentUserId = TokenUtils.getCurrentUserId();
         User currentUser = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new AppException(404, "Không tìm thấy User"));
         int currentTrust = currentUser.getTrustScore() != null ? currentUser.getTrustScore() : 100;
 
-        Pageable top15 = PageRequest.of(0, 15);
-        Page<MatchPost> rawMatchesPage = matchPostRepository.findPotentialMatches(currentUserId, top15);
+        Enums.PostType activePostType = postType != null ? postType : Enums.PostType.FIND_OPPONENT;
+
+        Pageable top20 = PageRequest.of(0, 20);
+        Page<MatchPost> rawMatchesPage = matchPostRepository.findPotentialMatches(currentUserId, activePostType, top20);
         if (rawMatchesPage.isEmpty()) {
             return List.of();
         }
 
-        List<MatchPost> top15Matches = rawMatchesPage.getContent();
+        List<MatchPost> top20Matches = rawMatchesPage.getContent();
 
-        List<AiOpponentDto> aiInputData = top15Matches.stream()
+        List<AiOpponentDto> aiInputData = top20Matches.stream()
                 .map(m -> {
                     int opponentTrust = m.getUser() != null && m.getUser().getTrustScore() != null
                             ? m.getUser().getTrustScore()
                             : 100;
 
-                    return new AiOpponentDto(m.getId(), m.getMessage(), opponentTrust);
+                    return new AiOpponentDto(
+                            m.getId(),
+                            m.getMessage(),
+                            opponentTrust,
+                            m.getDate() != null ? m.getDate().toString() : null,
+                            m.getTimeStart() != null ? m.getTimeStart().toString() : null,
+                            m.getTimeEnd() != null ? m.getTimeEnd().toString() : null,
+                            m.getSkillLevel() != null ? m.getSkillLevel().name() : null,
+                            m.getCostSharing(),
+                            m.getAgeRange(),
+                            m.getHasField(),
+                            m.getTargetPositions()
+                    );
                 })
                 .toList();
 
-        List<AiRecommendationResult> aiResults = groqAiService.recommendOpponents(
-                playstyleNote, currentTrust, aiInputData
+        List<AiRecommendationResult> aiResults = groqAiService.recommendMatches(
+                playstyleNote,
+                currentTrust,
+                date != null ? date.toString() : null,
+                timeStart != null ? timeStart.toString() : null,
+                timeEnd != null ? timeEnd.toString() : null,
+                skillLevel != null ? skillLevel.name() : null,
+                hasField,
+                activePostType,
+                position,
+                aiInputData
         );
 
         return aiResults.stream().map(aiRes -> {
-            MatchPost fullMatchInfo = top15Matches.stream()
+            MatchPost fullMatchInfo = top20Matches.stream()
                     .filter(m -> m.getId().equals(aiRes.getMatchId()))
                     .findFirst()
                     .orElse(null);

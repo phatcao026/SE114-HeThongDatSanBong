@@ -6,9 +6,7 @@ import java.time.LocalDateTime;
 
 public class FieldResponse {
     private Long id;
-    private Long ownerId;
     private String name;
-    private String address;
     private String description;
     private Enums.FieldType type;
     private Enums.FieldStatus status;
@@ -27,28 +25,12 @@ public class FieldResponse {
         this.id = id;
     }
 
-    public Long getOwnerId() {
-        return ownerId;
-    }
-
-    public void setOwnerId(Long ownerId) {
-        this.ownerId = ownerId;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     public String getDescription() {
