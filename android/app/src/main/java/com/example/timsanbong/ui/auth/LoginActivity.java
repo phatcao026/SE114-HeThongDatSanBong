@@ -68,15 +68,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        hideUnsupportedGoogleLogin();
         setupForgotPasswordFlow();
-    }
-
-    private void hideUnsupportedGoogleLogin() {
-        MaterialButton btnGoogle = findViewById(R.id.btnGoogle);
-        if (btnGoogle != null) {
-            btnGoogle.setVisibility(android.view.View.GONE);
-        }
     }
 
     private void setupForgotPasswordFlow() {

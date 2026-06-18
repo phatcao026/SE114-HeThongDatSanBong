@@ -126,9 +126,6 @@
     <color name="chat_system_text">#0B6E3F</color>
     <color name="chat_system_border">#D2F3DD</color>
 
-    <!-- Google / Social -->
-    <color name="google_red">#DB4437</color>
-
     <!-- Rating star -->
     <color name="star_yellow">#FBBF24</color>
     <color name="star_gray">#D1D5DB</color>

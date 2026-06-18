@@ -12,14 +12,14 @@
         android:id="@+id/ivHeader"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="@color/primary_light"
         android:contentDescription="@null"
         android:scaleType="centerCrop"
-        android:background="@color/primary_light"
+        android:layout_marginBottom="@dimen/overlap_wave"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/scrollContainer"
-        android:layout_marginBottom="@dimen/overlap_wave" />
+        app:layout_constraintBottom_toTopOf="@+id/scrollContainer" />
 
     <ImageView
         android:id="@+id/ivWave"
@@ -36,19 +36,17 @@
         android:id="@+id/scrollContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_rounded_top"
+        android:background="@color/background_primary"
         android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- ViewFlipper: 0=Login, 1=ForgotEmail, 2=VerifyOTP, 3=ResetPassword -->
         <ViewFlipper
             android:id="@+id/viewFlipper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- Page 0: Login Form -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -135,55 +133,6 @@
                     app:cornerRadius="@dimen/radius_button"
                     app:elevation="0dp" />
 
-                <!-- Divider with OR -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_5"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_weight="1"
-                        android:background="@color/border" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/spacing_4"
-                        android:text="hoặc"
-                        android:textColor="@color/text_hint"
-                        android:textSize="@dimen/text_body_small"
-                        android:fontFamily="@font/be_vietnam_pro" />
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_weight="1"
-                        android:background="@color/border" />
-                </LinearLayout>
-
-                <!-- Google Sign In Button -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnGoogle"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/button_height"
-                    android:layout_marginTop="@dimen/spacing_4"
-                    android:text="Đăng nhập với Google"
-                    android:textSize="@dimen/text_body_medium"
-                    android:textColor="@color/text_primary"
-                    android:fontFamily="@font/be_vietnam_pro"
-                    app:cornerRadius="@dimen/radius_button"
-                    app:icon="@drawable/ic_google"
-                    app:iconGravity="textStart"
-                    app:iconPadding="@dimen/spacing_2"
-                    app:iconTint="@null"
-                    app:strokeColor="@color/border"
-                    app:elevation="0dp" />
-
                 <TextView
                     android:id="@+id/tvRegisterLink"
                     android:layout_width="match_parent"
@@ -197,10 +146,8 @@
                     android:fontFamily="@font/be_vietnam_pro"
                     android:clickable="true"
                     android:focusable="true" />
-
             </LinearLayout>
 
-            <!-- Page 1: Forgot Password - Enter Email -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -232,7 +179,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_2"
-                    android:text="Nhập email của bạn để nhận mã OTP"
+                    android:text="Nhập email để nhận mã OTP."
                     android:textColor="@color/text_secondary"
                     android:textSize="@dimen/text_body_medium"
                     android:fontFamily="@font/be_vietnam_pro" />
@@ -263,7 +210,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/button_height"
                     android:layout_marginTop="@dimen/spacing_5"
-                    android:text="Gửi mã OTP"
+                    android:text="Gửi OTP"
                     android:textSize="@dimen/text_body_large"
                     android:textStyle="bold"
                     android:textColor="@color/text_on_primary"
@@ -271,10 +218,8 @@
                     app:backgroundTint="@color/primary"
                     app:cornerRadius="@dimen/radius_button"
                     app:elevation="0dp" />
-
             </LinearLayout>
 
-            <!-- Page 2: Verify OTP -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -296,7 +241,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_4"
-                    android:text="Nhập mã OTP"
+                    android:text="Nhập OTP"
                     android:textColor="@color/text_primary"
                     android:textSize="@dimen/text_heading1"
                     android:textStyle="bold"
@@ -307,7 +252,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_2"
-                    android:text="Mã OTP đã được gửi đến email của bạn"
+                    android:text="Mã OTP đã được gửi đến email của bạn."
                     android:textColor="@color/text_secondary"
                     android:textSize="@dimen/text_body_medium"
                     android:fontFamily="@font/be_vietnam_pro" />
@@ -318,7 +263,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_5"
-                    android:hint="Mã OTP"
+                    android:hint="OTP"
                     app:boxCornerRadiusBottomEnd="@dimen/radius_button"
                     app:boxCornerRadiusBottomStart="@dimen/radius_button"
                     app:boxCornerRadiusTopEnd="@dimen/radius_button"
@@ -329,6 +274,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="number"
+                        android:maxLength="6"
                         android:textSize="@dimen/text_body_medium"
                         android:textColor="@color/text_primary" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -346,10 +292,8 @@
                     app:backgroundTint="@color/primary"
                     app:cornerRadius="@dimen/radius_button"
                     app:elevation="0dp" />
-
             </LinearLayout>
 
-            <!-- Page 3: Reset Password -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -434,13 +378,10 @@
                     app:backgroundTint="@color/primary"
                     app:cornerRadius="@dimen/radius_button"
                     app:elevation="0dp" />
-
             </LinearLayout>
-
         </ViewFlipper>
     </ScrollView>
 
-    <!-- Loading overlay -->
     <FrameLayout
         android:id="@+id/layoutLoading"
         android:layout_width="0dp"
@@ -459,5 +400,4 @@
             android:layout_height="48dp"
             android:layout_gravity="center" />
     </FrameLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

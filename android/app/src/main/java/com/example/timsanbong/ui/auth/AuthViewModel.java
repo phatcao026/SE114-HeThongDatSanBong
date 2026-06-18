@@ -29,6 +29,9 @@ public class AuthViewModel extends AndroidViewModel {
     private final MutableLiveData<Resource<AuthResponse>> _registerState = new MutableLiveData<>();
     public LiveData<Resource<AuthResponse>> registerState = _registerState;
 
+    private final MutableLiveData<Resource<Void>> _registerOtpState = new MutableLiveData<>();
+    public LiveData<Resource<Void>> registerOtpState = _registerOtpState;
+
     private final MutableLiveData<String> _loginMessage = new MutableLiveData<>();
     public LiveData<String> loginMessage = _loginMessage;
 
@@ -37,9 +40,6 @@ public class AuthViewModel extends AndroidViewModel {
 
     private final MutableLiveData<Resource<Void>> _forgotPasswordState = new MutableLiveData<>();
     public LiveData<Resource<Void>> forgotPasswordState = _forgotPasswordState;
-
-    private final MutableLiveData<Resource<String>> _googleUrlState = new MutableLiveData<>();
-    public LiveData<Resource<String>> googleUrlState = _googleUrlState;
 
     public AuthViewModel(@NonNull Application application) {
         super(application);
@@ -57,7 +57,7 @@ public class AuthViewModel extends AndroidViewModel {
             @Override
             public void onSuccess(AuthResponse data) {
                 saveToken(data);
-                loadProfileAfterLogin();
+                loadProfileAfterAuth();
             }
 
             @Override
@@ -69,19 +69,39 @@ public class AuthViewModel extends AndroidViewModel {
         });
     }
 
-    public void register(String fullName, String email, String password) {
+    public void sendRegisterOtp(String email) {
+        _registerOtpState.setValue(Resource.loading(null));
+
+        Map<String, String> body = new HashMap<>();
+        body.put("email", email);
+
+        authRepository.sendRegisterOtp(getApplication(), body, new RepositoryCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) {
+                _registerOtpState.postValue(Resource.success(null));
+            }
+
+            @Override
+            public void onError(String message) {
+                _registerOtpState.postValue(Resource.error(message, null));
+            }
+        });
+    }
+
+    public void register(String fullName, String email, String password, String otp) {
         _registerState.setValue(Resource.loading(null));
 
         Map<String, String> body = new HashMap<>();
         body.put("fullName", fullName);
         body.put("email", email);
         body.put("password", password);
+        body.put("otp", otp);
 
         authRepository.register(getApplication(), body, new RepositoryCallback<AuthResponse>() {
             @Override
             public void onSuccess(AuthResponse data) {
                 saveToken(data);
-                _registerState.postValue(Resource.success(data));
+                loadProfileAfterAuth();
             }
 
             @Override
@@ -133,35 +153,6 @@ public class AuthViewModel extends AndroidViewModel {
         });
     }
 
-    public void getGoogleUrl() {
-        _googleUrlState.setValue(Resource.loading(null));
-        authRepository.getGoogleUrl(getApplication(), new RepositoryCallback<String>() {
-            @Override
-            public void onSuccess(String data) { _googleUrlState.postValue(Resource.success(data)); }
-
-            @Override
-            public void onError(String msg) { _googleUrlState.postValue(Resource.error(msg, null)); }
-        });
-    }
-
-    public void googleSync(String idToken) {
-        _registerState.setValue(Resource.loading(null));
-        authRepository.googleSync(getApplication(), idToken, new RepositoryCallback<AuthResponse>() {
-            @Override
-            public void onSuccess(AuthResponse data) {
-                saveToken(data);
-                loadProfileAfterLogin();
-            }
-
-            @Override
-            public void onError(String msg) {
-                _loginMessage.postValue(msg);
-                _registerState.postValue(Resource.error(msg, null));
-                _loginSuccess.postValue(false);
-            }
-        });
-    }
-
     private void saveToken(AuthResponse data) {
         if (data != null && data.getAccessToken() != null) {
             sessionManager.saveToken(data.getAccessToken());
@@ -169,7 +160,7 @@ public class AuthViewModel extends AndroidViewModel {
         }
     }
 
-    private void loadProfileAfterLogin() {
+    private void loadProfileAfterAuth() {
         authRepository.getMyProfile(getApplication(), new RepositoryCallback<User>() {
             @Override
             public void onSuccess(User user) {

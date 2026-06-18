@@ -2,25 +2,53 @@ package com.example.timsanbong.ui.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.timsanbong.R;
+import com.example.timsanbong.ui.admin.AdminMainActivity;
+import com.example.timsanbong.ui.customer.MainActivity;
+import com.example.timsanbong.ui.owner.OwnerDashboardActivity;
 import com.example.timsanbong.utils.Resource;
+import com.example.timsanbong.utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class RegisterActivity extends AppCompatActivity {
+
+    private static final int RESEND_COOLDOWN_SECONDS = 30;
 
     private TextInputLayout tilName;
     private TextInputLayout tilEmail;
     private TextInputLayout tilPassword;
     private TextInputLayout tilConfirmPassword;
+    private TextInputLayout tilRegisterOtp;
+    private MaterialButton btnSendRegisterOtp;
     private MaterialButton btnRegister;
+    private MaterialButton btnResendRegisterOtp;
+    private ViewFlipper registerViewFlipper;
     private AuthViewModel authViewModel;
+    private int resendSecondsRemaining = 0;
+    private final Handler resendHandler = new Handler(Looper.getMainLooper());
+    private final Runnable resendTick = new Runnable() {
+        @Override
+        public void run() {
+            if (resendSecondsRemaining > 0) {
+                resendSecondsRemaining--;
+                updateResendButton();
+                resendHandler.postDelayed(this, 1000);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,34 +57,93 @@ public class RegisterActivity extends AppCompatActivity {
 
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
 
+        registerViewFlipper = findViewById(R.id.registerViewFlipper);
         tilName = findViewById(R.id.tilName);
         tilEmail = findViewById(R.id.tilEmail);
         tilPassword = findViewById(R.id.tilPassword);
         tilConfirmPassword = findViewById(R.id.tilConfirmPassword);
+        tilRegisterOtp = findViewById(R.id.tilRegisterOtp);
+        btnSendRegisterOtp = findViewById(R.id.btnSendRegisterOtp);
         btnRegister = findViewById(R.id.btnRegister);
+        btnResendRegisterOtp = findViewById(R.id.btnResendRegisterOtp);
 
+        btnSendRegisterOtp.setOnClickListener(v -> requestRegisterOtp());
+        btnResendRegisterOtp.setOnClickListener(v -> requestRegisterOtp());
         btnRegister.setOnClickListener(v -> attemptRegister());
+
+        findViewById(R.id.btnBackFromRegisterOtp).setOnClickListener(v -> showRegisterStep(0, false));
 
         TextView tvLoginLink = findViewById(R.id.tvLoginLink);
         tvLoginLink.setOnClickListener(v -> finish());
 
+        observeViewModel();
+        updateResendButton();
+    }
+
+    private void observeViewModel() {
+        authViewModel.registerOtpState.observe(this, resource -> {
+            if (resource == null) return;
+
+            boolean loading = resource.status == Resource.Status.LOADING;
+            btnSendRegisterOtp.setEnabled(!loading);
+            if (resendSecondsRemaining == 0) {
+                btnResendRegisterOtp.setEnabled(!loading);
+            }
+
+            if (resource.status == Resource.Status.SUCCESS) {
+                Toast.makeText(this, "Đã gửi OTP. Vui lòng kiểm tra email.", Toast.LENGTH_SHORT).show();
+                showRegisterStep(1, true);
+                startResendCooldown();
+            } else if (resource.status == Resource.Status.ERROR) {
+                Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
+                tilEmail.setError(resource.message);
+            }
+        });
+
         authViewModel.registerState.observe(this, resource -> {
-            if (resource.status == Resource.Status.LOADING) {
-                btnRegister.setEnabled(false);
-            } else if (resource.status == Resource.Status.SUCCESS) {
-                btnRegister.setEnabled(true);
-                Toast.makeText(RegisterActivity.this, "Đăng ký thành công.", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(RegisterActivity.this, com.example.timsanbong.ui.customer.MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-            } else {
-                btnRegister.setEnabled(true);
-                Toast.makeText(RegisterActivity.this, resource.message, Toast.LENGTH_SHORT).show();
+            if (resource == null) return;
+
+            btnRegister.setEnabled(resource.status != Resource.Status.LOADING);
+            if (resource.status == Resource.Status.SUCCESS) {
+                Toast.makeText(this, "Đăng ký thành công.", Toast.LENGTH_SHORT).show();
+                navigateByRole();
+            } else if (resource.status == Resource.Status.ERROR) {
+                Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
+                tilRegisterOtp.setError(resource.message);
             }
         });
     }
 
+    private void requestRegisterOtp() {
+        if (!validateRegistrationForm()) {
+            return;
+        }
+
+        authViewModel.sendRegisterOtp(getTextValue(tilEmail));
+    }
+
     private void attemptRegister() {
+        clearErrors();
+
+        if (!validateRegistrationForm()) {
+            return;
+        }
+
+        String otp = getTextValue(tilRegisterOtp);
+        if (otp.isEmpty()) {
+            tilRegisterOtp.setError("Vui lòng nhập OTP");
+            return;
+        }
+
+        authViewModel.register(
+                getTextValue(tilName),
+                getTextValue(tilEmail),
+                getTextValue(tilPassword),
+                otp
+        );
+    }
+
+    private boolean validateRegistrationForm() {
         clearErrors();
 
         String fullName = getTextValue(tilName);
@@ -81,6 +168,9 @@ public class RegisterActivity extends AppCompatActivity {
         if (password.isEmpty()) {
             tilPassword.setError("Vui lòng nhập mật khẩu");
             hasError = true;
+        } else if (password.length() < 6) {
+            tilPassword.setError("Mật khẩu phải có ít nhất 6 ký tự");
+            hasError = true;
         }
 
         if (confirmPassword.isEmpty()) {
@@ -91,11 +181,34 @@ public class RegisterActivity extends AppCompatActivity {
             hasError = true;
         }
 
-        if (hasError) {
+        return !hasError;
+    }
+
+    private void showRegisterStep(int child, boolean forward) {
+        registerViewFlipper.setInAnimation(this, forward ? R.anim.slide_in_right : R.anim.slide_in_left);
+        registerViewFlipper.setOutAnimation(this, forward ? R.anim.slide_out_left : R.anim.slide_out_right);
+        registerViewFlipper.setDisplayedChild(child);
+    }
+
+    private void startResendCooldown() {
+        resendSecondsRemaining = RESEND_COOLDOWN_SECONDS;
+        resendHandler.removeCallbacks(resendTick);
+        updateResendButton();
+        resendHandler.postDelayed(resendTick, 1000);
+    }
+
+    private void updateResendButton() {
+        if (btnResendRegisterOtp == null) {
             return;
         }
 
-        authViewModel.register(fullName, email, password);
+        if (resendSecondsRemaining > 0) {
+            btnResendRegisterOtp.setEnabled(false);
+            btnResendRegisterOtp.setText("Gửi lại OTP (" + resendSecondsRemaining + "s)");
+        } else {
+            btnResendRegisterOtp.setEnabled(true);
+            btnResendRegisterOtp.setText("Gửi lại OTP");
+        }
     }
 
     private String getTextValue(TextInputLayout layout) {
@@ -110,5 +223,41 @@ public class RegisterActivity extends AppCompatActivity {
         tilEmail.setError(null);
         tilPassword.setError(null);
         tilConfirmPassword.setError(null);
+        tilRegisterOtp.setError(null);
+    }
+
+    private void navigateByRole() {
+        SessionManager sessionManager = new SessionManager(this);
+        Class<?> destination = MainActivity.class;
+
+        try {
+            JSONObject userJson = new JSONObject(sessionManager.getUserJson());
+            String role = userJson.optString("role", "PLAYER");
+            if ("OWNER".equalsIgnoreCase(role)) {
+                destination = OwnerDashboardActivity.class;
+            } else if ("ADMIN".equalsIgnoreCase(role)) {
+                destination = AdminMainActivity.class;
+            }
+        } catch (JSONException ignored) {
+        }
+
+        Intent intent = new Intent(this, destination);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (registerViewFlipper != null && registerViewFlipper.getDisplayedChild() == 1) {
+            showRegisterStep(0, false);
+            return;
+        }
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onDestroy() {
+        resendHandler.removeCallbacks(resendTick);
+        super.onDestroy();
     }
 }

@@ -73,6 +73,7 @@ public class AuthServiceImpl implements AuthService {
             throw new AppException(409, "Phone already exists");
         }
 
+        UserRole role = resolveRegisterRole(request.getRole());
         verifyRegistrationOtpIfNeeded(email, request.getOtp());
 
         User user = new User();
@@ -80,7 +81,7 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFullName(fullName);
         user.setPhone(phone);
-        user.setRole(resolveRole(request.getRole()));
+        user.setRole(role);
         user.setTrustScore(100);
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
@@ -98,12 +99,12 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new AppException(401, "Invalid email or password"));
 
-        if (Boolean.TRUE.equals(user.getIsLocked())) {
-            throw new AppException(403, "Tài khoản của bạn đã bị khóa bởi quản trị viên.");
-        }
-
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new AppException(401, "Invalid email or password");
+        }
+
+        if (Boolean.TRUE.equals(user.getIsLocked())) {
+            throw new AppException(403, "Account is locked");
         }
 
         String token = TokenUtils.generateToken(user, jwtSecret, jwtExpirationMs);
@@ -150,15 +151,15 @@ public class AuthServiceImpl implements AuthService {
         authOtpService.verifyRegistrationOtp(email, otp);
     }
 
-    private UserRole resolveRole(String role) {
+    private UserRole resolveRegisterRole(String role) {
         if (!StringUtils.hasText(role)) {
             return UserRole.PLAYER;
         }
 
         try {
             UserRole userRole = UserRole.valueOf(role.trim().toUpperCase(Locale.ROOT));
-            if (userRole == UserRole.ADMIN) {
-                throw new AppException(400, "Admin account cannot be registered here");
+            if (userRole != UserRole.PLAYER) {
+                throw new AppException(400, "Only player accounts can be registered here");
             }
             if (userRole == UserRole.OWNER) {
                 if (userRepository.countByRole(UserRole.OWNER) > 0) {
@@ -172,6 +173,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private String normalizeEmail(String email) {
+        if (!StringUtils.hasText(email)) {
+            throw new AppException(400, "Email is required");
+        }
+
         return email.trim().toLowerCase(Locale.ROOT);
     }
 

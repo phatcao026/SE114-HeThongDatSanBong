@@ -4,11 +4,11 @@ import android.content.Context;
 
 import com.example.timsanbong.data.api.ApiClient;
 import com.example.timsanbong.data.model.AuthResponse;
-import com.example.timsanbong.data.model.GoogleUrlResponse;
 import com.example.timsanbong.data.model.User;
 import com.example.timsanbong.utils.RepositoryCallback;
 
-import java.util.HashMap;
+import org.json.JSONObject;
+
 import java.util.Map;
 
 import retrofit2.Call;
@@ -25,13 +25,13 @@ public class AuthRepository {
                         && response.body().getAccessToken() != null) {
                     callback.onSuccess(response.body());
                 } else {
-                    callback.onError("Email hoặc mật khẩu không đúng.");
+                    callback.onError(getErrorMessage(response, "Invalid email or password."));
                 }
             }
 
             @Override
             public void onFailure(Call<AuthResponse> call, Throwable t) {
-                callback.onError("Không thể kết nối máy chủ.");
+                callback.onError("Cannot connect to server.");
             }
         });
     }
@@ -44,13 +44,31 @@ public class AuthRepository {
                         && response.body().getAccessToken() != null) {
                     callback.onSuccess(response.body());
                 } else {
-                    callback.onError("Đăng ký thất bại. Vui lòng thử lại.");
+                    callback.onError(getErrorMessage(response, "Registration failed. Please try again."));
                 }
             }
 
             @Override
             public void onFailure(Call<AuthResponse> call, Throwable t) {
-                callback.onError("Không thể kết nối máy chủ.");
+                callback.onError("Cannot connect to server.");
+            }
+        });
+    }
+
+    public void sendRegisterOtp(Context context, Map<String, String> body, RepositoryCallback<Void> callback) {
+        ApiClient.getService(context).sendRegisterOtp(body).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess(null);
+                } else {
+                    callback.onError(getErrorMessage(response, "Cannot send registration OTP."));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                callback.onError("Cannot connect to server.");
             }
         });
     }
@@ -62,13 +80,13 @@ public class AuthRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     callback.onSuccess(response.body());
                 } else {
-                    callback.onError("Không thể tải thông tin tài khoản.");
+                    callback.onError(getErrorMessage(response, "Cannot load account profile."));
                 }
             }
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
-                callback.onError("Không thể kết nối máy chủ.");
+                callback.onError("Cannot connect to server.");
             }
         });
     }
@@ -80,13 +98,13 @@ public class AuthRepository {
                 if (response.isSuccessful()) {
                     callback.onSuccess(null);
                 } else {
-                    callback.onError("Không thể gửi OTP.");
+                    callback.onError(getErrorMessage(response, "Cannot send OTP."));
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                callback.onError("Lỗi kết nối.");
+                callback.onError("Cannot connect to server.");
             }
         });
     }
@@ -98,13 +116,13 @@ public class AuthRepository {
                 if (response.isSuccessful()) {
                     callback.onSuccess(null);
                 } else {
-                    callback.onError("OTP không hợp lệ.");
+                    callback.onError(getErrorMessage(response, "OTP is invalid or expired."));
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                callback.onError("Lỗi kết nối.");
+                callback.onError("Cannot connect to server.");
             }
         });
     }
@@ -116,53 +134,31 @@ public class AuthRepository {
                 if (response.isSuccessful()) {
                     callback.onSuccess(null);
                 } else {
-                    callback.onError("Không thể đặt lại mật khẩu.");
+                    callback.onError(getErrorMessage(response, "Cannot reset password."));
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                callback.onError("Lỗi kết nối.");
+                callback.onError("Cannot connect to server.");
             }
         });
     }
 
-    public void getGoogleUrl(Context context, RepositoryCallback<String> callback) {
-        ApiClient.getService(context).getGoogleUrl().enqueue(new Callback<GoogleUrlResponse>() {
-            @Override
-            public void onResponse(Call<GoogleUrlResponse> call, Response<GoogleUrlResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    callback.onSuccess(response.body().getUrl());
-                } else {
-                    callback.onError("Không thể lấy Google URL.");
+    private String getErrorMessage(Response<?> response, String fallback) {
+        if (response != null && response.errorBody() != null) {
+            try {
+                String body = response.errorBody().string();
+                if (body != null && !body.isEmpty()) {
+                    String message = new JSONObject(body).optString("message");
+                    if (message != null && !message.isEmpty()) {
+                        return message;
+                    }
                 }
+            } catch (Exception ignored) {
             }
+        }
 
-            @Override
-            public void onFailure(Call<GoogleUrlResponse> call, Throwable t) {
-                callback.onError("Lỗi kết nối.");
-            }
-        });
-    }
-
-    public void googleSync(Context context, String idToken, RepositoryCallback<AuthResponse> callback) {
-        Map<String, String> body = new HashMap<>();
-        body.put("idToken", idToken);
-        ApiClient.getService(context).googleSync(body).enqueue(new Callback<AuthResponse>() {
-            @Override
-            public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
-                if (response.isSuccessful() && response.body() != null
-                        && response.body().getAccessToken() != null) {
-                    callback.onSuccess(response.body());
-                } else {
-                    callback.onError("Đăng nhập Google thất bại.");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<AuthResponse> call, Throwable t) {
-                callback.onError("Lỗi kết nối.");
-            }
-        });
+        return fallback;
     }
 }

@@ -23,6 +23,9 @@ public interface ApiService {
     @POST("auth/register")
     Call<AuthResponse> register(@Body Map<String, String> body);
 
+    @POST("auth/send-register-otp")
+    Call<Void> sendRegisterOtp(@Body Map<String, String> body);
+
     @POST("auth/forgot-password")
     Call<Void> forgotPassword(@Body Map<String, String> body);
 
@@ -31,12 +34,6 @@ public interface ApiService {
 
     @POST("auth/reset-password")
     Call<Void> resetPassword(@Body Map<String, String> body);
-
-    @GET("auth/google-url")
-    Call<GoogleUrlResponse> getGoogleUrl();
-
-    @POST("auth/google-sync")
-    Call<AuthResponse> googleSync(@Body Map<String, String> body);
 
     // Users / profile
     @GET("users/me")

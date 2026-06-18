@@ -46,7 +46,8 @@ public class ApiClient {
             Authenticator authenticator = new Authenticator() {
                 @Override
                 public Request authenticate(Route route, Response response) {
-                    if (response.code() == 401) {
+                    String path = response.request().url().encodedPath();
+                    if (response.code() == 401 && !path.contains("/auth/")) {
                         SessionManager sessionManager = new SessionManager(context);
                         sessionManager.clearSession();
                         
@@ -65,8 +66,8 @@ public class ApiClient {
                         Request original = chain.request();
                         String path = original.url().encodedPath();
 
-                        // Don't add Authorization header for login and register endpoints
-                        if (path.contains("auth/login") || path.contains("auth/register")) {
+                        // Auth endpoints must not receive stale bearer tokens.
+                        if (path.contains("/auth/")) {
                             return chain.proceed(original);
                         }
 

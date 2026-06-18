@@ -104,9 +104,11 @@ public class AdminUserLockTest {
         User user = new User();
         user.setId(10L);
         user.setEmail("banned@example.com");
+        user.setPassword("hashed");
         user.setIsLocked(true);
 
         when(userRepository.findByEmailIgnoreCase("banned@example.com")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("password", "hashed")).thenReturn(true);
 
         AuthRequest request = new AuthRequest();
         request.setEmail("banned@example.com");
@@ -117,6 +119,6 @@ public class AdminUserLockTest {
         });
 
         assertEquals(403, exception.getStatusCode());
-        assertEquals("Tài khoản của bạn đã bị khóa bởi quản trị viên.", exception.getMessage());
+        assertEquals("Account is locked", exception.getMessage());
     }
 }
