@@ -19,6 +19,7 @@ public class OwnerBookingViewModel extends AndroidViewModel {
     private final MutableLiveData<List<Booking>> bookings = new MutableLiveData<>(Collections.emptyList());
     private final MutableLiveData<Boolean> loading = new MutableLiveData<>(false);
     private final MutableLiveData<String> message = new MutableLiveData<>();
+    private final MutableLiveData<Long> busyBookingId = new MutableLiveData<>(-1L);
 
     public OwnerBookingViewModel(@NonNull Application application) {
         super(application);
@@ -34,6 +35,10 @@ public class OwnerBookingViewModel extends AndroidViewModel {
 
     public LiveData<String> getMessage() {
         return message;
+    }
+
+    public LiveData<Long> getBusyBookingId() {
+        return busyBookingId;
     }
 
     public void loadBookings() {
@@ -53,35 +58,88 @@ public class OwnerBookingViewModel extends AndroidViewModel {
         });
     }
 
+    public void checkInBooking(long bookingId) {
+        mutateBooking(bookingId, "Check-in thành công.", new RepositoryMutation() {
+            @Override
+            public void run(RepositoryCallback<Booking> callback) {
+                repository.checkInBooking(getApplication(), bookingId, callback);
+            }
+        });
+    }
+
+    public void checkOutBooking(long bookingId) {
+        mutateBooking(bookingId, "Thu nốt tiền thành công.", new RepositoryMutation() {
+            @Override
+            public void run(RepositoryCallback<Booking> callback) {
+                repository.checkOutBooking(getApplication(), bookingId, callback);
+            }
+        });
+    }
+
+    public void markNoShow(long bookingId) {
+        mutateBooking(bookingId, "Đã đánh dấu no-show.", new RepositoryMutation() {
+            @Override
+            public void run(RepositoryCallback<Booking> callback) {
+                repository.markNoShow(getApplication(), bookingId, callback);
+            }
+        });
+    }
+
     public void confirmBooking(long bookingId) {
-        loading.setValue(true);
-        repository.confirmBooking(getApplication(), bookingId, bookingMutationCallback());
+        mutateBooking(bookingId, "Xác nhận booking thành công.", new RepositoryMutation() {
+            @Override
+            public void run(RepositoryCallback<Booking> callback) {
+                repository.confirmBooking(getApplication(), bookingId, callback);
+            }
+        });
     }
 
     public void completeBooking(long bookingId) {
-        loading.setValue(true);
-        repository.completeBooking(getApplication(), bookingId, bookingMutationCallback());
+        mutateBooking(bookingId, "Hoàn tất booking thành công.", new RepositoryMutation() {
+            @Override
+            public void run(RepositoryCallback<Booking> callback) {
+                repository.completeBooking(getApplication(), bookingId, callback);
+            }
+        });
     }
 
     public void cancelBooking(long bookingId) {
-        loading.setValue(true);
-        repository.cancelBooking(getApplication(), bookingId, bookingMutationCallback());
+        mutateBooking(bookingId, "Hủy booking thành công.", new RepositoryMutation() {
+            @Override
+            public void run(RepositoryCallback<Booking> callback) {
+                repository.cancelBooking(getApplication(), bookingId, callback);
+            }
+        });
     }
 
-    private RepositoryCallback<Booking> bookingMutationCallback() {
-        return new RepositoryCallback<Booking>() {
+    private void mutateBooking(long bookingId, String successMessage, RepositoryMutation mutation) {
+        if (bookingId <= 0) {
+            message.setValue("Booking khong hop le.");
+            return;
+        }
+        busyBookingId.setValue(bookingId);
+        loading.setValue(true);
+        mutation.run(new RepositoryCallback<Booking>() {
             @Override
             public void onSuccess(Booking data) {
                 loading.setValue(false);
-                message.setValue("Cap nhat booking thanh cong.");
+                busyBookingId.setValue(-1L);
+                message.setValue(data != null && data.getStatus() != null
+                        ? successMessage + " Trạng thái mới: " + data.getStatus()
+                        : successMessage);
                 loadBookings();
             }
 
             @Override
             public void onError(String error) {
                 loading.setValue(false);
+                busyBookingId.setValue(-1L);
                 message.setValue(error);
             }
-        };
+        });
+    }
+
+    private interface RepositoryMutation {
+        void run(RepositoryCallback<Booking> callback);
     }
 }
