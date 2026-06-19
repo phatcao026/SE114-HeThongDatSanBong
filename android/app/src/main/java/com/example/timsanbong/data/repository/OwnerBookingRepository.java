@@ -44,6 +44,30 @@ public class OwnerBookingRepository {
         updateBookingStatus(context, bookingId, callback, "cancel");
     }
 
+    public void checkInBooking(Context context, long bookingId, RepositoryCallback<Booking> callback) {
+        if (bookingId <= 0) {
+            callback.onError("Booking khong hop le.");
+            return;
+        }
+        ApiClient.getService(context).checkInOwnerBooking(bookingId).enqueue(bookingCallback(callback));
+    }
+
+    public void checkOutBooking(Context context, long bookingId, RepositoryCallback<Booking> callback) {
+        if (bookingId <= 0) {
+            callback.onError("Booking khong hop le.");
+            return;
+        }
+        ApiClient.getService(context).checkOutOwnerBooking(bookingId).enqueue(bookingCallback(callback));
+    }
+
+    public void markNoShow(Context context, long bookingId, RepositoryCallback<Booking> callback) {
+        if (bookingId <= 0) {
+            callback.onError("Booking khong hop le.");
+            return;
+        }
+        ApiClient.getService(context).markOwnerBookingNoShow(bookingId).enqueue(bookingCallback(callback));
+    }
+
     private void updateBookingStatus(Context context, long bookingId, RepositoryCallback<Booking> callback,
                                      String action) {
         if (bookingId <= 0) {
@@ -74,5 +98,23 @@ public class OwnerBookingRepository {
                 callback.onError("Không thể kết nối máy chủ.");
             }
         });
+    }
+
+    private Callback<Booking> bookingCallback(RepositoryCallback<Booking> callback) {
+        return new Callback<Booking>() {
+            @Override
+            public void onResponse(Call<Booking> call, Response<Booking> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onError("Cập nhật booking không thành công.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Booking> call, Throwable t) {
+                callback.onError("Không thể kết nối máy chủ.");
+            }
+        };
     }
 }

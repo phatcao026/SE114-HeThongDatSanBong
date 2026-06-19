@@ -63,7 +63,7 @@ public interface ApiService {
     Call<Booking> getBookingById(@Path("id") long id);
 
     @PUT("bookings/{id}/cancel")
-    Call<Booking> cancelBooking(@Path("id") long id);
+    Call<Booking> cancelMyBooking(@Path("id") long id);
 
     // Payments
     @GET("payments")
@@ -181,6 +181,15 @@ public interface ApiService {
 
     @PUT("bookings/{id}/cancel")
     Call<Booking> cancelOwnerBooking(@Path("id") long id);
+
+    @PUT("bookings/{id}/check-in")
+    Call<Booking> checkInOwnerBooking(@Path("id") long id);
+
+    @POST("bookings/{id}/check-out")
+    Call<Booking> checkOutOwnerBooking(@Path("id") long id);
+
+    @PUT("bookings/{id}/no-show")
+    Call<Booking> markOwnerBookingNoShow(@Path("id") long id);
 
     // Admin
     @GET("admin/dashboard/overview")

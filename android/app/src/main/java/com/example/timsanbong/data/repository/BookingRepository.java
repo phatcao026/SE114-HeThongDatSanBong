@@ -53,7 +53,7 @@ public class BookingRepository {
     }
 
     public void cancelBooking(Context context, long bookingId, RepositoryCallback<Void> callback) {
-        ApiClient.getService(context).cancelBooking(bookingId).enqueue(new Callback<Booking>() {
+        ApiClient.getService(context).cancelMyBooking(bookingId).enqueue(new Callback<Booking>() {
             @Override
             public void onResponse(Call<Booking> call, Response<Booking> response) {
                 if (response.isSuccessful()) {

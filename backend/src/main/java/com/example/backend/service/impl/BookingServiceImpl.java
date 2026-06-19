@@ -373,7 +373,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingResponse checkOutBooking(Long id, Enums.PaymentMethod paymentMethod) {
+    public BookingResponse checkOutBooking(Long id, com.example.backend.utils.Enums.PaymentMethod paymentMethodString) {
         Booking booking = findBooking(id);
         ensureCanManageBooking(booking);
 
@@ -393,12 +393,21 @@ public class BookingServiceImpl implements BookingService {
         booking.setUpdatedAt(LocalDateTime.now());
         Booking savedBooking = bookingRepository.save(booking);
 
+        Enums.PaymentMethod paymentMethod = null;
+        try {
+            paymentMethod = Enums.PaymentMethod.valueOf(paymentMethodString.toString().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            // Log the error or handle invalid payment method string
+            paymentMethod = Enums.PaymentMethod.CASH; // Default to CASH if invalid
+        }
+
+
         if (remaining.compareTo(BigDecimal.ZERO) > 0) {
             Payment restOfAmount = new Payment();
             restOfAmount.setBookingId(savedBooking.getId());
             restOfAmount.setUserId(savedBooking.getUserId());
             restOfAmount.setAmount(remaining);
-            restOfAmount.setPaymentMethod(paymentMethod != null ? paymentMethod : Enums.PaymentMethod.CASH);
+            restOfAmount.setPaymentMethod(paymentMethod);
             restOfAmount.setStatus(Enums.PaymentStatus.SUCCESS);
             restOfAmount.setCreatedAt(LocalDateTime.now());
 

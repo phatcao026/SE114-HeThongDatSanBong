@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.timsanbong.R;
 import com.example.timsanbong.ui.admin.AdminMainActivity;
 import com.example.timsanbong.ui.customer.MainActivity;
-import com.example.timsanbong.ui.owner.OwnerDashboardActivity;
+import com.example.timsanbong.ui.owner.OwnerMainActivity;
 import com.example.timsanbong.utils.Resource;
 import com.example.timsanbong.utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
@@ -234,7 +234,7 @@ public class RegisterActivity extends AppCompatActivity {
             JSONObject userJson = new JSONObject(sessionManager.getUserJson());
             String role = userJson.optString("role", "PLAYER");
             if ("OWNER".equalsIgnoreCase(role)) {
-                destination = OwnerDashboardActivity.class;
+                destination = OwnerMainActivity.class;
             } else if ("ADMIN".equalsIgnoreCase(role)) {
                 destination = AdminMainActivity.class;
             }

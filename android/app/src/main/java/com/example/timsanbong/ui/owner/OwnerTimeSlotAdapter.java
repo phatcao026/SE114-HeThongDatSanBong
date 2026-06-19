@@ -6,30 +6,33 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.timsanbong.R;
-import com.example.timsanbong.data.model.TimeSlot;
+import com.example.timsanbong.data.model.TimeSlotResponse;
 import com.google.android.material.button.MaterialButton;
 
+import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class OwnerTimeSlotAdapter extends RecyclerView.Adapter<OwnerTimeSlotAdapter.OwnerTimeSlotViewHolder> {
     public interface Listener {
-        void onEditTimeSlot(TimeSlot timeSlot);
-        void onDeleteTimeSlot(TimeSlot timeSlot);
+        void onEditTimeSlot(TimeSlotResponse timeSlot);
+        void onDeleteTimeSlot(TimeSlotResponse timeSlot);
     }
 
-    private final List<TimeSlot> timeSlots = new ArrayList<>();
+    private final List<TimeSlotResponse> timeSlots = new ArrayList<>();
     private final Listener listener;
 
     public OwnerTimeSlotAdapter(Listener listener) {
         this.listener = listener;
     }
 
-    public void submitList(List<TimeSlot> newTimeSlots) {
+    public void submitList(List<TimeSlotResponse> newTimeSlots) {
         timeSlots.clear();
         if (newTimeSlots != null) {
             timeSlots.addAll(newTimeSlots);
@@ -70,12 +73,71 @@ public class OwnerTimeSlotAdapter extends RecyclerView.Adapter<OwnerTimeSlotAdap
             btnDelete = itemView.findViewById(R.id.btnDeleteOwnerSlot);
         }
 
-        void bind(TimeSlot timeSlot) {
-            tvTimeRange.setText(timeSlot.getStartTime() + " - " + timeSlot.getEndTime());
-            tvPrice.setText(String.format(Locale.US, "%,.0f d", timeSlot.getPrice()));
-            tvStatus.setText(timeSlot.getStatus() == null ? "UNKNOWN" : timeSlot.getStatus());
+        void bind(TimeSlotResponse timeSlot) {
+            tvTimeRange.setText(formatTime(timeSlot));
+            tvPrice.setText(formatMoney(timeSlot.getPrice()));
+            String status = timeSlot.isAvailable() ? "AVAILABLE" : safeStatus(timeSlot.getStatus());
+            tvStatus.setText(labelForStatus(status));
+            styleStatus(status);
             btnEdit.setOnClickListener(v -> listener.onEditTimeSlot(timeSlot));
             btnDelete.setOnClickListener(v -> listener.onDeleteTimeSlot(timeSlot));
+        }
+
+        private void styleStatus(String status) {
+            int background;
+            int textColor;
+            switch (status) {
+                case "AVAILABLE":
+                    background = R.drawable.bg_tag_emerald;
+                    textColor = R.color.green_primary;
+                    break;
+                case "PENDING":
+                    background = R.drawable.bg_tag_amber;
+                    textColor = R.color.orange_700;
+                    break;
+                case "BOOKED":
+                    background = R.drawable.bg_status_cancelled;
+                    textColor = R.color.red_600;
+                    break;
+                default:
+                    background = R.drawable.bg_tag_emerald;
+                    textColor = R.color.green_primary;
+                    break;
+            }
+            tvStatus.setBackgroundResource(background);
+            tvStatus.setTextColor(ContextCompat.getColor(tvStatus.getContext(), textColor));
+        }
+
+        private String formatTime(TimeSlotResponse timeSlot) {
+            return safe(timeSlot.getStartTime()) + " - " + safe(timeSlot.getEndTime());
+        }
+
+        private String formatMoney(Double value) {
+            if (value == null) {
+                return "0 ₫";
+            }
+            return NumberFormat.getNumberInstance(new Locale("vi", "VN")).format(value) + " ₫";
+        }
+
+        private String safe(String value) {
+            return value == null ? "--:--" : value;
+        }
+
+        private String safeStatus(String status) {
+            return status == null ? "AVAILABLE" : status.toUpperCase(Locale.US);
+        }
+
+        private String labelForStatus(String status) {
+            switch (status) {
+                case "AVAILABLE":
+                    return "Trống";
+                case "PENDING":
+                    return "Tạm giữ";
+                case "BOOKED":
+                    return "Đã đặt";
+                default:
+                    return status;
+            }
         }
     }
 }

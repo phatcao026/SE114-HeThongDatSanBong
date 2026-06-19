@@ -1,103 +1,465 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+    item_field_card.xml  ─  FieldCardAdapter.ViewHolder
+    Used in: fragment_field_management.xml → rvFieldList
+
+    Sections:
+      1. Accent colour bar (6dp, set background colour = field.accentColor in Java)
+      2. Field name (21sp bold) + type badge + capacity + rating
+      3. Status toggle button (AVAILABLE ↔ MAINTENANCE)
+      4. 2-column info grid: price box · booked-today box + progress bar
+      5. Time slots section: header label + chip FlexboxLayout container
+         → Add chip TextViews programmatically from field.getSlots()
+         → Each chip: bg_slot_chip_free.xml (green) or bg_slot_chip_booked.xml (red)
+         → If slots.size() > 4: add expand chip using bg_slot_chip_expand.xml
+      6. Horizontal divider
+      7. Action row: [Edit btn] [Delete btn] [Manage Slots btn]
+
+    Java wiring (FieldCardAdapter.java):
+      viewAccentBar         → setBackgroundColor(field.accentColor)
+      tvFieldName           → field.getName()
+      tvFieldTypeBadge      → field.getType()  + set background:
+                               Sân 5  → bg_type_badge_san5  textColor=#6D28D9
+                               Sân 7  → bg_type_badge_san7  textColor=#1D4ED8
+                               Sân 11 → bg_type_badge_san11 textColor=#B45309
+      tvFieldCapacity       → field.getCapacity() + " người"
+      tvFieldRating         → field.getRating()
+      btnStatusToggle       → field.getStatus() → set text + background
+      tvFieldPrice          → field.getPricePerSlot()
+      tvBookedToday         → field.getBookedToday() + "/" + field.getTotalSlots()
+      progressSlotUtil      → setProgress(field.getUtilizationPercent())
+      flSlotChips           → clear() + add chips programmatically
+      btnEditField          → listener.onEdit(field, position)
+      btnDeleteField        → listener.onDelete(field, position)
+      btnManageSlots        → listener.onManageSlots(field, position)
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fieldCardRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-    android:background="@drawable/bg_card"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_marginBottom="14dp"
+    app:cardElevation="3dp"
+    app:cardCornerRadius="20dp"
+    app:cardBackgroundColor="@color/white"
+    app:strokeColor="@color/slate_200"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvOwnerFieldName"
-            android:layout_width="0dp"
+        <!-- ══ 1. ACCENT COLOUR BAR ══════════════════════ -->
+        <View
+            android:id="@+id/viewAccentBar"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:background="@color/emerald_500" />
+        <!-- In Java: viewAccentBar.setBackgroundColor(field.getAccentColor()) -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textColor="@color/text_primary"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tvOwnerFieldStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_owner_status_badge"
-            android:paddingStart="10dp"
-            android:paddingTop="4dp"
-            android:paddingEnd="10dp"
-            android:paddingBottom="4dp"
-            android:textColor="@color/green_primary"
-            android:textSize="11sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+            <!-- ══ 2. FIELD NAME + META ROW ══════════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="start"
+                android:layout_marginBottom="10dp">
 
-    <TextView
-        android:id="@+id/tvOwnerFieldAddress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textColor="@color/text_secondary" />
+                <!-- Left: Name + badges row -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tvOwnerFieldType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/bg_owner_soft_button"
-        android:paddingStart="10dp"
-        android:paddingTop="4dp"
-        android:paddingEnd="10dp"
-        android:paddingBottom="4dp"
-        android:textColor="@color/text_secondary"
-        android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/tvFieldName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sân A1"
+                        android:textColor="@color/slate_900"
+                        android:textSize="21sp"
+                        android:textStyle="bold"
+                        android:lineSpacingExtra="-2dp" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:orientation="horizontal">
+                    <!-- Badges row: Type badge · Capacity · Rating -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="6dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnEditOwnerField"
-            android:layout_width="0dp"
-            android:layout_height="42dp"
-            android:layout_weight="1"
-            android:text="Sửa"
-            android:textAllCaps="false"
-            android:textColor="@color/green_primary"
-            app:backgroundTint="@color/green_surface"
-            app:cornerRadius="12dp"
-            app:strokeColor="@color/green_primary"
-            app:strokeWidth="1dp" />
+                        <!-- Field type pill -->
+                        <TextView
+                            android:id="@+id/tvFieldTypeBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sân 5"
+                            android:textColor="@color/purple_700"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:background="@drawable/bg_type_badge_san5"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:paddingTop="3dp"
+                            android:paddingBottom="3dp"
+                            android:layout_marginEnd="8dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnDeleteOwnerField"
-            android:layout_width="0dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:text="Xóa"
-            android:textAllCaps="false"
-            android:textColor="@color/error"
-            app:backgroundTint="@color/danger_surface"
-            app:cornerRadius="12dp" />
+                        <!-- Capacity with user icon -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginEnd="8dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnManageOwnerSlots"
-            android:layout_width="0dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:text="Giờ"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            app:backgroundTint="@color/green_primary"
-            app:cornerRadius="12dp" />
-    </LinearLayout>
-</LinearLayout>
+                            <ImageView
+                                android:layout_width="11dp"
+                                android:layout_height="11dp"
+                                android:src="@android:drawable/ic_menu_myplaces"
+                                app:tint="@color/slate_400"
+                                android:layout_marginEnd="3dp" />
+
+                            <TextView
+                                android:id="@+id/tvFieldCapacity"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="10 người"
+                                android:textColor="@color/slate_500"
+                                android:textSize="11sp" />
+
+                        </LinearLayout>
+
+                        <!-- Rating with star icon -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="11dp"
+                                android:layout_height="11dp"
+                                android:src="@android:drawable/btn_star_big_on"
+                                app:tint="@color/amber_500"
+                                android:layout_marginEnd="2dp" />
+
+                            <TextView
+                                android:id="@+id/tvFieldRating"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="4.8"
+                                android:textColor="@color/amber_700"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Right: Status toggle button -->
+                <LinearLayout
+                    android:id="@+id/btnStatusToggle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_status_available"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp">
+
+                    <!-- Status dot -->
+                    <View
+                        android:id="@+id/viewStatusDot"
+                        android:layout_width="7dp"
+                        android:layout_height="7dp"
+                        android:background="@drawable/bg_badge_green"
+                        android:layout_marginEnd="5dp" />
+
+                    <TextView
+                        android:id="@+id/tvStatusLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="AVAILABLE"
+                        android:textColor="@color/emerald_700"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.04" />
+
+                </LinearLayout>
+                <!--
+                  In Java: when status == "Maintenance":
+                    btnStatusToggle.setBackground(ContextCompat.getDrawable(ctx, R.drawable.bg_status_maintenance))
+                    viewStatusDot  .setBackground(ContextCompat.getDrawable(ctx, R.drawable.bg_badge_orange))
+                    tvStatusLabel  .setText("MAINTENANCE")
+                    tvStatusLabel  .setTextColor(ContextCompat.getColor(ctx, R.color.orange_700))
+                -->
+
+            </LinearLayout>
+
+            <!-- ══ 3. INFO GRID: Price · Booked Today ════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="14dp">
+
+                <!-- Price box -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_info_green"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Giá / khung giờ"
+                        android:textColor="@color/slate_500"
+                        android:textSize="10sp"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/tvFieldPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="350,000₫"
+                        android:textColor="@color/emerald_600"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <!-- Booked today box + progress bar -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_info_gray"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Đã đặt hôm nay"
+                        android:textColor="@color/slate_500"
+                        android:textSize="10sp"
+                        android:layout_marginBottom="4dp" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="">
+
+                        <TextView
+                            android:id="@+id/tvBookedToday"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="5"
+                            android:textColor="@color/slate_900"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvTotalSlotsLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="/12 slot"
+                            android:textColor="@color/slate_400"
+                            android:textSize="11sp" />
+
+                    </LinearLayout>
+
+                    <!-- Utilisation progress bar -->
+                    <ProgressBar
+                        android:id="@+id/progressSlotUtil"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="4dp"
+                        android:layout_marginTop="6dp"
+                        android:progressDrawable="@drawable/progress_slot_util"
+                        android:max="100"
+                        android:progress="42" />
+                    <!--
+                      In Java: set progress color based on utilization:
+                        > 70% → emerald_500
+                        > 40% → amber_500
+                        ≤ 40% → slate_300
+                      Use LayerDrawable to update color programmatically.
+                    -->
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- ══ 4. TIME SLOTS SECTION ═════════════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="14dp">
+
+                <!-- Section header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <ImageView
+                        android:layout_width="13dp"
+                        android:layout_height="13dp"
+                        android:src="@android:drawable/ic_menu_recent_history"
+                        app:tint="@color/slate_500"
+                        android:layout_marginEnd="5dp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Khung giờ"
+                        android:textColor="@color/slate_700"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <!-- Free / booked summary -->
+                    <TextView
+                        android:id="@+id/tvSlotSummary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="3 trống · 5 đã đặt"
+                        android:textColor="@color/emerald_600"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <!--
+                    TIME SLOT CHIPS CONTAINER
+                    Use com.google.android.flexbox.FlexboxLayout from the Flexbox library:
+                      implementation 'com.google.android.flexbox:flexbox:3.0.0'
+
+                    FlexboxLayout wraps chips to multiple lines automatically.
+                    In FieldCardAdapter.java:
+                      1. flSlotChips.removeAllViews()
+                      2. For each TimeSlot in field.getSlots() (show first 4, hide rest):
+                           TextView chip = inflater.inflate(R.layout.item_slot_chip, flSlotChips, false)
+                           chip.setText(slot.getTimeRange())
+                           chip.setBackground(slot.isBooked()
+                               ? bg_slot_chip_booked : bg_slot_chip_free)
+                           chip.setTextColor(slot.isBooked() ? #B91C1C : #15803D)
+                           flSlotChips.addView(chip)
+                      3. If slots.size() > 4: add "expand" chip with bg_slot_chip_expand
+                         clicking it removes itself and adds remaining chips
+                -->
+                <com.google.android.flexbox.FlexboxLayout
+                    android:id="@+id/flSlotChips"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:flexWrap="wrap"
+                    app:flexDirection="row"
+                    app:alignItems="flex_start"
+                    app:justifyContent="flex_start" />
+
+                <!--
+                    FALLBACK if Flexbox not available:
+                    Use a LinearLayout inside HorizontalScrollView for a single-row view.
+                    The item XML for each chip is item_slot_chip.xml (see below).
+
+                    <HorizontalScrollView android:scrollbars="none">
+                        <LinearLayout android:id="@+id/llSlotChipsRow"
+                            android:orientation="horizontal" />
+                    </HorizontalScrollView>
+                -->
+
+            </LinearLayout>
+
+            <!-- ══ 5. DIVIDER ════════════════════════════ -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/slate_100"
+                android:layout_marginBottom="12dp" />
+
+            <!-- ══ 6. ACTION ROW ═════════════════════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEditField"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:padding="0dp"
+                    app:icon="@android:drawable/ic_menu_edit"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="18dp"
+                    app:iconTint="@color/slate_500"
+                    app:backgroundTint="@android:color/transparent"
+                    app:strokeColor="@color/slate_200"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDeleteField"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:padding="0dp"
+                    app:icon="@android:drawable/ic_menu_delete"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="18dp"
+                    app:iconTint="@color/red_500"
+                    app:backgroundTint="@color/red_50"
+                    app:cornerRadius="8dp"
+                    app:strokeColor="@color/red_100"
+                    app:strokeWidth="1dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnManageSlots"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:text="Manage Slots"
+                    android:textColor="@color/white"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    app:icon="@android:drawable/ic_menu_manage"
+                    app:iconGravity="textStart"
+                    app:iconPadding="6dp"
+                    app:iconSize="14dp"
+                    app:iconTint="@color/white"
+                    app:backgroundTint="@color/emerald_500"
+                    app:cornerRadius="8dp" />
+
+            </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

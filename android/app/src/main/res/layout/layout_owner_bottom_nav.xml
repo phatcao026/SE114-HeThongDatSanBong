@@ -1,39 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="78dp"
-    android:background="@drawable/bg_owner_bottom_nav"
-    android:elevation="10dp"
+    android:layout_height="68dp"
+    android:background="@android:color/white"
+    android:elevation="12dp"
     android:orientation="horizontal"
-    android:paddingStart="12dp"
-    android:paddingTop="8dp"
-    android:paddingEnd="12dp"
-    android:paddingBottom="8dp">
+    android:gravity="center_vertical"
+    android:paddingStart="8dp"
+    android:paddingTop="6dp"
+    android:paddingEnd="8dp"
+    android:paddingBottom="6dp"
+    android:baselineAligned="false">
 
     <LinearLayout
         android:id="@+id/ownerNavDashboard"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@drawable/bg_owner_nav_item"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:clickable="true"
         android:focusable="true"
         android:gravity="center"
-        android:minHeight="56dp"
         android:orientation="vertical">
 
         <FrameLayout
             android:id="@+id/wrapOwnerNavDashboard"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
-            android:background="@drawable/bg_owner_nav_icon">
-
+            android:layout_width="56dp"
+            android:layout_height="30dp"
+            android:background="@drawable/bg_nav_pill_active">
             <ImageView
-                android:id="@+id/ivOwnerNavDashboard"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center"
-                android:src="@android:drawable/ic_menu_today" />
+            android:id="@+id/ivOwnerNavDashboard"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_gravity="center"
+            app:tint="@color/green_primary"
+            android:src="@drawable/ic_nav_dashboard" />
         </FrameLayout>
 
         <TextView
@@ -42,38 +44,34 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="@string/nav_dashboard"
+            android:textColor="@color/green_primary"
             android:textSize="11sp"
+            android:textStyle="bold"
             android:singleLine="true" />
     </LinearLayout>
-
-    <Space
-        android:layout_width="8dp"
-        android:layout_height="match_parent" />
 
     <LinearLayout
         android:id="@+id/ownerNavFields"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@drawable/bg_owner_nav_item"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:clickable="true"
         android:focusable="true"
         android:gravity="center"
-        android:minHeight="56dp"
         android:orientation="vertical">
 
         <FrameLayout
             android:id="@+id/wrapOwnerNavFields"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
-            android:background="@drawable/bg_owner_nav_icon">
-
-            <ImageView
-                android:id="@+id/ivOwnerNavFields"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center"
-                android:src="@android:drawable/ic_menu_mapmode" />
+            android:layout_width="56dp"
+            android:layout_height="30dp"
+            android:background="@android:color/transparent"> <ImageView
+            android:id="@+id/ivOwnerNavFields"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_gravity="center"
+            app:tint="#9CA3AF"
+            android:src="@drawable/ic_nav_fields" />
         </FrameLayout>
 
         <TextView
@@ -82,38 +80,35 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="@string/nav_fields"
+            android:textColor="#9CA3AF"
             android:textSize="11sp"
             android:singleLine="true" />
     </LinearLayout>
-
-    <Space
-        android:layout_width="8dp"
-        android:layout_height="match_parent" />
 
     <LinearLayout
         android:id="@+id/ownerNavBookings"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@drawable/bg_owner_nav_item"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:clickable="true"
         android:focusable="true"
         android:gravity="center"
-        android:minHeight="56dp"
         android:orientation="vertical">
 
         <FrameLayout
             android:id="@+id/wrapOwnerNavBookings"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
-            android:background="@drawable/bg_owner_nav_icon">
+            android:layout_width="56dp"
+            android:layout_height="30dp"
+            android:background="@android:color/transparent">
 
             <ImageView
                 android:id="@+id/ivOwnerNavBookings"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:layout_gravity="center"
-                android:src="@android:drawable/ic_menu_agenda" />
+                app:tint="#9CA3AF"
+                android:src="@drawable/ic_nav_bookings" />
         </FrameLayout>
 
         <TextView
@@ -121,7 +116,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Lịch đặt"
+            android:text="Lịch đặt sân"
+            android:textColor="#9CA3AF"
             android:textSize="11sp"
             android:singleLine="true" />
     </LinearLayout>

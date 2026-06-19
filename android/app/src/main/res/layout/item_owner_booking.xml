@@ -1,110 +1,238 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-    android:background="@drawable/bg_card"
     android:orientation="vertical"
+    android:background="@drawable/bg_card"
+    android:layout_marginBottom="10dp"
     android:padding="16dp">
 
+    <!-- Top Row: Order ID + Status Badge -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:layout_marginBottom="8dp">
 
-        <TextView
-            android:id="@+id/tvOwnerBookingFieldName"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textColor="@color/text_primary"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mã đơn "
+                    android:textSize="11sp"
+                    android:textColor="@color/text_hint" />
+                <TextView
+                    android:id="@+id/tv_order_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="#ABCDEF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_field_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sân Bóng 2"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_secondary"
+                android:layout_marginTop="2dp" />
+
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/tvOwnerBookingStatus"
+            android:id="@+id/tv_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_owner_status_badge"
-            android:paddingStart="10dp"
-            android:paddingTop="4dp"
-            android:paddingEnd="10dp"
-            android:paddingBottom="4dp"
-            android:textColor="@color/green_primary"
+            android:text="Đã hủy"
             android:textSize="11sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="@color/red_primary"
+            android:background="@drawable/bg_status_red"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp" />
+
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tvOwnerBookingCustomer"
+    <!-- Divider -->
+    <View
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textColor="@color/text_secondary" />
+        android:layout_height="1dp"
+        android:background="@color/bg_divider"
+        android:layout_marginBottom="8dp" />
 
-    <TextView
-        android:id="@+id/tvOwnerBookingDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textColor="@color/text_secondary" />
-
-    <TextView
-        android:id="@+id/tvOwnerBookingTime"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textColor="@color/text_secondary" />
-
-    <TextView
-        android:id="@+id/tvOwnerBookingPrice"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textColor="@color/text_primary"
-        android:textStyle="bold" />
-
+    <!-- Details Grid -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnConfirmOwnerBooking"
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="42dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Xác nhận"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            app:backgroundTint="@color/green_primary"
-            app:cornerRadius="12dp" />
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ngày"
+                android:textSize="10sp"
+                android:textColor="@color/text_hint" />
+            <TextView
+                android:id="@+id/tv_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="07/06/2026"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary" />
+        </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCompleteOwnerBooking"
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="8dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Hoàn tất"
-            android:textAllCaps="false"
-            android:textColor="@color/blue_primary"
-            app:backgroundTint="@color/blue_light"
-            app:cornerRadius="12dp" />
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Giờ"
+                android:textSize="10sp"
+                android:textColor="@color/text_hint" />
+            <TextView
+                android:id="@+id/tv_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="22:00 - 23:00"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary" />
+        </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCancelOwnerBooking"
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="8dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Hủy"
-            android:textAllCaps="false"
-            android:textColor="@color/error"
-            app:backgroundTint="@color/danger_surface"
-            app:cornerRadius="12dp" />
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tổng tiền"
+                android:textSize="10sp"
+                android:textColor="@color/text_hint" />
+            <TextView
+                android:id="@+id/tv_total"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="300,000đ"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tiền cọc"
+                android:textSize="10sp"
+                android:textColor="@color/text_hint" />
+            <TextView
+                android:id="@+id/tv_deposit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="45,000đ"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/orange_primary" />
+        </LinearLayout>
+
     </LinearLayout>
+
+    <!-- Note + Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tv_note"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text=""
+            android:textSize="11sp"
+            android:textColor="@color/text_hint"
+            android:ellipsize="end"
+            android:maxLines="1" />
+
+        <!-- Confirm/Reject buttons (visible only for "Chờ cọc") -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="Xác nhận"
+            android:textSize="11sp"
+            android:textColor="@color/white"
+            android:background="@drawable/bg_small_green_btn"
+            style="?android:attr/borderlessButtonStyle"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:layout_marginStart="8dp"
+            android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_reject"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="Từ chối"
+            android:textSize="11sp"
+            android:textColor="@color/red_primary"
+            android:background="@drawable/bg_small_red_btn"
+            style="?android:attr/borderlessButtonStyle"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:layout_marginStart="6dp"
+            android:visibility="gone" />
+
+        <!-- Check-in button (visible only for "Đã cọc") -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_checkin"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="Check-in"
+            android:textSize="11sp"
+            android:textColor="@color/blue_primary"
+            android:background="@drawable/bg_small_blue_btn"
+            style="?android:attr/borderlessButtonStyle"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:layout_marginStart="8dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
 </LinearLayout>

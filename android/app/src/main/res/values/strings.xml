@@ -275,6 +275,19 @@
 
     <!-- Owner -->
     <string name="greeting">Xin chào, chủ sân</string>
+    <string name="stat_revenue_change">+18% so với tháng trước</string>
+    <string name="stat_pending_label">Đơn hàng chờ xử lý</string>
+    <string name="stat_pending_badge">Cần duyệt</string>
+    <string name="stat_fields_label">Tổng số sân bóng</string>
+    <string name="stat_fields_badge">Hoạt động</string>
+    <string name="stat_completed_label">Đơn đặt sân thành công</string>
+    <string name="stat_completed_change">+24 tuần này</string>
+    <string name="quick_actions_title">Thao tác nhanh</string>
+    <string name="btn_new_field">+ Thêm sân mới</string>
+    <string name="btn_calendar">Lịch đặt sân</string>
+    <string name="recent_bookings_title">Đơn đặt sân gần đây</string>
+    <string name="recent_bookings_sub">Cập nhật theo thời gian thực</string>
+    <string name="owner_name"> Name </string>
     <string name="greeting_subtitle">Theo dõi sân, lịch đặt và doanh thu trong ngày.</string>
     <string name="btn_create_field">Tạo sân mới</string>
     <string name="btn_view_bookings">Xem lịch đặt</string>
@@ -289,6 +302,10 @@
     <string name="section_transactions">Giao dịch gần đây</string>
     <string name="section_quick_actions">Thao tác nhanh</string>
     <string name="btn_manage">Quản lý</string>
+    <string name="fields_title">Danh sách sân</string>
+    <string name="bookings_title">Danh sách đặt sân</string>
+    <string name="bookings_search_hint">Mã đặt, tên sân,...</string>
+    <string name="fields_search_hint">Tên sân,...</string>
     <string name="btn_see_all">Xem tất cả</string>
     <string name="title_field_management">Quản lý sân</string>
     <string name="subtitle_field_management">Cập nhật sân và khung giờ mở bán.</string>
@@ -308,6 +325,12 @@
     <string name="subtitle_booking_history">Theo dõi và xử lý các đơn đặt sân.</string>
     <string name="nav_dashboard">Tổng quan</string>
     <string name="nav_fields">Sân</string>
+    <string name="booking_label_field">Sân bóng</string>
+    <string name="booking_label_time">Khung giờ</string>
+    <string name="booking_label_price">Tổng thanh toán</string>
+    <string name="booking_done_msg">Đơn đặt sân này đã hoàn thành xuất sắc.</string>
+    <string name="booking_cancelled_msg">Đơn đặt sân này đã bị hủy.</string>
+
     <!-- Player UX refresh -->
     <string name="nav_notifications">Tin</string>
     <string name="home_ready_to_book">Ready for your next booking</string>

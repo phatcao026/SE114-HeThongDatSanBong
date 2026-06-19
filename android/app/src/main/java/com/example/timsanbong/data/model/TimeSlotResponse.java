@@ -26,6 +26,7 @@ public class TimeSlotResponse {
     public String getStartTime() { return startTime; }
     public String getEndTime() { return endTime; }
     public Double getPrice() { return price; }
+    public String getStatus() { return status; }
 
     public boolean isAvailable() {
         if (available != null) return available;

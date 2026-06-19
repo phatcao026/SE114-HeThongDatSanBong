@@ -39,6 +39,15 @@ public class Booking {
     @SerializedName("status")
     private String status;
 
+    @SerializedName("note")
+    private String note;
+
+    @SerializedName("createdAt")
+    private String createdAt;
+
+    @SerializedName("updatedAt")
+    private String updatedAt;
+
     public Booking() {}
 
     public Booking(long id, Field field, User user, String bookingDate, String startTime,
@@ -65,6 +74,9 @@ public class Booking {
     public double getDepositAmount() { return depositAmount; }
     public double getTotalPrice() { return totalAmount; }
     public String getStatus() { return status; }
+    public String getNote() { return note; }
+    public String getCreatedAt() { return createdAt; }
+    public String getUpdatedAt() { return updatedAt; }
 
     public Field getField() {
         if (field != null) {

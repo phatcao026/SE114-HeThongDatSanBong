@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/ownerFragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/ownerBottomNavLayout" />
+
+    <include
+        android:id="@+id/ownerBottomNavLayout"
+        layout="@layout/layout_owner_bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="78dp"
+        android:layout_alignParentBottom="true" />
+
+</RelativeLayout>
