@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Football pitch top-view icon -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Outer rectangle -->
+    <path
+        android:pathData="M2,4 L22,4 L22,20 L2,20 Z"
+        android:strokeColor="#9CA3AF"
+        android:strokeWidth="1.8"
+        android:fillColor="@android:color/transparent"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round" />
+
+    <!-- Centre line -->
+    <path
+        android:pathData="M12,4 L12,20"
+        android:strokeColor="#9CA3AF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round" />
+
+    <!-- Centre circle -->
+    <path
+        android:pathData="M12,12 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"
+        android:strokeColor="#9CA3AF"
+        android:strokeWidth="1.5"
+        android:fillColor="@android:color/transparent" />
+
+    <!-- Left goal lines -->
+    <path
+        android:pathData="M2,8.5 L5.5,8.5"
+        android:strokeColor="#9CA3AF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M2,15.5 L5.5,15.5"
+        android:strokeColor="#9CA3AF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round" />
+
+    <!-- Right goal lines -->
+    <path
+        android:pathData="M18.5,8.5 L22,8.5"
+        android:strokeColor="#9CA3AF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M18.5,15.5 L22,15.5"
+        android:strokeColor="#9CA3AF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round" />
+
+</vector>

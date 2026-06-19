@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Progress bar drawable for ProgressBar in item_field_card.xml (progressSlotUtil).
+    Track: slate_200 background.
+    Filled: colour set programmatically based on utilization percentage.
+    Use LayerDrawable in Java:
+        LayerDrawable ld = (LayerDrawable) progress.getProgressDrawable();
+        Drawable fill = ld.findDrawableByLayerId(android.R.id.progress);
+        fill.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Background track -->
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/slate_200" />
+            <corners android:radius="2dp" />
+        </shape>
+    </item>
+
+    <!-- Progress fill -->
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape android:shape="rectangle">
+                <solid android:color="@color/emerald_500" />
+                <corners android:radius="2dp" />
+            </shape>
+        </clip>
+    </item>
+
+</layer-list>

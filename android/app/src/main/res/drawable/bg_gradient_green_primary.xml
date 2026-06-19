@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Used for: Revenue hero card, FAB, primary CTA buttons -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="135"
+        android:startColor="@color/emerald_600"
+        android:centerColor="@color/emerald_500"
+        android:endColor="#34D399"
+        android:type="linear" />
+    <corners android:radius="20dp" />
+</shape>

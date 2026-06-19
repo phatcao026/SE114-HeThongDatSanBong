@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    fragment_booking_management.xml  ─  BookingManagementFragment
+    Screens: Header (title + pending badge + filter icon) ·
+             Search bar + Date picker button ·
+             Horizontal scrollable status TabBar ·
+             RecyclerView of Booking Cards
+    Java wiring:
+      - etSearchBookings   → TextWatcher → BookingAdapter.filter(query)
+      - btnDateFilter      → show DatePickerDialog → BookingAdapter.filterByDate()
+      - btnFilterOptions   → show bottom sheet filter
+      - llStatusTabsContainer → build tab buttons programmatically in Fragment
+      - rvBookingList      → LinearLayoutManager + BookingCardAdapter
+      - tvPendingBadge     → set text / visibility from ViewModel
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bookingMgmtRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/slate_100">
+
+    <!-- ══════════════════════════════════════════════════
+         STICKY HEADER
+         ══════════════════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/bookingMgmtHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/white"
+        android:elevation="2dp">
+
+        <!-- ── Title row ── -->
+        <LinearLayout
+            android:baselineAligned="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="12dp">
+
+            <!-- Title + pending badge -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Management"
+                    android:textColor="@color/slate_400"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.05" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="2dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/bookings_title"
+                        android:textColor="@color/slate_900"
+                        android:textSize="19sp"
+                        android:textStyle="bold" />
+
+                    <!-- Pending count badge — hide with View.GONE when 0 -->
+                    <TextView
+                        android:id="@+id/tvPendingBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2 chờ duyệt"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:background="@drawable/bg_badge_orange"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:layout_marginStart="8dp"
+                        android:visibility="visible" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Filter icon button -->
+            <LinearLayout
+                android:id="@+id/btnFilterOptions"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_btn_outline_gray"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@android:drawable/ic_menu_sort_by_size"
+                    app:tint="@color/slate_500" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- ── Search + Date picker row ── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="12dp">
+
+            <!-- Search input -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_search_bar"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:layout_marginEnd="8dp">
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:src="@android:drawable/ic_menu_search"
+                    app:tint="@color/slate_400"
+                    android:layout_marginEnd="8dp" />
+
+                <EditText
+                    android:id="@+id/etSearchBookings"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="@string/bookings_search_hint"
+                    android:textColorHint="@color/slate_400"
+                    android:textColor="@color/slate_700"
+                    android:textSize="13sp"
+                    android:singleLine="true"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch" />
+
+            </LinearLayout>
+
+            <!-- Date picker button -->
+            <LinearLayout
+                android:id="@+id/btnDateFilter"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_btn_calendar"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="17dp"
+                    android:layout_height="17dp"
+                    android:src="@drawable/ic_nav_bookings"
+                    app:tint="@color/emerald_600" />
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnClearFilters"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:layout_marginStart="8dp"
+                android:text="Xóa lọc"
+                android:textAllCaps="false"
+                android:textSize="12sp"
+                android:backgroundTint="@color/white"
+                android:textColor="@color/slate_600"
+                app:strokeColor="@color/slate_200"
+                app:strokeWidth="1dp"
+                app:cornerRadius="12dp" />
+
+        </LinearLayout>
+
+        <!-- ── Horizontal scrollable Status Tabs ──
+             NOTE: Tab buttons (All, Pending, Confirmed, Completed, Cancelled)
+             are added PROGRAMMATICALLY in BookingManagementFragment.java
+             using addTabChip(String label, int count, boolean active).
+             Each chip is a TextView with bg_tab_active.xml / bg_tab_inactive.xml.
+        -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:paddingBottom="14dp">
+
+            <LinearLayout
+                android:id="@+id/llStatusTabsContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp">
+
+                <!--
+                    Example of a single active tab chip (All):
+                    Replicate this pattern for each status tab in Java.
+
+                    Active chip:
+                      background = @drawable/bg_tab_active
+                      textColor  = @color/white
+                      textStyle  = bold
+
+                    Inactive chip:
+                      background = @drawable/bg_tab_inactive
+                      textColor  = @color/slate_500
+                      textStyle  = normal
+                -->
+
+                <!-- ALL tab (active by default) -->
+                <LinearLayout
+                    android:id="@+id/tabAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_tab_active"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:layout_marginEnd="6dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="All"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvTabAllCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="10"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:background="#40FFFFFF"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp"
+                        android:paddingTop="1dp"
+                        android:paddingBottom="1dp"
+                        android:layout_marginStart="5dp" />
+
+                </LinearLayout>
+
+                <!-- PENDING tab -->
+                <LinearLayout
+                    android:id="@+id/tabPending"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_tab_inactive"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:layout_marginEnd="6dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Pending"
+                        android:textColor="@color/slate_500"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tvTabPendingCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2"
+                        android:textColor="@color/slate_500"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:background="@color/slate_200"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp"
+                        android:paddingTop="1dp"
+                        android:paddingBottom="1dp"
+                        android:layout_marginStart="5dp" />
+
+                </LinearLayout>
+
+                <!-- CONFIRMED tab -->
+                <LinearLayout
+                    android:id="@+id/tabConfirmed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_tab_inactive"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:layout_marginEnd="6dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Confirmed"
+                        android:textColor="@color/slate_500"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tvTabConfirmedCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="3"
+                        android:textColor="@color/slate_500"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:background="@color/slate_200"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp"
+                        android:paddingTop="1dp"
+                        android:paddingBottom="1dp"
+                        android:layout_marginStart="5dp" />
+
+                </LinearLayout>
+
+                <!-- COMPLETED tab -->
+                <LinearLayout
+                    android:id="@+id/tabCompleted"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_tab_inactive"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:layout_marginEnd="6dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Completed"
+                        android:textColor="@color/slate_500"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tvTabCompletedCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="3"
+                        android:textColor="@color/slate_500"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:background="@color/slate_200"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp"
+                        android:paddingTop="1dp"
+                        android:paddingBottom="1dp"
+                        android:layout_marginStart="5dp" />
+
+                </LinearLayout>
+
+                <!-- CANCELLED tab -->
+                <LinearLayout
+                    android:id="@+id/tabCancelled"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_tab_inactive"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Cancelled"
+                        android:textColor="@color/slate_500"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tvTabCancelledCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2"
+                        android:textColor="@color/slate_500"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:background="@color/slate_200"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp"
+                        android:paddingTop="1dp"
+                        android:paddingBottom="1dp"
+                        android:layout_marginStart="5dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+    </LinearLayout>
+
+    <!-- ══════════════════════════════════════════════════
+         BOOKING CARDS RecyclerView
+         Adapter  : BookingCardAdapter
+         Item XML : item_booking_card.xml
+         Manager  : LinearLayoutManager(context, VERTICAL, false)
+         ══════════════════════════════════════════════════ -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvBookingList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="80dp"
+        android:clipToPadding="false"
+        android:scrollbarStyle="outsideOverlay" />
+
+    <!-- Empty state (shown via View.VISIBLE when list is empty) -->
+    <LinearLayout
+        android:id="@+id/llEmptyState"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingTop="48dp"
+        android:paddingBottom="48dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/ic_menu_search"
+            app:tint="@color/slate_300"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_bookings"
+            android:textColor="@color/slate_400"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</LinearLayout>

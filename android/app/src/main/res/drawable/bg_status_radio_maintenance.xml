@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Status radio button — active Maintenance (orange) -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/orange_50" />
+    <stroke android:color="@color/orange_600" android:width="2dp" />
+    <corners android:radius="12dp" />
+</shape>

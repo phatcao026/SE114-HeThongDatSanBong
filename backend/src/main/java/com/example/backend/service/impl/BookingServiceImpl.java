@@ -373,7 +373,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingResponse checkOutBooking(Long id, String paymentMethodString) {
+    public BookingResponse checkOutBooking(Long id, com.example.backend.utils.Enums.PaymentMethod paymentMethodString) {
         Booking booking = findBooking(id);
         ensureCanManageBooking(booking);
 
@@ -395,7 +395,7 @@ public class BookingServiceImpl implements BookingService {
 
         Enums.PaymentMethod paymentMethod = null;
         try {
-            paymentMethod = Enums.PaymentMethod.valueOf(paymentMethodString.toUpperCase());
+            paymentMethod = Enums.PaymentMethod.valueOf(paymentMethodString.toString().toUpperCase());
         } catch (IllegalArgumentException e) {
             // Log the error or handle invalid payment method string
             paymentMethod = Enums.PaymentMethod.CASH; // Default to CASH if invalid

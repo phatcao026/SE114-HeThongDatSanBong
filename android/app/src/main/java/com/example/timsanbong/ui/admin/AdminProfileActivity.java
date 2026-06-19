@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat;
 import com.example.timsanbong.R;
 import com.example.timsanbong.ui.auth.LoginActivity;
 import com.example.timsanbong.ui.customer.MainActivity;
-import com.example.timsanbong.ui.owner.OwnerDashboardActivity;
+import com.example.timsanbong.ui.owner.OwnerMainActivity;
 import com.example.timsanbong.utils.SessionManager;
 import com.google.android.material.card.MaterialCardView;
 
@@ -38,7 +38,7 @@ public class AdminProfileActivity extends AppCompatActivity {
             startActivity(intent);
         });
         setupMenuItem(findViewById(R.id.menuOwner), R.drawable.ic_admin_stadium, "Chủ sân", "#ECFDF5", "#059669", false, v -> {
-            Intent intent = new Intent(this, OwnerDashboardActivity.class);
+            Intent intent = new Intent(this, OwnerMainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         });

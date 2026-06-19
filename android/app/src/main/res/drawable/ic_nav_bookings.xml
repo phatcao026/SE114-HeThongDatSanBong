@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Calendar / bookings icon -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Calendar border -->
+    <path
+        android:pathData="M3,5 L21,5 L21,21 L3,21 Z"
+        android:strokeColor="#9CA3AF"
+        android:strokeWidth="1.8"
+        android:fillColor="@android:color/transparent"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round" />
+
+    <!-- Top hook left -->
+    <path
+        android:pathData="M8,3 L8,7"
+        android:strokeColor="#9CA3AF"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round" />
+
+    <!-- Top hook right -->
+    <path
+        android:pathData="M16,3 L16,7"
+        android:strokeColor="#9CA3AF"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round" />
+
+    <!-- Horizontal divider -->
+    <path
+        android:pathData="M3,10 L21,10"
+        android:strokeColor="#9CA3AF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round" />
+
+    <!-- Date dots row 1 -->
+    <path
+        android:pathData="M7,14.5 L9,14.5"
+        android:strokeColor="#9CA3AF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M11,14.5 L13,14.5"
+        android:strokeColor="#9CA3AF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M15,14.5 L17,14.5"
+        android:strokeColor="#9CA3AF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+
+    <!-- Date dots row 2 -->
+    <path
+        android:pathData="M7,18 L9,18"
+        android:strokeColor="#9CA3AF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M11,18 L13,18"
+        android:strokeColor="#9CA3AF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+
+</vector>

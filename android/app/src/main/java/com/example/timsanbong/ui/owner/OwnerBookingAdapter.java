@@ -13,8 +13,6 @@ import com.example.timsanbong.R;
 import com.example.timsanbong.data.model.Booking;
 import com.google.android.material.button.MaterialButton;
 
-import android.util.Log;
-
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -28,11 +26,10 @@ public class OwnerBookingAdapter extends RecyclerView.Adapter<OwnerBookingAdapte
         void onNoShow(Booking booking);
     }
 
-    private static final String TAG = "OwnerBookingAdapter";
     private final List<Booking> bookings = new ArrayList<>();
     private final Listener listener;
-    private boolean actionInProgress; // Tracks if any action (check-in, checkout, noshow) is in progress
-    private long busyBookingId = -1L; // The ID of the booking currently being acted upon
+    private boolean actionInProgress;
+    private long busyBookingId = -1L;
 
     public OwnerBookingAdapter(Listener listener) {
         this.listener = listener;
