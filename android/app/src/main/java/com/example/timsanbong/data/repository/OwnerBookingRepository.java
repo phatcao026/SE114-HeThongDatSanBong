@@ -52,12 +52,12 @@ public class OwnerBookingRepository {
         ApiClient.getService(context).checkInOwnerBooking(bookingId).enqueue(bookingCallback(callback));
     }
 
-    public void checkOutBooking(Context context, long bookingId, RepositoryCallback<Booking> callback) {
+    public void checkOutBooking(Context context, long bookingId, String paymentMethod, RepositoryCallback<Booking> callback) {
         if (bookingId <= 0) {
             callback.onError("Booking khong hop le.");
             return;
         }
-        ApiClient.getService(context).checkOutOwnerBooking(bookingId).enqueue(bookingCallback(callback));
+        ApiClient.getService(context).checkOutOwnerBooking(bookingId, paymentMethod).enqueue(bookingCallback(callback));
     }
 
     public void markNoShow(Context context, long bookingId, RepositoryCallback<Booking> callback) {

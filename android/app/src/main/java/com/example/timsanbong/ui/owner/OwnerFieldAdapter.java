@@ -14,6 +14,8 @@ import com.example.timsanbong.data.model.Field;
 import com.example.timsanbong.data.model.TimeSlotResponse;
 import com.google.android.material.button.MaterialButton;
 
+import android.util.Log;
+
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +34,8 @@ public class OwnerFieldAdapter extends RecyclerView.Adapter<OwnerFieldAdapter.Ow
     public OwnerFieldAdapter(Listener listener) {
         this.listener = listener;
     }
+    
+    // Add a diff util callback if list updates are frequent and large
 
     public void submitList(List<Field> newFields) {
         fields.clear();

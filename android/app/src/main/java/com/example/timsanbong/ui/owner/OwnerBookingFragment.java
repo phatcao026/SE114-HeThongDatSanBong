@@ -23,28 +23,19 @@ import com.example.timsanbong.data.model.Booking;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 
 // 1. Chuyển đổi từ AppCompatActivity sang Fragment
 public class OwnerBookingFragment extends Fragment {
     private OwnerBookingViewModel viewModel;
     private OwnerBookingAdapter adapter;
-    private final List<Booking> allBookings = new ArrayList<>();
-    private final List<Booking> visibleBookings = new ArrayList<>();
     private EditText etSearchBookings;
     private TextView tvTotalBookings;
     private TextView tvDepositCollected;
     private TextView tvPendingBadge;
     private View emptyState;
-    private final TextView tvEmptyBookings = null;
     private View btnClearFilters;
-    private String selectedDate;
-    private String selectedStatus = "ALL";
-    private String query = "";
 
     // 2. Nạp giao diện fragment_owner_booking vào hệ thống
     @Nullable
@@ -98,10 +89,7 @@ public class OwnerBookingFragment extends Fragment {
 
             @Override
             public void onCollectRest(Booking booking) {
-                confirmAction(
-                        "Thu nốt tiền",
-                        "Ghi nhận đã thu đủ tiền cho đơn #" + booking.getId() + "?",
-                        () -> viewModel.checkOutBooking(booking.getId()));
+                showPaymentMethodDialog(booking);
             }
 
             @Override
@@ -126,8 +114,7 @@ public class OwnerBookingFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                query = s == null ? "" : s.toString().trim();
-                applyFilters();
+                viewModel.setSearchQuery(s == null ? "" : s.toString().trim());
             }
 
             @Override
@@ -150,21 +137,20 @@ public class OwnerBookingFragment extends Fragment {
         setupTab(view, R.id.tabConfirmed, "CONFIRMED");
         setupTab(view, R.id.tabCompleted, "COMPLETED");
         setupTab(view, R.id.tabCancelled, "CANCELLED");
-        updateTabState();
+        // Initial tab state will be set by observer
     }
 
     private void setupTab(View view, int viewId, String status) {
         View tab = view.findViewById(viewId);
         if (tab != null) {
             tab.setOnClickListener(v -> {
-                selectedStatus = status;
-                updateTabState();
-                applyFilters();
+                viewModel.setSelectedStatus(status);
+                updateTabState(status); // Update UI immediately
             });
         }
     }
 
-    private void updateTabState() {
+    private void updateTabState(String selectedStatus) {
         setTabSelected(R.id.tabAll, "ALL".equals(selectedStatus));
         setTabSelected(R.id.tabPending, "PENDING".equals(selectedStatus));
         setTabSelected(R.id.tabConfirmed, "CONFIRMED".equals(selectedStatus));
@@ -183,13 +169,21 @@ public class OwnerBookingFragment extends Fragment {
 
     // 5. Đồng bộ hóa bộ lắng nghe bằng 'getViewLifecycleOwner()' thay vì 'this'
     private void setupObservers() {
-        viewModel.getBookings().observe(getViewLifecycleOwner(), bookings -> {
-            allBookings.clear();
-            if (bookings != null) {
-                allBookings.addAll(bookings);
+        viewModel.getFilteredBookings().observe(getViewLifecycleOwner(), bookings -> {
+            if (adapter != null) {
+                adapter.submitList(bookings);
             }
-            applyFilters();
-            updateSummary();
+            if (emptyState != null) {
+                emptyState.setVisibility(bookings.isEmpty() ? View.VISIBLE : View.GONE);
+            }
+        });
+        viewModel.getBookingSummary().observe(getViewLifecycleOwner(), summary -> {
+            if (tvTotalBookings != null) tvTotalBookings.setText(String.valueOf(summary.totalBookings));
+            if (tvDepositCollected != null) tvDepositCollected.setText(summary.formatDepositCollected());
+            if (tvPendingBadge != null) {
+                tvPendingBadge.setText(summary.formatPendingBadge());
+                tvPendingBadge.setVisibility(summary.pendingCount > 0 ? View.VISIBLE : View.GONE);
+            }
         });
         viewModel.getBusyBookingId().observe(getViewLifecycleOwner(), busyId -> {
             if (adapter != null) {
@@ -210,98 +204,14 @@ public class OwnerBookingFragment extends Fragment {
         });
     }
 
-    private void applyFilters() {
-        visibleBookings.clear();
-        for (Booking booking : allBookings) {
-            if (!matchesStatus(booking)) {
-                continue;
-            }
-            if (!matchesDate(booking)) {
-                continue;
-            }
-            if (!matchesQuery(booking)) {
-                continue;
-            }
-            visibleBookings.add(booking);
-        }
-        Collections.sort(visibleBookings, (a, b) -> {
-            int dateCompare = safeString(a.getBookingDate()).compareTo(safeString(b.getBookingDate()));
-            if (dateCompare != 0) {
-                return dateCompare;
-            }
-            return Long.compare(b.getId(), a.getId());
-        });
-        if (adapter != null) {
-            adapter.submitList(visibleBookings);
-        }
-        if (emptyState != null) {
-            emptyState.setVisibility(visibleBookings.isEmpty() ? View.VISIBLE : View.GONE);
-        }
-    }
-
-    private void updateSummary() {
-        if (tvTotalBookings == null || tvDepositCollected == null || tvPendingBadge == null) return;
-
-        tvTotalBookings.setText(String.valueOf(allBookings.size()));
-        double depositSum = 0;
-        int pendingCount = 0;
-        for (Booking booking : allBookings) {
-            String status = safeStatus(booking);
-            if ("PENDING".equals(status)) {
-                pendingCount++;
-            }
-            if ("DEPOSIT_PAID".equals(status) || "CONFIRMED".equals(status) || "COMPLETED".equals(status)) {
-                depositSum += booking.getDepositAmount();
-            }
-        }
-        tvDepositCollected.setText(NumberFormat.getNumberInstance(new Locale("vi", "VN")).format(depositSum));
-        tvPendingBadge.setText(pendingCount > 0 ? pendingCount + " chờ cọc" : "0 chờ cọc");
-        tvPendingBadge.setVisibility(pendingCount > 0 ? View.VISIBLE : View.GONE);
-    }
-
-    private boolean matchesStatus(Booking booking) {
-        if ("ALL".equals(selectedStatus)) {
-            return true;
-        }
-        return selectedStatus.equals(safeStatus(booking));
-    }
-
-    private boolean matchesDate(Booking booking) {
-        if (selectedDate == null || selectedDate.trim().isEmpty()) {
-            return true;
-        }
-        return selectedDate.equals(safeString(booking.getBookingDate()));
-    }
-
-    private boolean matchesQuery(Booking booking) {
-        if (query == null || query.trim().isEmpty()) {
-            return true;
-        }
-        String source = buildSearchSource(booking);
-        return source.contains(query.toLowerCase(Locale.US));
-    }
-
-    private String buildSearchSource(Booking booking) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("#").append(booking.getId()).append(' ');
-        builder.append(safeString(booking.getFieldName())).append(' ');
-        builder.append(safeString(booking.getNote())).append(' ');
-        builder.append(safeString(booking.getBookingDate())).append(' ');
-        builder.append(safeString(booking.getStartTime())).append(' ');
-        builder.append(safeString(booking.getEndTime())).append(' ');
-        builder.append(safeStatus(booking)).append(' ');
-        builder.append(safeString(String.valueOf(booking.getFieldId())));
-        return builder.toString().toLowerCase(Locale.US);
-    }
-
     // 6. Cấu hình Dialog chọn ngày với Context là requireContext()
     private void openDatePicker() {
         Calendar now = Calendar.getInstance();
         DatePickerDialog dialog = new DatePickerDialog(
                 requireContext(),
                 (view, year, month, dayOfMonth) -> {
-                    selectedDate = String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, dayOfMonth);
-                    applyFilters();
+                    String selectedDate = String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, dayOfMonth);
+                    viewModel.setSelectedDate(selectedDate);
                 },
                 now.get(Calendar.YEAR),
                 now.get(Calendar.MONTH),
@@ -310,14 +220,11 @@ public class OwnerBookingFragment extends Fragment {
     }
 
     private void clearFilters() {
-        selectedDate = null;
-        selectedStatus = "ALL";
-        query = "";
+        viewModel.clearFilters();
         if (etSearchBookings != null) {
             etSearchBookings.setText("");
         }
-        updateTabState();
-        applyFilters();
+        updateTabState("ALL"); // Reset tab to ALL
     }
 
     // 7. Cấu hình Material Dialog xác nhận hành động bằng requireContext()
@@ -330,11 +237,19 @@ public class OwnerBookingFragment extends Fragment {
                 .show();
     }
 
-    private String safeStatus(Booking booking) {
-        return booking.getStatus() == null ? "" : booking.getStatus().toUpperCase(Locale.US);
-    }
-
-    private String safeString(String value) {
-        return value == null ? "" : value.trim();
+    private void showPaymentMethodDialog(Booking booking) {
+        String[] paymentMethods = {"Tiền mặt", "Chuyển khoản (Ví MOMO, Banking)"};
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Chọn hình thức thanh toán")
+                .setItems(paymentMethods, (dialog, which) -> {
+                    String method = (which == 0) ? "CASH" : "MOMO"; // Assuming "MOMO" for transfer
+                    confirmAction(
+                            "Thu nốt tiền",
+                            "Ghi nhận đã thu đủ tiền cho đơn #" + booking.getId() + " bằng hình thức " + paymentMethods[which] + "?",
+                            () -> viewModel.checkOutBooking(booking.getId(), method)
+                    );
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
     }
 }
