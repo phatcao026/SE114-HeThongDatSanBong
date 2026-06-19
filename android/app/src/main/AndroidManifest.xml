@@ -154,5 +154,9 @@
             android:name=".ui.admin.AdminUserDetailActivity"
             android:exported="false"
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
+        <activity
+            android:name=".ui.admin.AdminStatsDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
     </application>
 </manifest>

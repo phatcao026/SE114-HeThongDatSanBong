@@ -51,7 +51,8 @@ public class AdminUserActivity extends AppCompatActivity {
             intent.putExtra("email", user.getEmail());
             intent.putExtra("phone", user.getPhone());
             intent.putExtra("role", user.getRole());
-            startActivity(intent);
+            intent.putExtra("isLocked", user.isLocked());
+            startActivityForResult(intent, 1001);
         });
 
         fetchUsers();
@@ -62,8 +63,22 @@ public class AdminUserActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefresh = findViewById(R.id.swipeRefresh);
+        swipeRefresh.setOnRefreshListener(() -> {
+            fetchUsers();
+            swipeRefresh.setRefreshing(false);
+        });
+
         AdminNavBarManager navBarManager = new AdminNavBarManager(this, AdminNavBarManager.ITEM_USERS);
         navBarManager.setup();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1001 && resultCode == RESULT_OK) {
+            fetchUsers();
+        }
     }
 
     private void fetchUsers() {
@@ -106,22 +121,30 @@ public class AdminUserActivity extends AppCompatActivity {
         MaterialButton btnPlayer = findViewById(R.id.btnFilterPlayer);
         MaterialButton btnOwner = findViewById(R.id.btnFilterOwner);
         MaterialButton btnLocked = findViewById(R.id.btnFilterLocked);
+        MaterialButton btnLowTrust = new MaterialButton(this, null, com.google.android.material.R.attr.materialButtonStyle);
+        btnLowTrust.setText("Uy tín thấp");
+        btnLowTrust.setAllCaps(false);
+        ((ViewGroup) btnAll.getParent()).addView(btnLowTrust);
 
         btnAll.setOnClickListener(v -> {
-            updateFilterButtons(btnAll, btnPlayer, btnOwner, btnLocked);
+            updateFilterButtons(btnAll, btnPlayer, btnOwner, btnLocked, btnLowTrust);
             filterUsers("Tất cả");
         });
         btnPlayer.setOnClickListener(v -> {
-            updateFilterButtons(btnPlayer, btnAll, btnOwner, btnLocked);
+            updateFilterButtons(btnPlayer, btnAll, btnOwner, btnLocked, btnLowTrust);
             filterUsers("Người chơi");
         });
         btnOwner.setOnClickListener(v -> {
-            updateFilterButtons(btnOwner, btnAll, btnPlayer, btnLocked);
+            updateFilterButtons(btnOwner, btnAll, btnPlayer, btnLocked, btnLowTrust);
             filterUsers("Chủ sân");
         });
         btnLocked.setOnClickListener(v -> {
-            updateFilterButtons(btnLocked, btnAll, btnPlayer, btnOwner);
+            updateFilterButtons(btnLocked, btnAll, btnPlayer, btnOwner, btnLowTrust);
             filterUsers("Đã khóa");
+        });
+        btnLowTrust.setOnClickListener(v -> {
+            updateFilterButtons(btnLowTrust, btnAll, btnPlayer, btnOwner, btnLocked);
+            filterUsers("LowTrust");
         });
     }
 
@@ -152,6 +175,18 @@ public class AdminUserActivity extends AppCompatActivity {
         List<User> filteredList = new ArrayList<>();
         if (role.equals("Tất cả")) {
             filteredList.addAll(allUsers);
+        } else if (role.equals("Đã khóa")) {
+            for (User user : allUsers) {
+                if (user.isLocked()) {
+                    filteredList.add(user);
+                }
+            }
+        } else if (role.equals("LowTrust")) {
+            for (User user : allUsers) {
+                if (user.getTrustScore() < 80) {
+                    filteredList.add(user);
+                }
+            }
         } else {
             String roleKey = role.equals("Người chơi") ? "PLAYER" : (role.equals("Chủ sân") ? "OWNER" : role);
             for (User user : allUsers) {
@@ -200,12 +235,18 @@ public class AdminUserActivity extends AppCompatActivity {
             String initials = user.getFullName() != null && user.getFullName().length() >= 2 ? 
                     user.getFullName().substring(0, 2).toUpperCase() : "U";
             holder.tvInitials.setText(initials);
-            holder.tvLevel.setText("100"); // Trust score placeholder
+            holder.tvLevel.setText(String.valueOf(user.getTrustScore()));
             holder.tvDetail.setText(user.getRole() + " · " + user.getPhone() + " · " + user.getEmail());
-            holder.tvStatus.setText("● Hoạt động");
             
-            holder.tvStatus.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#F0FDF4")));
-            holder.tvStatus.setTextColor(android.graphics.Color.parseColor("#60D86E"));
+            if (user.isLocked()) {
+                holder.tvStatus.setText("● Đã khóa");
+                holder.tvStatus.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#EF4444")));
+                holder.tvStatus.setTextColor(android.graphics.Color.WHITE);
+            } else {
+                holder.tvStatus.setText("● Hoạt động");
+                holder.tvStatus.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#F0FDF4")));
+                holder.tvStatus.setTextColor(android.graphics.Color.parseColor("#60D86E"));
+            }
 
             holder.itemView.setOnClickListener(v -> {
                 if (listener != null) listener.onItemClick(user);

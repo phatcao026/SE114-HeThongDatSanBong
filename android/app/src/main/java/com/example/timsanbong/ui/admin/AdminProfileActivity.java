@@ -45,10 +45,11 @@ public class AdminProfileActivity extends AppCompatActivity {
         setupMenuItem(findViewById(R.id.menuAdmin), R.drawable.ic_admin_shield, "Quản trị viên", "#166534", "#FFFFFF", true, null);
 
         // System
-        setupMenuItem(findViewById(R.id.menuPerms), R.drawable.ic_admin_users, "Phân quyền & nhân sự", "transparent", "#64748B", false, null);
-        setupMenuItem(findViewById(R.id.menuLogs), R.drawable.ic_message, "Nhật ký kiểm duyệt", "transparent", "#64748B", false, null);
-        setupMenuItem(findViewById(R.id.menuConfig), R.drawable.ic_admin_dashboard, "Cấu hình nền tảng", "transparent", "#64748B", false, null);
-        setupMenuItem(findViewById(R.id.menuApi), R.drawable.ic_admin_key, "API & webhooks", "transparent", "#64748B", false, null);
+        findViewById(R.id.menuPerms).setVisibility(View.GONE);
+        findViewById(R.id.menuLogs).setVisibility(View.GONE);
+        findViewById(R.id.menuConfig).setVisibility(View.GONE);
+        findViewById(R.id.menuApi).setVisibility(View.GONE);
+
         setupMenuItem(findViewById(R.id.menuLogout), R.drawable.ic_admin_logout, "Đăng xuất", "transparent", "#EF4444", false, v -> {
             new SessionManager(this).clearSession();
             Intent intent = new Intent(this, LoginActivity.class);

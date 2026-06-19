@@ -213,6 +213,12 @@ public interface ApiService {
     @GET("admin/reviews")
     Call<List<ReviewResponse>> getAdminReviews();
 
+    @PUT("admin/users/{id}/lock")
+    Call<Void> lockUser(@Path("id") long id);
+
+    @PUT("admin/users/{id}/unlock")
+    Call<Void> unlockUser(@Path("id") long id);
+
     @GET("admin/fairplay/pending")
     Call<List<OpponentReviewResponse>> getAdminFairplayPending();
 

@@ -42,15 +42,7 @@ public class AdminBookingActivity extends AppCompatActivity {
 
         fetchBookings();
 
-        findViewById(R.id.cvAdminAvatar).setOnClickListener(v -> {
-            android.content.Intent intent = new android.content.Intent(this, AdminProfileActivity.class);
-            startActivity(intent);
-        });
-
-        // We use ITEM_AUDIT or something else since we don't have a specific nav item for bookings yet
-        // or we can just leave it as is.
-        AdminNavBarManager navBarManager = new AdminNavBarManager(this, AdminNavBarManager.ITEM_AUDIT);
-        navBarManager.setup();
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
 
     private void fetchBookings() {

@@ -41,6 +41,10 @@ public class AdminMainActivity extends AppCompatActivity {
         navBarManager = new AdminNavBarManager(this, AdminNavBarManager.ITEM_OVERVIEW);
         navBarManager.setup();
 
+        findViewById(R.id.cardWeeklyGmv).setOnClickListener(v -> {
+            startActivity(new Intent(this, AdminStatsDetailActivity.class));
+        });
+
         findViewById(R.id.cardGmv).setOnClickListener(v -> {
             startActivity(new Intent(this, AdminTransactionActivity.class));
         });

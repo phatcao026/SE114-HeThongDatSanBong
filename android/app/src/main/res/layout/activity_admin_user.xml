@@ -76,144 +76,150 @@
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingBottom="100dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="100dp">
 
-            <!-- Search Bar -->
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                app:cardBackgroundColor="@android:color/white"
-                app:cardCornerRadius="28dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/border_gray"
-                app:strokeWidth="1dp">
-                <LinearLayout
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Search Bar -->
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="16dp">
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_search"
-                        app:tint="@color/text_hint"
-                        android:contentDescription="Search icon" />
-                    <EditText
-                        android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    app:cardBackgroundColor="@android:color/white"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/border_gray"
+                    app:strokeWidth="1dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginStart="12dp"
-                        android:layout_weight="1"
-                        android:background="@android:color/transparent"
-                        android:hint="SĐT, tên, hoặc mã user..."
-                        android:inputType="text"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="16dp">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_search"
+                            app:tint="@color/text_hint"
+                            android:contentDescription="Search icon" />
+                        <EditText
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:background="@android:color/transparent"
+                            android:hint="SĐT, tên, hoặc mã user..."
+                            android:inputType="text"
+                            android:textSize="14sp" />
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_admin_filter"
+                            app:tint="@color/text_heading"
+                            android:contentDescription="Filter icon" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Filter Chips -->
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:scrollbars="none">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnFilterAll"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:backgroundTint="@color/primary_light"
+                            android:text="✓ Tất cả"
+                            android:textColor="@color/primary_dark"
+                            app:cornerRadius="24dp" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnFilterPlayer"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="Người chơi"
+                            android:textColor="@color/text_heading"
+                            app:cornerRadius="24dp"
+                            app:strokeColor="@color/border_gray"
+                            app:strokeWidth="1dp" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnFilterOwner"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="Chủ sân"
+                            android:textColor="@color/text_heading"
+                            app:cornerRadius="24dp"
+                            app:strokeColor="@color/border_gray"
+                            app:strokeWidth="1dp" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnFilterLocked"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="Đã khóa"
+                            android:textColor="@color/text_heading"
+                            app:cornerRadius="24dp"
+                            app:strokeColor="@color/border_gray"
+                            app:strokeWidth="1dp" />
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp">
+                    <TextView
+                        android:id="@+id/tvUserCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="8 người dùng"
+                        android:textColor="@color/text_heading"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:text="Sắp xếp: Mới nhất"
+                        android:textColor="@color/text_hint"
                         android:textSize="14sp" />
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_admin_filter"
-                        app:tint="@color/text_heading"
-                        android:contentDescription="Filter icon" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                </RelativeLayout>
 
-            <!-- Filter Chips -->
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:scrollbars="none">
-                <LinearLayout
-                    android:layout_width="wrap_content"
+                <!-- User List -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvAdminUsers"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnFilterAll"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:backgroundTint="@color/primary_light"
-                        android:text="✓ Tất cả"
-                        android:textColor="@color/primary_dark"
-                        app:cornerRadius="24dp" />
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnFilterPlayer"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="Người chơi"
-                        android:textColor="@color/text_heading"
-                        app:cornerRadius="24dp"
-                        app:strokeColor="@color/border_gray"
-                        app:strokeWidth="1dp" />
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnFilterOwner"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="Chủ sân"
-                        android:textColor="@color/text_heading"
-                        app:cornerRadius="24dp"
-                        app:strokeColor="@color/border_gray"
-                        app:strokeWidth="1dp" />
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnFilterLocked"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="Đã khóa"
-                        android:textColor="@color/text_heading"
-                        app:cornerRadius="24dp"
-                        app:strokeColor="@color/border_gray"
-                        app:strokeWidth="1dp" />
-                </LinearLayout>
-            </HorizontalScrollView>
+                    android:layout_marginTop="12dp"
+                    tools:listitem="@layout/item_admin_user" />
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp">
-                <TextView
-                    android:id="@+id/tvUserCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="8 người dùng"
-                    android:textColor="@color/text_heading"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:text="Sắp xếp: Mới nhất"
-                    android:textColor="@color/text_hint"
-                    android:textSize="14sp" />
-            </RelativeLayout>
-
-            <!-- User List -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvAdminUsers"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                tools:listitem="@layout/item_admin_user" />
-
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <!-- Admin Bottom Navigation -->
     <include
