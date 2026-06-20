@@ -12,7 +12,7 @@ import com.example.timsanbong.R;
 import com.example.timsanbong.data.api.ApiClient;
 import com.example.timsanbong.data.model.User;
 import com.example.timsanbong.ui.admin.AdminMainActivity;
-import com.example.timsanbong.ui.customer.MainActivity;
+import com.example.timsanbong.ui.customer.CustomerMainActivity;
 import com.example.timsanbong.ui.owner.OwnerMainActivity;
 import com.example.timsanbong.utils.SessionManager;
 
@@ -80,7 +80,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void navigateByRole() {
-        Class<?> destination = MainActivity.class;
+        Class<?> destination = CustomerMainActivity.class;
         if (sessionManager.isOwner()) {
             destination = OwnerMainActivity.class;
         } else if (sessionManager.isAdmin()) {

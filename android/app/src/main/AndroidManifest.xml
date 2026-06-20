@@ -45,12 +45,9 @@
             android:exported="false"
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
         <activity
-            android:name=".ui.customer.MainActivity"
+            android:name=".ui.customer.CustomerMainActivity"
             android:exported="false"
-            android:theme="@style/Theme.TimSanBong.NoActionBar" />
-        <activity
-            android:name=".ui.customer.FindPitchActivity"
-            android:exported="false"
+            android:launchMode="singleTask"
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
         <activity
             android:name=".ui.customer.FieldDetailActivity"
@@ -58,10 +55,6 @@
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
         <activity
             android:name=".ui.customer.BookingActivity"
-            android:exported="false"
-            android:theme="@style/Theme.TimSanBong.NoActionBar" />
-        <activity
-            android:name=".ui.customer.MyBookingsActivity"
             android:exported="false"
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
         <activity
@@ -86,11 +79,6 @@
                 <data android:scheme="timsanbong" android:host="payment" android:pathPrefix="/result" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.customer.FindOpponentActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.TimSanBong.NoActionBar" />
         <activity
             android:name=".ui.customer.QuickFindResultsActivity"
             android:exported="false"
