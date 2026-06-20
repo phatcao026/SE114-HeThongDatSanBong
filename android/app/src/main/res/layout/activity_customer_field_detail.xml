@@ -143,6 +143,7 @@
                         </LinearLayout>
 
                         <TextView
+                            android:id="@+id/tvReviewCountHint"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/review_count_hint"
@@ -505,6 +506,7 @@
                     android:gravity="center_vertical">
 
                     <TextView
+                        android:id="@+id/tvReviewsTitle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -524,10 +526,35 @@
                         android:fontFamily="@font/be_vietnam_pro" />
                 </LinearLayout>
 
+                <TextView
+                    android:id="@+id/tvFieldReviewsEmpty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_3"
+                    android:gravity="center"
+                    android:padding="@dimen/spacing_4"
+                    android:text="@string/field_reviews_empty"
+                    android:textColor="@color/text_hint"
+                    android:textSize="@dimen/text_body_medium"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:visibility="gone" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvFieldReviews"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_3"
+                    android:nestedScrollingEnabled="false"
+                    android:visibility="gone"
+                    tools:itemCount="2"
+                    tools:listitem="@layout/item_customer_field_review"
+                    tools:visibility="visible" />
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_3"
+                    android:visibility="gone"
                     app:cardCornerRadius="@dimen/radius_lg"
                     app:cardBackgroundColor="@color/background_primary"
                     app:cardElevation="0dp"

@@ -24,7 +24,7 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
         void onCancel(long bookingId);
         void onPay(Booking booking);
         void onQrCheckin(Booking booking);
-
+        void onRateField(Booking booking);
     }
 
     private final List<Booking> bookings = new ArrayList<>();
@@ -66,7 +66,7 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
         private final TextView tvFieldName, tvBookingRef, tvDate, tvTime, tvTotalPrice, tvStatus;
         private final TextView tvDepositFooter, tvRemainder;
         private final View layoutDepositFooter, layoutActions;
-        private final MaterialButton btnQr, btnCancel;
+        private final MaterialButton btnQr, btnCancel, btnRateField;
 
         BookingViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -83,6 +83,7 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
             btnQr = itemView.findViewById(R.id.btnQr);
 
             btnCancel = itemView.findViewById(R.id.btnCancel);
+            btnRateField = itemView.findViewById(R.id.btnRateField);
         }
 
         void bind(Booking booking) {
@@ -97,6 +98,9 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
 
             boolean active = "PENDING".equals(status) || "DEPOSIT_PAID".equals(status) || "CONFIRMED".equals(status);
             layoutActions.setVisibility(active ? View.VISIBLE : View.GONE);
+            boolean canRate = "COMPLETED".equals(status);
+            btnRateField.setVisibility(canRate ? View.VISIBLE : View.GONE);
+            btnRateField.setOnClickListener(v -> listener.onRateField(booking));
             double remaining = booking.getTotalAmount() - booking.getDepositAmount();
             if (active && booking.getDepositAmount() > 0 && remaining > 0) {
                 layoutDepositFooter.setVisibility(View.VISIBLE);
@@ -163,7 +167,7 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
             if ("PENDING".equals(status)) {
                 backgroundRes = R.color.status_pending_bg;
                 textRes = R.color.warning;
-            } else if ("DEPOSIT_PAID".equals(status) || "CONFIRMED".equals(status)) {
+            } else if ("DEPOSIT_PAID".equals(status) || "CONFIRMED".equals(status) || "COMPLETED".equals(status)) {
                 backgroundRes = R.color.status_confirmed_bg;
                 textRes = R.color.success;
             } else if ("CANCELLED".equals(status) || "CANCELED".equals(status)) {

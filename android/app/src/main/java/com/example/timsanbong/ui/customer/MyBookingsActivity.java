@@ -110,6 +110,15 @@ public class MyBookingsActivity extends AppCompatActivity implements BookingAdap
             }
         });
 
+        bookingViewModel.fieldReviewState.observe(this, resource -> {
+            if (resource == null) return;
+            if (resource.status == Resource.Status.SUCCESS) {
+                Toast.makeText(this, R.string.field_review_success, Toast.LENGTH_SHORT).show();
+            } else if (resource.status == Resource.Status.ERROR) {
+                Toast.makeText(this, getSafeMessage(resource.message), Toast.LENGTH_SHORT).show();
+            }
+        });
+
         setupTabs();
         setupPullToRefresh();
 
@@ -257,7 +266,12 @@ public class MyBookingsActivity extends AppCompatActivity implements BookingAdap
                 .show();
     }
 
-
+    @Override
+    public void onRateField(Booking booking) {
+        FieldReviewDialog.show(this, booking,
+                (selectedBooking, rating, comment) ->
+                        bookingViewModel.submitFieldReview(selectedBooking.getId(), rating, comment));
+    }
 
     private void removeBookingById(long bookingId) {
         List<Booking> updated = new ArrayList<>();

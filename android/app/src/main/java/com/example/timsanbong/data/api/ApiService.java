@@ -157,6 +157,12 @@ public interface ApiService {
     @POST("fairplay/reviews")
     Call<Void> submitReview(@Body ReviewRequest request);
 
+    @POST("reviews/field")
+    Call<FieldReviewResponse> createFieldReview(@Body FieldReviewRequest request);
+
+    @GET("reviews/field/{fieldId}")
+    Call<List<FieldReviewResponse>> getFieldReviews(@Path("fieldId") long fieldId);
+
     // Owner fields
     @POST("fields")
     Call<Field> createOwnerField(@Body FieldCreateRequest request);
