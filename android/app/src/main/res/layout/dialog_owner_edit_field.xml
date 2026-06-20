@@ -320,31 +320,6 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/chipEditTypeSan11"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:background="@drawable/bg_type_chip_inactive">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Sân 11"
-                    android:textColor="@color/slate_600"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="11 - 22 người"
-                    android:textColor="@color/slate_400"
-                    android:textSize="10sp" />
-
-            </LinearLayout>
 
         </LinearLayout>
 

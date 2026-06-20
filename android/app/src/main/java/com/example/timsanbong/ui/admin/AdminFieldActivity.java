@@ -76,7 +76,7 @@ public class AdminFieldActivity extends AppCompatActivity {
     private void setupDemoFields() {
         allFields.clear();
         allFields.add(new Field(1, "Sân Trần Bình", "Quận 1", 250000, "", "Sân cỏ nhân tạo", "Sân 7", true));
-        allFields.add(new Field(2, "Sân Phú Mỹ Hưng", "Quận 7", 400000, "", "Sân chuẩn quốc tế", "Sân 11", true));
+        allFields.add(new Field(2, "Sân Phú Mỹ Hưng", "Quận 7", 400000, "", "Sân chuẩn quốc tế", "Sân 7", true));
         adapter.notifyDataSetChanged();
         ((TextView) findViewById(R.id.tvFieldCount)).setText(allFields.size() + " sân bóng");
     }

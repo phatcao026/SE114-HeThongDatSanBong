@@ -64,8 +64,10 @@ public class OwnerFieldAdapter extends RecyclerView.Adapter<OwnerFieldAdapter.Ow
         private final TextView tvFieldTypeBadge;
         private final TextView tvFieldCapacity;
         private final TextView tvFieldRating;
+        private final View llFieldRating;
         private final TextView tvStatusLabel;
         private final TextView tvFieldPrice;
+        private final View llPriceBox;
         private final TextView tvBookedToday;
         private final TextView tvTotalSlotsLabel;
         private final TextView tvSlotSummary;
@@ -81,8 +83,10 @@ public class OwnerFieldAdapter extends RecyclerView.Adapter<OwnerFieldAdapter.Ow
             tvFieldTypeBadge = itemView.findViewById(R.id.tvFieldTypeBadge);
             tvFieldCapacity = itemView.findViewById(R.id.tvFieldCapacity);
             tvFieldRating = itemView.findViewById(R.id.tvFieldRating);
+            llFieldRating = itemView.findViewById(R.id.llFieldRating);
             tvStatusLabel = itemView.findViewById(R.id.tvStatusLabel);
             tvFieldPrice = itemView.findViewById(R.id.tvFieldPrice);
+            llPriceBox = itemView.findViewById(R.id.llPriceBox);
             tvBookedToday = itemView.findViewById(R.id.tvBookedToday);
             tvTotalSlotsLabel = itemView.findViewById(R.id.tvTotalSlotsLabel);
             tvSlotSummary = itemView.findViewById(R.id.tvSlotSummary);
@@ -93,12 +97,28 @@ public class OwnerFieldAdapter extends RecyclerView.Adapter<OwnerFieldAdapter.Ow
         }
 
         void bind(Field field) {
-            tvFieldName.setText(nonEmpty(field.getName(), "Chưa có tên sân"));
-            tvFieldTypeBadge.setText(nonEmpty(field.getTypeLabel(), "Sân bóng"));
-            tvFieldCapacity.setText(resolveCapacityLabel(field));
-            tvFieldRating.setText(formatRating(field.getAverageRating()));
+            tvFieldName.setText(nonEmpty(field.getName(), itemView.getContext().getString(R.string.field_name_missing)));
+            tvFieldTypeBadge.setText(nonEmpty(field.getTypeLabel(), itemView.getContext().getString(R.string.field_default_label)));
+            // Capacity is derived from type; hide if type missing
+            if (field.getType() == null || field.getType().trim().isEmpty()) {
+                tvFieldCapacity.setVisibility(View.GONE);
+            } else {
+                tvFieldCapacity.setVisibility(View.VISIBLE);
+                tvFieldCapacity.setText(resolveCapacityLabel(field));
+            }
+            // Rating may not be provided by backend; hide when absent or zero
+            Double avg = field.getAverageRating();
+            if (avg == null || avg <= 0) {
+                if (llFieldRating != null) llFieldRating.setVisibility(View.GONE);
+                else tvFieldRating.setVisibility(View.GONE);
+            } else {
+                if (llFieldRating != null) llFieldRating.setVisibility(View.VISIBLE);
+                tvFieldRating.setVisibility(View.VISIBLE);
+                tvFieldRating.setText(formatRating(avg));
+            }
             tvStatusLabel.setText(nonEmpty(field.getStatus(), "AVAILABLE"));
-            tvFieldPrice.setText(formatMoney(resolveMinimumPrice(field)));
+            // Hide the general price box — owners will manage per-slot prices in the Time Slot manager
+            if (llPriceBox != null) llPriceBox.setVisibility(View.GONE);
             tvBookedToday.setText(String.valueOf(countBookedSlots(field)));
             tvTotalSlotsLabel.setText("/" + resolveSlotCount(field) + " slot");
             tvSlotSummary.setText(resolveSlotSummary(field));
@@ -169,9 +189,6 @@ public class OwnerFieldAdapter extends RecyclerView.Adapter<OwnerFieldAdapter.Ow
 
         private String resolveCapacityLabel(Field field) {
             String type = field.getType() == null ? "" : field.getType().toUpperCase(Locale.US);
-            if (type.contains("11")) {
-                return "Sân 11";
-            }
             if (type.contains("7")) {
                 return "Sân 7";
             }

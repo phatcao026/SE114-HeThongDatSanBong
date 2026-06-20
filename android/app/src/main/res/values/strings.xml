@@ -30,6 +30,9 @@
     <string name="price_per_hour">đ/giờ</string>
     <string name="available">Còn trống</string>
     <string name="booked">Đã đặt</string>
+    <string name="owner_field_type_status_format">%1$s · %2$s</string>
+    <string name="owner_edit_field_title">Chỉnh sửa sân</string>
+    <string name="owner_save_changes">Lưu thay đổi</string>
 
     <!-- Booking -->
     <string name="booking_title">Đặt sân</string>
@@ -79,7 +82,6 @@
     <string name="filter_field_type">Loại sân</string>
     <string name="filter_type_5">5 người</string>
     <string name="filter_type_7">7 người</string>
-    <string name="filter_type_11">11 người</string>
     <string name="filter_price_range">Khoảng giá</string>
     <string name="filter_price_under_200">Dưới 200k</string>
     <string name="filter_price_200_300">200k – 300k</string>
@@ -214,7 +216,6 @@
     <string name="action_change">Đổi</string>
     <string name="find_result_count">%d sân quanh bạn</string>
     <string name="action_book">Đặt</string>
-    <string name="suggested_field_type_11">Sân 11</string>
     <string name="golden_hour_hint">Giờ vàng có thể cao hơn</string>
 
     <!-- My bookings (prototype parity) -->
@@ -357,4 +358,33 @@
     <string name="field_surface_artificial">Artificial turf</string>
     <string name="price_from_format">From %1$s %2$s</string>
     <string name="time_range_arrow">-&gt; %1$s</string>
+    <!-- Owner field management / item strings -->
+    <string name="owner_management_label">QUẢN LÝ</string>
+    <string name="plus">+</string>
+    <string name="owner_available_pill">● %1$d Còn trống</string>
+    <string name="owner_maintenance_pill">● %1$d Bảo trì</string>
+    <string name="owner_available_pill_preview">● 0 Còn trống</string>
+    <string name="owner_maintenance_pill_preview">● 0 Bảo trì</string>
+    <string name="owner_closed_pill">● %1$d Đã đầy</string>
+    <string name="owner_closed_pill_preview">● 0 Đã đầy</string>
+    <string name="owner_empty_fields_message">Chưa có sân nào. Hãy tạo sân đầu tiên.</string>
+
+    <!-- Item owner field sample strings (moved from layout hardcoded text) -->
+    <string name="sample_field_name">Sân A1</string>
+    <string name="sample_field_type">Sân 5</string>
+    <string name="sample_capacity">10 người</string>
+    <string name="sample_rating">4.8</string>
+    <string name="status_available">AVAILABLE</string>
+    <string name="price_per_slot_label">Giá / khung giờ</string>
+    <string name="sample_price">350,000₫</string>
+    <string name="booked_today">Đã đặt hôm nay</string>
+    <string name="sample_booked_today">5</string>
+    <string name="sample_total_slots">/12 slot</string>
+    <string name="timeslot_label">Khung giờ</string>
+    <string name="sample_slot_summary">3 trống · 5 đã đặt</string>
+    <string name="manage_slots">Quản lý khung giờ</string>
+
+    <!-- Fallback / helper strings used by adapter -->
+    <string name="field_name_missing">Chưa có tên sân</string>
+    <string name="field_default_label">Sân bóng</string>
 </resources>

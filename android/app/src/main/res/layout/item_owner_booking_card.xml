@@ -1,0 +1,561 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_booking_card.xml  ─  BookingCardAdapter.ViewHolder
+    Used in: fragment_booking_management.xml → rvBookingList
+
+    Sections:
+      1. Accent colour bar (5dp, set to booking.getAvatarColor() in Java)
+      2. Booking ID + Status pill
+      3. Customer avatar (rounded square) + Name + Phone
+      4. Detail box (gray bg): Field row | divider | Time row | divider | Price row
+      5. Contextual action buttons:
+           - Pending  → llActionsPending  (VISIBLE):  btnCancel + btnConfirm
+           - Confirmed → llActionConfirmed (VISIBLE): btnComplete
+           - Completed/Cancelled → llStatusFooter (VISIBLE): status message
+         All three groups default to GONE; show correct one in Java.
+
+    Java wiring (BookingCardAdapter.java):
+      viewBookingAccentBar   → setBackgroundColor(booking.getColor())
+      tvBookingId            → booking.getId()
+      tvBookingStatusPill    → booking.getStatus() + set background + textColor
+      viewBookingAvatarBg    → setBackgroundColor(booking.getColor())
+                               (override rounded rectangle shape color)
+      tvBookingAvatarLetter  → booking.getName().lastWord().charAt(0)
+      tvBookingCustomerName  → booking.getName()
+      tvBookingPhone         → booking.getPhone()
+      tvBookingFieldValue    → booking.getField()
+      tvBookingFieldType     → booking.getType() + set background per type
+      tvBookingTimeSlot      → booking.getTimeSlot()
+      tvBookingDate          → booking.getDate()
+      tvBookingPrice         → booking.getPrice()
+      llActionsPending       → set VISIBLE when status == "Pending"
+      llActionConfirmed      → set VISIBLE when status == "Confirmed"
+      llStatusFooter         → set VISIBLE when status == "Completed" or "Cancelled"
+      tvStatusFooterMsg      → set text from R.string.booking_done_msg or booking_cancelled_msg
+      btnCancelBooking       → listener.onCancel(booking, position) → update status="Cancelled"
+      btnConfirmBooking      → listener.onConfirm(booking, position) → update status="Confirmed"
+      btnCompleteBooking     → listener.onComplete(booking, position) → update status="Completed"
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bookingCardRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardElevation="3dp"
+    app:cardCornerRadius="18dp"
+    app:cardBackgroundColor="@color/white"
+    app:strokeColor="@color/slate_200"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- ══ 1. ACCENT COLOUR BAR ══════════════════════ -->
+        <View
+            android:id="@+id/viewBookingAccentBar"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="@color/indigo_500" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- ══ 2. BOOKING ID + STATUS PILL ═══════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+
+                <!-- Booking ID with hash icon -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="#"
+                        android:textColor="@color/slate_400"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvBookingId"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BK-2041"
+                        android:textColor="@color/slate_500"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.03" />
+
+                </LinearLayout>
+
+                <!-- Status pill (background + textColor set in Java per status) -->
+                <LinearLayout
+                    android:id="@+id/containerStatusPill"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_status_pending"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp">
+
+                    <View
+                        android:id="@+id/viewPillDot"
+                        android:layout_width="6dp"
+                        android:layout_height="6dp"
+                        android:background="@drawable/bg_badge_orange"
+                        android:layout_marginEnd="5dp" />
+
+                    <TextView
+                        android:id="@+id/tvBookingStatusPill"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Pending"
+                        android:textColor="@color/amber_600"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- ══ 3. CUSTOMER AVATAR + NAME + PHONE ══════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="14dp">
+
+                <!-- Rounded-square avatar (set background color in Java) -->
+                <FrameLayout
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginEnd="12dp">
+
+                    <View
+                        android:id="@+id/viewBookingAvatarBg"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:background="@drawable/bg_avatar_green" />
+
+                    <TextView
+                        android:id="@+id/tvBookingAvatarLetter"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:text="A"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:gravity="center" />
+
+                </FrameLayout>
+
+                <!-- Name + phone -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvBookingCustomerName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nguyễn Văn Anh"
+                        android:textColor="@color/slate_900"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:lineSpacingExtra="-1dp" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="5dp">
+
+                        <ImageView
+                            android:layout_width="12dp"
+                            android:layout_height="12dp"
+                            android:src="@android:drawable/ic_menu_call"
+                            app:tint="@color/slate_400"
+                            android:layout_marginEnd="5dp" />
+
+                        <TextView
+                            android:id="@+id/tvBookingPhone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="090 123 4567"
+                            android:textColor="@color/slate_500"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- ══ 4. BOOKING DETAIL BOX ══════════════════
+                 Three rows: Field · Time · Price
+                 Each row: icon box | label | value (right-aligned)
+            ════════════════════════════════════════════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_outline_box"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:layout_marginBottom="14dp">
+
+                <!-- Row: Field -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="10dp">
+
+                    <!-- Icon box -->
+                    <LinearLayout
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/bg_info_indigo"
+                        android:gravity="center"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@android:drawable/ic_menu_mapmode"
+                            app:tint="#4F46E5" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/booking_label_field"
+                        android:textColor="@color/slate_500"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <!-- Field name + type badge aligned right -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/tvBookingFieldValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sân A1"
+                            android:textColor="@color/slate_900"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:layout_marginEnd="6dp" />
+
+                        <TextView
+                            android:id="@+id/tvBookingFieldType"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sân 5"
+                            android:textColor="@color/purple_700"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:background="@drawable/bg_type_badge_san5"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
+                            android:paddingTop="2dp"
+                            android:paddingBottom="2dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Horizontal divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/slate_200"
+                    android:layout_marginBottom="10dp" />
+
+                <!-- Row: Time Slot + Date -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="10dp">
+
+                    <LinearLayout
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/bg_info_amber"
+                        android:gravity="center"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@android:drawable/ic_menu_recent_history"
+                            app:tint="@color/amber_600" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/booking_label_time"
+                        android:textColor="@color/slate_500"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <!-- Time slot + date stacked right -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="end">
+
+                        <TextView
+                            android:id="@+id/tvBookingTimeSlot"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="18:00 – 19:30"
+                            android:textColor="@color/slate_900"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvBookingDate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="15/06/2026"
+                            android:textColor="@color/slate_400"
+                            android:textSize="11sp"
+                            android:layout_marginTop="2dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Horizontal divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/slate_200"
+                    android:layout_marginBottom="10dp" />
+
+                <!-- Row: Total Price -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@color/emerald_100"
+                        android:gravity="center"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@android:drawable/ic_menu_sort_by_size"
+                            app:tint="@color/emerald_600" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/booking_label_price"
+                        android:textColor="@color/slate_500"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvBookingPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="350,000₫"
+                        android:textColor="@color/emerald_600"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- ══ 5A. PENDING ACTIONS (default GONE) ════ -->
+            <LinearLayout
+                android:id="@+id/llActionsPending"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <!-- Cancel button -->
+                <LinearLayout
+                    android:id="@+id/btnCancelBooking"
+                    android:layout_width="0dp"
+                    android:layout_height="46dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:background="@drawable/bg_btn_danger">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@android:drawable/ic_delete"
+                        app:tint="@color/red_500"
+                        android:layout_marginEnd="6dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hủy đặt sân"
+                        android:textColor="@color/red_500"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <!-- Confirm button -->
+                <LinearLayout
+                    android:id="@+id/btnConfirmBooking"
+                    android:layout_width="0dp"
+                    android:layout_height="46dp"
+                    android:layout_weight="2"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:background="@drawable/bg_btn_primary_green"
+                    android:elevation="2dp">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@android:drawable/checkbox_on_background"
+                        app:tint="@color/white"
+                        android:layout_marginEnd="6dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Xác nhận"
+                        android:textColor="@color/white"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- ══ 5B. CONFIRMED ACTION (default GONE) ═══ -->
+            <LinearLayout
+                android:id="@+id/llActionConfirmed"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="@drawable/bg_btn_primary_green"
+                android:elevation="2dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@android:drawable/checkbox_on_background"
+                    app:tint="@color/white"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/btnCompleteBooking"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Đánh dấu Hoàn thành"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" ›"
+                    android:textColor="#B3FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- ══ 5C. TERMINAL STATUS FOOTER (default GONE) ══
+                 Shown for Completed or Cancelled bookings.
+                 Set background + textColor per status.
+            ════════════════════════════════════════════════ -->
+            <LinearLayout
+                android:id="@+id/llStatusFooter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_status_completed"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:visibility="gone">
+
+                <View
+                    android:id="@+id/viewFooterDot"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:background="@drawable/bg_badge_green"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/tvStatusFooterMsg"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/booking_done_msg"
+                    android:textColor="@color/emerald_700"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

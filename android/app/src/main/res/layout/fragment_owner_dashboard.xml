@@ -91,40 +91,64 @@
         <!-- Notification Bell + red badge -->
         <FrameLayout
             android:layout_width="40dp"
-            android:layout_height="40dp">
+            android:layout_height="40dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:clickable="true"
+            android:background="@drawable/bg_btn_outline_gray"
+            android:focusable="true">
 
             <LinearLayout
                 android:id="@+id/btnNotificationBell"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@drawable/bg_btn_outline_gray"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:gravity="center">
 
                 <ImageView
                     android:layout_width="18dp"
                     android:layout_height="18dp"
-                    android:src="@android:drawable/ic_popup_reminder"
-                    app:tint="@color/slate_700" />
-
+                    android:src="@drawable/ic_admin_notifications"
+                    app:tint="@color/blue_500" />
             </LinearLayout>
 
-            <!-- Unread count badge -->
             <TextView
                 android:id="@+id/tvNotificationBadge"
-                android:layout_width="17dp"
-                android:layout_height="17dp"
-                android:background="@drawable/bg_status_cancelled"
-                android:text="3"
-                android:textColor="@color/red_500"
-                android:textSize="9sp"
-                android:textStyle="bold"
-                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="top|end"
-                android:layout_marginTop="-3dp"
-                android:layout_marginEnd="-3dp" />
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="2dp"
+                android:background="@drawable/bg_notification_badge"
+                android:gravity="center"
+                android:minWidth="14dp"
+                android:minHeight="14dp"
+                android:paddingHorizontal="4dp"
+                android:text="5"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                android:visibility="visible" />
 
         </FrameLayout>
+        <LinearLayout
+            android:id="@+id/btnLogout"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_btn_outline_gray"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center">
 
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="3dp"
+            android:src="@drawable/ic_admin_logout"
+            app:tint="@color/slate_700" />
+
+    </LinearLayout>
     </LinearLayout>
 
     <!-- ══════════════════════════════════════════════════
