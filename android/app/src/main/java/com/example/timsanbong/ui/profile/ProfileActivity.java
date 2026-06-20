@@ -154,6 +154,15 @@ public class ProfileActivity extends AppCompatActivity implements BookingAdapter
                 Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
             }
         });
+
+        bookingViewModel.fieldReviewState.observe(this, resource -> {
+            if (resource == null) return;
+            if (resource.status == Resource.Status.SUCCESS) {
+                Toast.makeText(this, R.string.field_review_success, Toast.LENGTH_SHORT).show();
+            } else if (resource.status == Resource.Status.ERROR) {
+                Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setupTabs() {
@@ -283,5 +292,11 @@ public class ProfileActivity extends AppCompatActivity implements BookingAdapter
                 .show();
     }
 
+    @Override
+    public void onRateField(Booking booking) {
+        com.example.timsanbong.ui.customer.FieldReviewDialog.show(this, booking,
+                (selectedBooking, rating, comment) ->
+                        bookingViewModel.submitFieldReview(selectedBooking.getId(), rating, comment));
+    }
 
 }

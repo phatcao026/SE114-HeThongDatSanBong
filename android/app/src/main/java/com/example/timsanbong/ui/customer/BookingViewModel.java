@@ -8,7 +8,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.timsanbong.data.model.Booking;
+import com.example.timsanbong.data.model.FieldReviewRequest;
+import com.example.timsanbong.data.model.FieldReviewResponse;
 import com.example.timsanbong.data.repository.BookingRepository;
+import com.example.timsanbong.data.repository.FieldReviewRepository;
 import com.example.timsanbong.utils.RepositoryCallback;
 import com.example.timsanbong.utils.Resource;
 
@@ -17,6 +20,7 @@ import java.util.List;
 public class BookingViewModel extends AndroidViewModel {
 
     private final BookingRepository bookingRepository = new BookingRepository();
+    private final FieldReviewRepository fieldReviewRepository = new FieldReviewRepository();
 
     private final MutableLiveData<Resource<List<Booking>>> _bookingsState = new MutableLiveData<>();
     public LiveData<Resource<List<Booking>>> bookingsState = _bookingsState;
@@ -26,6 +30,9 @@ public class BookingViewModel extends AndroidViewModel {
 
     private final MutableLiveData<Resource<Void>> _cancelState = new MutableLiveData<>();
     public LiveData<Resource<Void>> cancelState = _cancelState;
+
+    private final MutableLiveData<Resource<FieldReviewResponse>> _fieldReviewState = new MutableLiveData<>();
+    public LiveData<Resource<FieldReviewResponse>> fieldReviewState = _fieldReviewState;
 
     public BookingViewModel(@NonNull Application application) {
         super(application);
@@ -80,5 +87,23 @@ public class BookingViewModel extends AndroidViewModel {
                 _cancelState.postValue(Resource.error(message, null));
             }
         });
+    }
+
+    public void submitFieldReview(long bookingId, int rating, String comment) {
+        _fieldReviewState.setValue(Resource.loading(null));
+        String cleanedComment = comment == null || comment.trim().isEmpty() ? null : comment.trim();
+        FieldReviewRequest request = new FieldReviewRequest(bookingId, rating, cleanedComment, null);
+        fieldReviewRepository.createReview(getApplication(), request,
+                new RepositoryCallback<FieldReviewResponse>() {
+                    @Override
+                    public void onSuccess(FieldReviewResponse data) {
+                        _fieldReviewState.postValue(Resource.success(data));
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        _fieldReviewState.postValue(Resource.error(message, null));
+                    }
+                });
     }
 }

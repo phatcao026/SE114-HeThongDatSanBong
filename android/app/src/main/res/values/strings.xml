@@ -242,6 +242,11 @@
     <string name="qr_dialog_title">QR check-in</string>
     <string name="qr_dialog_message">Đưa mã đặt sân này cho chủ sân khi check-in:\n\n#BK-%d</string>
     <string name="cd_cancel_booking">Hủy đặt sân</string>
+    <string name="action_rate_field">Đánh giá sân</string>
+    <string name="field_review_dialog_title">Đánh giá sân</string>
+    <string name="field_review_comment_hint">Chia sẻ trải nghiệm của bạn</string>
+    <string name="action_submit_review">Gửi đánh giá</string>
+    <string name="field_review_success">Đã gửi đánh giá sân.</string>
 
     <!-- Field detail (prototype parity) -->
     <string name="amenities_title">Tiện ích</string>
@@ -253,6 +258,11 @@
     <string name="amenity_cafe">Căng tin · cà phê</string>
     <string name="reviews_title">Đánh giá (126)</string>
     <string name="review_count_hint">126 đánh giá</string>
+    <string name="reviews_title_format">Đánh giá (%1$d)</string>
+    <string name="review_count_format">%1$d đánh giá</string>
+    <string name="field_reviews_empty">Chưa có đánh giá nào cho sân này.</string>
+    <string name="review_anonymous">Người dùng</string>
+    <string name="review_no_comment">Người dùng chưa để lại nhận xét.</string>
 
     <!-- Payment result (prototype parity) -->
     <string name="deposit_paid_row">Cọc đã thanh toán</string>

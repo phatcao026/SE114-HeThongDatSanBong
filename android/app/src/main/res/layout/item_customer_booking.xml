@@ -194,6 +194,26 @@
                         app:iconTint="@color/error"
                         app:strokeColor="@color/error" />
                 </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRateField"
+                    style="@style/Widget.TimSanBong.Button.Outlined"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:layout_marginTop="@dimen/spacing_3"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="@dimen/spacing_2"
+                    android:text="@string/action_rate_field"
+                    android:textSize="11sp"
+                    android:visibility="gone"
+                    app:icon="@drawable/ic_star"
+                    app:iconSize="14dp"
+                    app:iconPadding="@dimen/spacing_1"
+                    app:iconTint="@color/star_yellow"
+                    app:strokeColor="@color/star_yellow"
+                    tools:visibility="visible" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 

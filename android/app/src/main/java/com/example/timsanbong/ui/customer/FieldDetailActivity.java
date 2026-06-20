@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.timsanbong.R;
 import com.example.timsanbong.data.model.Field;
+import com.example.timsanbong.data.model.FieldReviewResponse;
 import com.example.timsanbong.utils.Resource;
 import com.google.android.material.button.MaterialButton;
 
@@ -26,7 +27,7 @@ import java.util.List;
 public class FieldDetailActivity extends AppCompatActivity {
 
     private ImageView ivFieldImage, btnBack;
-    private TextView tvFieldName, tvPrice, tvDescription, tvRating;
+    private TextView tvFieldName, tvPrice, tvDescription, tvRating, tvReviewCountHint, tvReviewsTitle;
     private MaterialButton btnBook;
     private FieldViewModel fieldViewModel;
     private long fieldId;
@@ -44,10 +45,13 @@ public class FieldDetailActivity extends AppCompatActivity {
     private TextView tvSelectedSlot;
     private TextView tvSelectedSlotLabel;
     private TextView tvNoSlots;
+    private TextView tvFieldReviewsEmpty;
     private android.widget.ProgressBar pbSlots;
+    private RecyclerView rvFieldReviews;
 
     private DateChipAdapter dateChipAdapter;
     private TimeSlotAdapter timeSlotAdapter;
+    private FieldReviewAdapter fieldReviewAdapter;
 
     // Selections
     private String selectedDate = "";
@@ -71,6 +75,8 @@ public class FieldDetailActivity extends AppCompatActivity {
         tvPrice = findViewById(R.id.tvPrice);
         tvDescription = findViewById(R.id.tvDescription);
         tvRating = findViewById(R.id.tvRating);
+        tvReviewCountHint = findViewById(R.id.tvReviewCountHint);
+        tvReviewsTitle = findViewById(R.id.tvReviewsTitle);
         btnBook = findViewById(R.id.btnBook);
         scrollContent = findViewById(R.id.scrollContent);
         pbLoading = findViewById(R.id.pbLoading);
@@ -81,7 +87,9 @@ public class FieldDetailActivity extends AppCompatActivity {
         tvSelectedSlot = findViewById(R.id.tvSelectedSlot);
         tvSelectedSlotLabel = findViewById(R.id.tvSelectedSlotLabel);
         tvNoSlots = findViewById(R.id.tvNoSlots);
+        tvFieldReviewsEmpty = findViewById(R.id.tvFieldReviewsEmpty);
         pbSlots = findViewById(R.id.pbSlots);
+        rvFieldReviews = findViewById(R.id.rvFieldReviews);
         btnShowMoreSlots = findViewById(R.id.btnShowMoreSlots);
 
         btnShowMoreSlots.setOnClickListener(v -> {
@@ -94,6 +102,7 @@ public class FieldDetailActivity extends AppCompatActivity {
 
         setupDateChips();
         setupTimeSlots();
+        setupFieldReviews();
         updateStickyBar();
 
         fieldViewModel = new ViewModelProvider(this).get(FieldViewModel.class);
@@ -108,6 +117,7 @@ public class FieldDetailActivity extends AppCompatActivity {
                     currentField = resource.data;
                     showContentState();
                     bindField(resource.data);
+                    fieldViewModel.loadFieldReviews(resource.data.getId());
                 }
             } else {
                 String message = getSafeMessage(resource.message);
@@ -158,6 +168,21 @@ public class FieldDetailActivity extends AppCompatActivity {
                 Toast.makeText(this, "Không thể tải giờ trống", Toast.LENGTH_SHORT).show();
             }
         });
+
+        fieldViewModel.fieldReviewsState.observe(this, resource -> {
+            if (resource == null) return;
+            if (resource.status == Resource.Status.SUCCESS) {
+                List<FieldReviewResponse> reviews = resource.data == null ? new ArrayList<>() : resource.data;
+                fieldReviewAdapter.updateReviews(reviews);
+                updateReviewCount(reviews.size());
+                rvFieldReviews.setVisibility(reviews.isEmpty() ? View.GONE : View.VISIBLE);
+                tvFieldReviewsEmpty.setVisibility(reviews.isEmpty() ? View.VISIBLE : View.GONE);
+            } else if (resource.status == Resource.Status.ERROR) {
+                rvFieldReviews.setVisibility(View.GONE);
+                tvFieldReviewsEmpty.setVisibility(View.VISIBLE);
+                tvFieldReviewsEmpty.setText(getSafeMessage(resource.message));
+            }
+        });
     }
     
     private void setupDateChips() {
@@ -201,6 +226,12 @@ public class FieldDetailActivity extends AppCompatActivity {
         });
         rvTimeSlots.setLayoutManager(new GridLayoutManager(this, 2));
         rvTimeSlots.setAdapter(timeSlotAdapter);
+    }
+
+    private void setupFieldReviews() {
+        fieldReviewAdapter = new FieldReviewAdapter();
+        rvFieldReviews.setLayoutManager(new LinearLayoutManager(this));
+        rvFieldReviews.setAdapter(fieldReviewAdapter);
     }
 
     private void updateSlotDisplay() {
@@ -269,6 +300,7 @@ public class FieldDetailActivity extends AppCompatActivity {
 
         tvDescription.setText(field.getDescription());
         tvRating.setText(String.format("%.1f", field.getAverageRating() != null ? field.getAverageRating() : 0));
+        updateReviewCount(field.getReviewCount() == null ? 0 : field.getReviewCount());
 
         double minPrice = field.getPricePerHour();
         if (minPrice > 0) {
@@ -302,6 +334,11 @@ public class FieldDetailActivity extends AppCompatActivity {
             intent.putExtra("totalPrice", selectedPrice);
             startActivity(intent);
         });
+    }
+
+    private void updateReviewCount(long reviewCount) {
+        tvReviewsTitle.setText(getString(R.string.reviews_title_format, reviewCount));
+        tvReviewCountHint.setText(getString(R.string.review_count_format, reviewCount));
     }
 
     private void showLoadingState() {

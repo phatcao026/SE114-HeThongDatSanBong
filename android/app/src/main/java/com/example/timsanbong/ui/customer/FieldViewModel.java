@@ -9,6 +9,8 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.timsanbong.data.model.Field;
 import com.example.timsanbong.data.model.FieldFilter;
+import com.example.timsanbong.data.model.FieldReviewResponse;
+import com.example.timsanbong.data.repository.FieldReviewRepository;
 import com.example.timsanbong.data.repository.FieldRepository;
 import com.example.timsanbong.utils.RepositoryCallback;
 import com.example.timsanbong.utils.Resource;
@@ -24,6 +26,7 @@ import java.util.Locale;
 public class FieldViewModel extends AndroidViewModel {
 
     private final FieldRepository fieldRepository = new FieldRepository();
+    private final FieldReviewRepository fieldReviewRepository = new FieldReviewRepository();
     private final SessionManager sessionManager;
 
     private final MutableLiveData<Resource<List<Field>>> _fieldsState = new MutableLiveData<>();
@@ -37,6 +40,9 @@ public class FieldViewModel extends AndroidViewModel {
 
     private final MutableLiveData<Resource<List<com.example.timsanbong.data.model.TimeSlotResponse>>> _timeSlotsState = new MutableLiveData<>();
     public LiveData<Resource<List<com.example.timsanbong.data.model.TimeSlotResponse>>> timeSlotsState = _timeSlotsState;
+
+    private final MutableLiveData<Resource<List<FieldReviewResponse>>> _fieldReviewsState = new MutableLiveData<>();
+    public LiveData<Resource<List<FieldReviewResponse>>> fieldReviewsState = _fieldReviewsState;
 
     private final MutableLiveData<String> _userDisplayName = new MutableLiveData<>();
     public LiveData<String> userDisplayName = _userDisplayName;
@@ -96,6 +102,22 @@ public class FieldViewModel extends AndroidViewModel {
                 _timeSlotsState.postValue(Resource.error(message, null));
             }
         });
+    }
+
+    public void loadFieldReviews(long fieldId) {
+        _fieldReviewsState.setValue(Resource.loading(null));
+        fieldReviewRepository.getReviewsForField(getApplication(), fieldId,
+                new RepositoryCallback<List<FieldReviewResponse>>() {
+                    @Override
+                    public void onSuccess(List<FieldReviewResponse> data) {
+                        _fieldReviewsState.postValue(Resource.success(data));
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        _fieldReviewsState.postValue(Resource.error(message, null));
+                    }
+                });
     }
 
     public void setSearchKeyword(String keyword) {
