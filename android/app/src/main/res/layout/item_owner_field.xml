@@ -21,7 +21,6 @@
       tvFieldTypeBadge      → field.getType()  + set background:
                                Sân 5  → bg_type_badge_san5  textColor=#6D28D9
                                Sân 7  → bg_type_badge_san7  textColor=#1D4ED8
-                               Sân 11 → bg_type_badge_san11 textColor=#B45309
       tvFieldCapacity       → field.getCapacity() + " người"
       tvFieldRating         → field.getRating()
       btnStatusToggle       → field.getStatus() → set text + background
@@ -63,7 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="10dp">
 
             <!-- ══ 2. FIELD NAME + META ROW ══════════════ -->
             <LinearLayout
@@ -84,7 +83,7 @@
                         android:id="@+id/tvFieldName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Sân A1"
+                        android:text="@string/sample_field_name"
                         android:textColor="@color/slate_900"
                         android:textSize="21sp"
                         android:textStyle="bold"
@@ -103,7 +102,7 @@
                             android:id="@+id/tvFieldTypeBadge"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Sân 5"
+                            android:text="@string/sample_field_type"
                             android:textColor="@color/purple_700"
                             android:textSize="11sp"
                             android:textStyle="bold"
@@ -133,7 +132,7 @@
                                 android:id="@+id/tvFieldCapacity"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="10 người"
+                                android:text="@string/sample_capacity"
                                 android:textColor="@color/slate_500"
                                 android:textSize="11sp" />
 
@@ -141,6 +140,7 @@
 
                         <!-- Rating with star icon -->
                         <LinearLayout
+                            android:id="@+id/llFieldRating"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
@@ -157,7 +157,7 @@
                                 android:id="@+id/tvFieldRating"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="4.8"
+                                android:text="@string/sample_rating"
                                 android:textColor="@color/amber_700"
                                 android:textSize="11sp"
                                 android:textStyle="bold" />
@@ -193,7 +193,7 @@
                         android:id="@+id/tvStatusLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="AVAILABLE"
+                        android:text="@string/status_available"
                         android:textColor="@color/emerald_700"
                         android:textSize="10sp"
                         android:textStyle="bold"
@@ -215,10 +215,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="14dp">
+                android:layout_marginBottom="10dp">
 
                 <!-- Price box -->
                 <LinearLayout
+                    android:id="@+id/llPriceBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -230,7 +231,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Giá / khung giờ"
+                        android:text="@string/price_per_slot_label"
                         android:textColor="@color/slate_500"
                         android:textSize="10sp"
                         android:layout_marginBottom="4dp" />
@@ -239,7 +240,7 @@
                         android:id="@+id/tvFieldPrice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="350,000₫"
+                        android:text="@string/sample_price"
                         android:textColor="@color/emerald_600"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -258,7 +259,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Đã đặt hôm nay"
+                        android:text="@string/booked_today"
                         android:textColor="@color/slate_500"
                         android:textSize="10sp"
                         android:layout_marginBottom="4dp" />
@@ -273,7 +274,7 @@
                             android:id="@+id/tvBookedToday"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="5"
+                            android:text="@string/sample_booked_today"
                             android:textColor="@color/slate_900"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -282,7 +283,7 @@
                             android:id="@+id/tvTotalSlotsLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="/12 slot"
+                            android:text="@string/sample_total_slots"
                             android:textColor="@color/slate_400"
                             android:textSize="11sp" />
 
@@ -315,7 +316,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginBottom="14dp">
+                android:layout_marginBottom="1dp">
 
                 <!-- Section header -->
                 <LinearLayout
@@ -336,7 +337,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Khung giờ"
+                        android:text="@string/timeslot_label"
                         android:textColor="@color/slate_700"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -346,7 +347,7 @@
                         android:id="@+id/tvSlotSummary"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="3 trống · 5 đã đặt"
+                        android:text="@string/sample_slot_summary"
                         android:textColor="@color/emerald_600"
                         android:textSize="11sp"
                         android:textStyle="bold" />
@@ -398,63 +399,75 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/slate_100"
-                android:layout_marginBottom="12dp" />
+                android:layout_marginBottom="4dp" />
 
             <!-- ══ 6. ACTION ROW ═════════════════════════ -->
             <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:padding="4dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnEditField"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="8dp"
-                    android:padding="0dp"
-                    app:icon="@android:drawable/ic_menu_edit"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    app:iconSize="18dp"
-                    app:iconTint="@color/slate_500"
-                    app:backgroundTint="@android:color/transparent"
-                    app:strokeColor="@color/slate_200"
-                    app:strokeWidth="1dp"
-                    app:cornerRadius="8dp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnDeleteField"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="8dp"
-                    android:padding="0dp"
-                    app:icon="@android:drawable/ic_menu_delete"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    app:iconSize="18dp"
-                    app:iconTint="@color/red_500"
-                    app:backgroundTint="@color/red_50"
-                    app:cornerRadius="8dp"
-                    app:strokeColor="@color/red_100"
-                    app:strokeWidth="1dp" />
-
-                <com.google.android.material.button.MaterialButton
+                <!-- NÚT CHÍNH: Chiếm phần lớn không gian, thu hút sự chú ý -->
+                    <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnManageSlots"
                     android:layout_width="0dp"
                     android:layout_height="40dp"
                     android:layout_weight="1"
-                    android:text="Manage Slots"
+                        android:layout_marginEnd="12dp"
+                        android:text="@string/manage_slots"
                     android:textColor="@color/white"
-                    android:textSize="13sp"
+                    android:textSize="15sp"
                     android:textStyle="bold"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
                     app:icon="@android:drawable/ic_menu_manage"
                     app:iconGravity="textStart"
-                    app:iconPadding="6dp"
-                    app:iconSize="14dp"
+                    app:iconPadding="8dp"
+                    app:iconSize="18dp"
                     app:iconTint="@color/white"
                     app:backgroundTint="@color/emerald_500"
-                    app:cornerRadius="8dp" />
+                    app:cornerRadius="10dp" />
+
+                <!-- NÚT PHỤ 1: Sửa (Màu trung tính, dạng Outline) -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEditField"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:padding="0dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@android:drawable/ic_menu_edit"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="20dp"
+                    app:iconTint="@color/slate_500"
+                    app:backgroundTint="@android:color/transparent"
+                    app:strokeColor="@color/slate_200"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="10dp" />
+
+                <!-- NÚT PHỤ 2: Xóa (Dạng cảnh báo nhẹ, nền đỏ nhạt) -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDeleteField"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:padding="0dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@android:drawable/ic_menu_delete"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="20dp"
+                    app:iconTint="@color/red_500"
+                    app:backgroundTint="@color/red_50"
+                    app:strokeColor="@color/red_100"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="10dp" />
 
             </LinearLayout>
 

@@ -95,7 +95,6 @@ public class FilterBottomSheetFragment extends BottomSheetDialogFragment {
     private void restoreTypeSelection(String fieldType) {
         if ("5 người".equals(fieldType))       chipGroupType.check(R.id.chipType5);
         else if ("7 người".equals(fieldType))  chipGroupType.check(R.id.chipType7);
-        else if ("11 người".equals(fieldType)) chipGroupType.check(R.id.chipType11);
         else                                   chipGroupType.check(R.id.chipTypeAll);
     }
 
@@ -112,7 +111,6 @@ public class FilterBottomSheetFragment extends BottomSheetDialogFragment {
         int typeId = chipGroupType.getCheckedChipId();
         if (typeId == R.id.chipType5)       filter.fieldType = "5 người";
         else if (typeId == R.id.chipType7)  filter.fieldType = "7 người";
-        else if (typeId == R.id.chipType11) filter.fieldType = "11 người";
 
         int priceId = chipGroupPrice.getCheckedChipId();
         if (priceId == R.id.chipPriceUnder200)    filter.priceRange = 1;

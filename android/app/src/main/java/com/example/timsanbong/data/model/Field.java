@@ -74,15 +74,25 @@ public class Field {
         return available || status == null || "AVAILABLE".equalsIgnoreCase(status);
     }
 
+    // Returns true if there is at least one timeslot that the backend/model considers available
+    public boolean hasAvailableSlots() {
+        if (timeSlots == null || timeSlots.isEmpty()) return false;
+        for (TimeSlotResponse slot : timeSlots) {
+            if (slot != null && slot.isAvailable()) return true;
+        }
+        return false;
+    }
+
+    // A field is rentable (can be registered/booked) when the field itself is marked available/open
+    // and there exists at least one available timeslot.
+    public boolean isRentable() {
+        return isAvailable() && hasAvailableSlots();
+    }
     public String getFieldType() {
         if (type == null || type.trim().isEmpty()) return "5 người";
         if ("SEVEN_A_SIDE".equalsIgnoreCase(type) || "Sân 7".equalsIgnoreCase(type)
                 || "7 người".equalsIgnoreCase(type)) {
             return "7 người";
-        }
-        if ("ELEVEN_A_SIDE".equalsIgnoreCase(type) || "Sân 11".equalsIgnoreCase(type)
-                || "11 người".equalsIgnoreCase(type)) {
-            return "11 người";
         }
         return "5 người";
     }
@@ -90,7 +100,6 @@ public class Field {
     public String getTypeLabel() {
         String fieldType = getFieldType();
         if ("7 người".equals(fieldType)) return "Sân 7";
-        if ("11 người".equals(fieldType)) return "Sân 11";
         return "Sân 5";
     }
 

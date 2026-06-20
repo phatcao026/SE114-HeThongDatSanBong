@@ -34,7 +34,7 @@ public class FindPitchActivity extends AppCompatActivity {
     private TextView tvEmptyState;
     private TextView tvErrorState;
     private View pbLoading;
-    private TextView chipTypeAll, chipType5, chipType7, chipType11;
+    private TextView chipTypeAll, chipType5, chipType7;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +61,6 @@ public class FindPitchActivity extends AppCompatActivity {
         chipTypeAll = findViewById(R.id.chipTypeAll);
         chipType5 = findViewById(R.id.chipType5);
         chipType7 = findViewById(R.id.chipType7);
-        chipType11 = findViewById(R.id.chipType11);
 
         fieldViewModel = new ViewModelProvider(this).get(FieldViewModel.class);
     }
@@ -102,7 +101,6 @@ public class FindPitchActivity extends AppCompatActivity {
         chipTypeAll.setOnClickListener(v -> selectTypeChip(null));
         chipType5.setOnClickListener(v -> selectTypeChip("5 người"));
         chipType7.setOnClickListener(v -> selectTypeChip("7 người"));
-        chipType11.setOnClickListener(v -> selectTypeChip("11 người"));
     }
 
     private void selectTypeChip(String fieldType) {
@@ -116,7 +114,6 @@ public class FindPitchActivity extends AppCompatActivity {
         styleChip(chipTypeAll, fieldType == null);
         styleChip(chipType5, "5 người".equals(fieldType));
         styleChip(chipType7, "7 người".equals(fieldType));
-        styleChip(chipType11, "11 người".equals(fieldType));
     }
 
     private void styleChip(TextView chip, boolean selected) {

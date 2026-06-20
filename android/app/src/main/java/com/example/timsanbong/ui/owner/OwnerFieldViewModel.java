@@ -43,7 +43,7 @@ public class OwnerFieldViewModel extends AndroidViewModel {
 
     public void loadFields() {
         loading.setValue(true);
-        repository.getOwnerFields(getApplication(), new RepositoryCallback<List<Field>>() {
+        repository.getOwnerFields(getApplication(), new RepositoryCallback<>() {
             @Override
             public void onSuccess(List<Field> data) {
                 loading.setValue(false);
@@ -89,11 +89,11 @@ public class OwnerFieldViewModel extends AndroidViewModel {
     }
 
     private RepositoryCallback<Field> fieldMutationCallback() {
-        return new RepositoryCallback<Field>() {
+        return new RepositoryCallback<>() {
             @Override
             public void onSuccess(Field data) {
                 loading.setValue(false);
-                message.setValue("Cap nhat san thanh cong.");
+                message.setValue("Tạo hoặc cập nhật sân thành công.");
                 loadFields();
             }
 
@@ -106,11 +106,11 @@ public class OwnerFieldViewModel extends AndroidViewModel {
     }
 
     private RepositoryCallback<TimeSlot> timeSlotMutationCallback() {
-        return new RepositoryCallback<TimeSlot>() {
+        return new RepositoryCallback<>() {
             @Override
             public void onSuccess(TimeSlot data) {
                 loading.setValue(false);
-                message.setValue("Cap nhat khung gio thanh cong.");
+                message.setValue("Tạo hoặc cập nhật khung giờ thành công.");
                 loadFields();
             }
 

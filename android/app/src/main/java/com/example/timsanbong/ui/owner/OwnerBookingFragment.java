@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.timsanbong.R;
 import com.example.timsanbong.data.model.Booking;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.example.timsanbong.ui.owner.BookingCardAdapter;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ import java.util.Locale;
 // 1. Chuyển đổi từ AppCompatActivity sang Fragment
 public class OwnerBookingFragment extends Fragment {
     private OwnerBookingViewModel viewModel;
-    private OwnerBookingAdapter adapter;
+    private BookingCardAdapter adapter;
     private final List<Booking> allBookings = new ArrayList<>();
     private final List<Booking> visibleBookings = new ArrayList<>();
     private EditText etSearchBookings;
@@ -45,6 +46,8 @@ public class OwnerBookingFragment extends Fragment {
     private String selectedDate;
     private String selectedStatus = "ALL";
     private String query = "";
+    private java.util.Set<String> filterStatuses = new java.util.HashSet<>();
+    private String filterFieldName = "";
 
     // 2. Nạp giao diện fragment_owner_booking vào hệ thống
     @Nullable
@@ -87,7 +90,7 @@ public class OwnerBookingFragment extends Fragment {
 
     private void setupRecyclerView(View view) {
         RecyclerView rvBookings = view.findViewById(R.id.rvBookingList);
-        adapter = new OwnerBookingAdapter(new OwnerBookingAdapter.Listener() {
+        adapter = new BookingCardAdapter(new BookingCardAdapter.Listener() {
             @Override
             public void onCheckIn(Booking booking) {
                 confirmAction(
@@ -110,6 +113,30 @@ public class OwnerBookingFragment extends Fragment {
                         "Đánh dấu no-show",
                         "Khách không đến sẽ khiến đơn #" + booking.getId() + " bị hủy. Tiếp tục?",
                         () -> viewModel.markNoShow(booking.getId()));
+            }
+
+            @Override
+            public void onConfirm(Booking booking) {
+                confirmAction(
+                        "Xác nhận booking",
+                        "Xác nhận đơn #" + booking.getId() + "?",
+                        () -> viewModel.confirmBooking(booking.getId()));
+            }
+
+            @Override
+            public void onCancel(Booking booking) {
+                confirmAction(
+                        "Hủy booking",
+                        "Hủy đơn #" + booking.getId() + "?",
+                        () -> viewModel.cancelBooking(booking.getId()));
+            }
+
+            @Override
+            public void onComplete(Booking booking) {
+                confirmAction(
+                        "Hoàn tất booking",
+                        "Xác nhận hoàn tất đơn #" + booking.getId() + "?",
+                        () -> viewModel.completeBooking(booking.getId()));
             }
         });
 
@@ -139,6 +166,10 @@ public class OwnerBookingFragment extends Fragment {
     private void setupActions(View view) {
         View btnDateFilter = view.findViewById(R.id.btnDateFilter);
         btnDateFilter.setOnClickListener(v -> openDatePicker());
+        View btnFilterOptions = view.findViewById(R.id.btnFilterOptions);
+        if (btnFilterOptions != null) {
+            btnFilterOptions.setOnClickListener(v -> openFilterDialog());
+        }
         if (btnClearFilters != null) {
             btnClearFilters.setOnClickListener(v -> clearFilters());
         }
@@ -260,10 +291,14 @@ public class OwnerBookingFragment extends Fragment {
     }
 
     private boolean matchesStatus(Booking booking) {
+        String status = safeStatus(booking);
+        if (filterStatuses != null && !filterStatuses.isEmpty()) {
+            return filterStatuses.contains(status);
+        }
         if ("ALL".equals(selectedStatus)) {
             return true;
         }
-        return selectedStatus.equals(safeStatus(booking));
+        return selectedStatus.equals(status);
     }
 
     private boolean matchesDate(Booking booking) {
@@ -275,6 +310,10 @@ public class OwnerBookingFragment extends Fragment {
 
     private boolean matchesQuery(Booking booking) {
         if (query == null || query.trim().isEmpty()) {
+            // Still apply field filter if present
+            if (filterFieldName != null && !filterFieldName.trim().isEmpty()) {
+                return safeString(booking.getFieldName()).toLowerCase(Locale.US).contains(filterFieldName.toLowerCase(Locale.US));
+            }
             return true;
         }
         String source = buildSearchSource(booking);
@@ -312,12 +351,46 @@ public class OwnerBookingFragment extends Fragment {
     private void clearFilters() {
         selectedDate = null;
         selectedStatus = "ALL";
+        filterStatuses.clear();
+        filterFieldName = "";
         query = "";
         if (etSearchBookings != null) {
             etSearchBookings.setText("");
         }
         updateTabState();
         applyFilters();
+    }
+
+    private void openFilterDialog() {
+        // Multi-select statuses + field name input
+        final String[] statusOptions = new String[]{"PENDING", "DEPOSIT_PAID", "CONFIRMED", "COMPLETED", "CANCELLED"};
+        final boolean[] checked = new boolean[statusOptions.length];
+        for (int i = 0; i < statusOptions.length; i++) {
+            checked[i] = filterStatuses.contains(statusOptions[i]);
+        }
+
+        android.widget.LinearLayout container = new android.widget.LinearLayout(requireContext());
+        container.setOrientation(android.widget.LinearLayout.VERTICAL);
+        android.widget.EditText etField = new android.widget.EditText(requireContext());
+        etField.setHint("Tên sân (tùy chọn)");
+        etField.setText(filterFieldName == null ? "" : filterFieldName);
+        container.setPadding(40, 10, 40, 10);
+        container.addView(etField);
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
+        builder.setTitle("Bộ lọc nâng cao")
+                .setMultiChoiceItems(statusOptions, checked, (dialog, which, isChecked) -> checked[which] = isChecked)
+                .setView(container)
+                .setNegativeButton("Hủy", null)
+                .setPositiveButton("Áp dụng", (dialog, which) -> {
+                    filterStatuses.clear();
+                    for (int i = 0; i < statusOptions.length; i++) {
+                        if (checked[i]) filterStatuses.add(statusOptions[i]);
+                    }
+                    filterFieldName = etField.getText() == null ? "" : etField.getText().toString().trim();
+                    applyFilters();
+                })
+                .show();
     }
 
     // 7. Cấu hình Material Dialog xác nhận hành động bằng requireContext()

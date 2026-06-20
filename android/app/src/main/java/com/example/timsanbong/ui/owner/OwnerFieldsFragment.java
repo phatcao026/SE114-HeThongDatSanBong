@@ -1,7 +1,9 @@
 package com.example.timsanbong.ui.owner;
 
 import android.app.Dialog;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +12,14 @@ import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -21,6 +28,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.timsanbong.R;
 import com.example.timsanbong.data.model.Field;
 import com.example.timsanbong.data.model.FieldCreateRequest;
@@ -45,7 +53,19 @@ public class OwnerFieldsFragment extends Fragment {
     private TextView tvEmptyFields;
     private TextView tvAvailableCount;
     private TextView tvMaintenanceCount;
+    private TextView tvClosedCount;
+    private ActivityResultLauncher<String> createFieldImagePickerLauncher;
+    private Uri createFieldImageUri;
+    private LinearLayout createFieldNoImageContainer;
+    private FrameLayout createFieldImagePreviewContainer;
+    private ImageView createFieldImagePreview;
+    private TextView createFieldNameError;
+    private String createFieldSelectedType = "FIVE_A_SIDE";
+    private String createFieldSelectedStatus = "AVAILABLE";
     private String searchQuery = "";
+    private FilterMode filterMode = FilterMode.ALL;
+
+    private enum FilterMode { ALL, AVAILABLE, MAINTENANCE, CLOSED }
 
     // 2. Nạp giao diện fragment_owner_field_management vào container
     @Nullable
@@ -60,6 +80,23 @@ public class OwnerFieldsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         viewModel = new ViewModelProvider(this).get(OwnerFieldViewModel.class);
+        createFieldImagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri == null) {
+                        return;
+                    }
+                    createFieldImageUri = uri;
+                    if (createFieldNoImageContainer != null) {
+                        createFieldNoImageContainer.setVisibility(View.GONE);
+                    }
+                    if (createFieldImagePreviewContainer != null) {
+                        createFieldImagePreviewContainer.setVisibility(View.VISIBLE);
+                    }
+                    if (createFieldImagePreview != null) {
+                        Glide.with(this).load(uri).into(createFieldImagePreview);
+                    }
+                });
 
         bindViews(view);
         setupRecyclerView(view);
@@ -78,6 +115,7 @@ public class OwnerFieldsFragment extends Fragment {
         tvEmptyFields = view.findViewById(R.id.tvOwnerEmptyFields);
         tvAvailableCount = view.findViewById(R.id.tvAvailableCount);
         tvMaintenanceCount = view.findViewById(R.id.tvMaintenanceCount);
+        tvClosedCount = view.findViewById(R.id.tvClosedCount);
     }
 
     private void setupRecyclerView(View view) {
@@ -110,6 +148,28 @@ public class OwnerFieldsFragment extends Fragment {
             searchQuery = value == null ? "" : value.trim();
             renderFields();
         }));
+        // Filter pills click handlers
+        if (tvAvailableCount != null) {
+            tvAvailableCount.setOnClickListener(v -> {
+                filterMode = filterMode == FilterMode.AVAILABLE ? FilterMode.ALL : FilterMode.AVAILABLE;
+                updateSummary();
+                renderFields();
+            });
+        }
+        if (tvMaintenanceCount != null) {
+            tvMaintenanceCount.setOnClickListener(v -> {
+                filterMode = filterMode == FilterMode.MAINTENANCE ? FilterMode.ALL : FilterMode.MAINTENANCE;
+                updateSummary();
+                renderFields();
+            });
+        }
+        if (tvClosedCount != null) {
+            tvClosedCount.setOnClickListener(v -> {
+                filterMode = filterMode == FilterMode.CLOSED ? FilterMode.ALL : FilterMode.CLOSED;
+                updateSummary();
+                renderFields();
+            });
+        }
     }
 
     // 5. Sử dụng 'getViewLifecycleOwner()' để lắng nghe dữ liệu LiveData an toàn
@@ -137,9 +197,22 @@ public class OwnerFieldsFragment extends Fragment {
                 filtered.add(field);
             }
         }
-        fieldAdapter.submitList(filtered);
+        // Apply status filter (Available / Maintenance / Closed)
+        List<Field> statusFiltered = new ArrayList<>();
+        for (Field f : filtered) {
+            if (filterMode == FilterMode.AVAILABLE) {
+                if (!"MAINTENANCE".equalsIgnoreCase(f.getStatus()) && !isFieldClosed(f)) statusFiltered.add(f);
+            } else if (filterMode == FilterMode.MAINTENANCE) {
+                if ("MAINTENANCE".equalsIgnoreCase(f.getStatus())) statusFiltered.add(f);
+            } else if (filterMode == FilterMode.CLOSED) {
+                if (isFieldClosed(f)) statusFiltered.add(f);
+            } else {
+                statusFiltered.add(f);
+            }
+        }
+        fieldAdapter.submitList(statusFiltered);
         if (tvEmptyFields != null) {
-            tvEmptyFields.setVisibility(filtered.isEmpty() ? View.VISIBLE : View.GONE);
+            tvEmptyFields.setVisibility(statusFiltered.isEmpty() ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -154,83 +227,371 @@ public class OwnerFieldsFragment extends Fragment {
     private void updateSummary() {
         int available = 0;
         int maintenance = 0;
+        int closed = 0;
         for (Field field : allFields) {
             if ("MAINTENANCE".equalsIgnoreCase(field.getStatus())) {
                 maintenance++;
+            } else if (isFieldClosed(field)) {
+                closed++;
             } else {
                 available++;
             }
         }
-        tvAvailableCount.setText("● " + available + " Available");
-        tvMaintenanceCount.setText("● " + maintenance + " Maintenance");
+        if (getContext() != null) {
+            tvAvailableCount.setText(getString(R.string.owner_available_pill, available));
+            tvMaintenanceCount.setText(getString(R.string.owner_maintenance_pill, maintenance));
+            if (tvClosedCount != null) tvClosedCount.setText(getString(R.string.owner_closed_pill, closed));
+        }
         tvEmptyFields.setVisibility(allFields.isEmpty() ? View.VISIBLE : View.GONE);
+        // Visual state for filter pills
+        if (tvAvailableCount != null && tvMaintenanceCount != null && tvClosedCount != null) {
+            // Reset all
+            tvAvailableCount.setAlpha(1f);
+            tvAvailableCount.setTypeface(null, android.graphics.Typeface.NORMAL);
+            tvMaintenanceCount.setAlpha(1f);
+            tvMaintenanceCount.setTypeface(null, android.graphics.Typeface.NORMAL);
+            tvClosedCount.setAlpha(1f);
+            tvClosedCount.setTypeface(null, android.graphics.Typeface.NORMAL);
+            switch (filterMode) {
+                case AVAILABLE:
+                    tvAvailableCount.setAlpha(1f);
+                    tvAvailableCount.setTypeface(null, android.graphics.Typeface.BOLD);
+                    tvMaintenanceCount.setAlpha(0.6f);
+                    tvClosedCount.setAlpha(0.6f);
+                    break;
+                case MAINTENANCE:
+                    tvMaintenanceCount.setAlpha(1f);
+                    tvMaintenanceCount.setTypeface(null, android.graphics.Typeface.BOLD);
+                    tvAvailableCount.setAlpha(0.6f);
+                    tvClosedCount.setAlpha(0.6f);
+                    break;
+                case CLOSED:
+                    tvClosedCount.setAlpha(1f);
+                    tvClosedCount.setTypeface(null, android.graphics.Typeface.BOLD);
+                    tvAvailableCount.setAlpha(0.6f);
+                    tvMaintenanceCount.setAlpha(0.6f);
+                    break;
+                default:
+                    // ALL
+                    break;
+            }
+        }
+    }
+
+    private boolean isFieldClosed(Field f) {
+        if (f == null) return false;
+        // If status is explicitly set to CLOSED, respect it
+        if ("CLOSED".equalsIgnoreCase(f.getStatus())) return true;
+        // Otherwise, determine closed if there are time slots and none are available
+        if (f.getTimeSlots() == null || f.getTimeSlots().isEmpty()) return false;
+        for (TimeSlotResponse slot : f.getTimeSlots()) {
+            if (slot == null) continue;
+            if (slot.isAvailable()) return false;
+        }
+        return true;
     }
 
     private void showFieldForm(Field field) {
-        boolean editing = field != null;
-        Dialog dialog = createDialog(R.layout.dialog_owner_field_form);
-
-        TextView tvTitle = dialog.findViewById(R.id.tvFieldFormTitle);
-        TextInputEditText etName = dialog.findViewById(R.id.etFieldName);
-        AutoCompleteTextView etType = dialog.findViewById(R.id.etFieldType);
-        TextInputEditText etAddress = dialog.findViewById(R.id.etFieldAddress);
-        TextInputEditText etCoverImage = dialog.findViewById(R.id.etFieldCoverImage);
-        TextInputEditText etDescription = dialog.findViewById(R.id.etFieldDescription);
-        AutoCompleteTextView etStatus = dialog.findViewById(R.id.etFieldStatus);
-        MaterialButton btnCancel = dialog.findViewById(R.id.btnCancelFieldForm);
-        MaterialButton btnSave = dialog.findViewById(R.id.btnSaveFieldForm);
-
-        String[] types = {"FIVE_A_SIDE", "SEVEN_A_SIDE", "ELEVEN_A_SIDE"};
-        String[] statuses = {"AVAILABLE", "MAINTENANCE", "BOOKED"};
-
-        // Cấp ngữ cảnh yêu cầu qua hàm 'requireContext()' thay cho Activity context cũ
-        etType.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, types));
-        etStatus.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, statuses));
-
-        tvTitle.setText(editing ? "Chỉnh sửa sân" : "Tạo sân mới");
-        btnSave.setText(editing ? "Lưu thay đổi" : "Tạo sân");
-
-        if (editing) {
-            etName.setText(field.getName());
-            etType.setText(normalizeTypeLabel(field.getType()), false);
-            etAddress.setText(field.getAddress());
-            etCoverImage.setText(field.getImageUrl());
-            etDescription.setText(field.getDescription());
-            etStatus.setText(normalizeStatus(field.getStatus()), false);
-        } else {
-            etType.setText(types[0], false);
-            etStatus.setText("AVAILABLE", false);
+        if (field == null) {
+            showCreateFieldForm();
+            return;
         }
 
-        btnCancel.setOnClickListener(v -> dialog.dismiss());
-        btnSave.setOnClickListener(v -> {
-            String name = readText(etName);
-            String type = readText(etType);
-            if (name.isEmpty() || type.isEmpty()) {
-                Toast.makeText(requireContext(), "Vui lòng nhập tên sân và loại sân.", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (editing) {
+        // Use the dedicated edit bottom-sheet layout for editing
+        Dialog dialog = createDialog(R.layout.dialog_owner_edit_field);
+
+        TextView tvEditingFieldName = dialog.findViewById(R.id.tvEditingFieldName);
+        View btnClose = dialog.findViewById(R.id.btnCloseEditField);
+        EditText etName = dialog.findViewById(R.id.etEditFieldName);
+        LinearLayout chipSan5 = dialog.findViewById(R.id.chipEditTypeSan5);
+        LinearLayout chipSan7 = dialog.findViewById(R.id.chipEditTypeSan7);
+        EditText etCapacity = dialog.findViewById(R.id.etEditCapacity);
+        EditText etPrice = dialog.findViewById(R.id.etEditPricePerSlot);
+        EditText etDescription = dialog.findViewById(R.id.etEditDescription);
+        LinearLayout rbAvailable = dialog.findViewById(R.id.rbEditStatusAvailable);
+        LinearLayout rbMaintenance = dialog.findViewById(R.id.rbEditStatusMaintenance);
+        TextView ivCheckAvailable = dialog.findViewById(R.id.ivEditCheckAvailable);
+        TextView ivCheckMaintenance = dialog.findViewById(R.id.ivEditCheckMaintenance);
+        View btnCancel = dialog.findViewById(R.id.btnCancelEditField);
+        View btnSubmit = dialog.findViewById(R.id.btnSubmitEditField);
+        View btnDelete = dialog.findViewById(R.id.btnDeleteFieldFromEdit);
+        FrameLayout framePreview = dialog.findViewById(R.id.frameEditImagePreview);
+        ImageView ivPreview = dialog.findViewById(R.id.ivEditFieldImagePreview);
+        View btnChangePhoto = dialog.findViewById(R.id.btnChangePhoto);
+
+        tvEditingFieldName.setText(field.getName());
+        etName.setText(field.getName());
+        etDescription.setText(field.getDescription());
+        etPrice.setText(field.getPricePerHour() > 0 ? String.valueOf((int) field.getPricePerHour()) : "");
+        etCapacity.setText("");
+
+        // Set type selection
+        String t = normalizeTypeLabel(field.getType());
+        boolean isSan5 = "FIVE_A_SIDE".equalsIgnoreCase(t);
+        chipSan5.setBackgroundResource(isSan5 ? R.drawable.bg_type_chip_active : R.drawable.bg_type_chip_inactive);
+        chipSan7.setBackgroundResource(!isSan5 ? R.drawable.bg_type_chip_active : R.drawable.bg_type_chip_inactive);
+        chipSan5.setTag(Boolean.valueOf(isSan5));
+        chipSan7.setTag(Boolean.valueOf(!isSan5));
+
+        // Set status selection
+        boolean isAvailable = !"MAINTENANCE".equalsIgnoreCase(field.getStatus());
+        rbAvailable.setBackgroundResource(isAvailable ? R.drawable.bg_status_radio_active : R.drawable.bg_status_radio_inactive);
+        rbMaintenance.setBackgroundResource(isAvailable ? R.drawable.bg_status_radio_inactive : R.drawable.bg_status_radio_active);
+        ivCheckAvailable.setVisibility(isAvailable ? View.VISIBLE : View.GONE);
+        ivCheckMaintenance.setVisibility(isAvailable ? View.GONE : View.VISIBLE);
+
+        // Image preview if available
+        if (field.getImageUrl() != null && !field.getImageUrl().trim().isEmpty()) {
+            ivPreview.setVisibility(View.VISIBLE);
+            Glide.with(this).load(field.getImageUrl()).into(ivPreview);
+            if (framePreview != null) framePreview.setVisibility(View.VISIBLE);
+        }
+
+        View.OnClickListener dismiss = v -> dialog.dismiss();
+        if (btnClose != null) btnClose.setOnClickListener(dismiss);
+        if (btnCancel != null) btnCancel.setOnClickListener(dismiss);
+
+        chipSan5.setOnClickListener(v -> {
+            chipSan5.setBackgroundResource(R.drawable.bg_type_chip_active);
+            chipSan7.setBackgroundResource(R.drawable.bg_type_chip_inactive);
+            chipSan5.setTag(Boolean.TRUE);
+            chipSan7.setTag(Boolean.FALSE);
+        });
+        chipSan7.setOnClickListener(v -> {
+            chipSan7.setBackgroundResource(R.drawable.bg_type_chip_active);
+            chipSan5.setBackgroundResource(R.drawable.bg_type_chip_inactive);
+            chipSan7.setTag(Boolean.TRUE);
+            chipSan5.setTag(Boolean.FALSE);
+        });
+
+        rbAvailable.setOnClickListener(v -> {
+            rbAvailable.setBackgroundResource(R.drawable.bg_status_radio_active);
+            rbMaintenance.setBackgroundResource(R.drawable.bg_status_radio_inactive);
+            ivCheckAvailable.setVisibility(View.VISIBLE);
+            ivCheckMaintenance.setVisibility(View.GONE);
+        });
+        rbMaintenance.setOnClickListener(v -> {
+            rbAvailable.setBackgroundResource(R.drawable.bg_status_radio_inactive);
+            rbMaintenance.setBackgroundResource(R.drawable.bg_status_radio_active);
+            ivCheckAvailable.setVisibility(View.GONE);
+            ivCheckMaintenance.setVisibility(View.VISIBLE);
+        });
+
+        if (btnChangePhoto != null && createFieldImagePickerLauncher != null) {
+            btnChangePhoto.setOnClickListener(v -> createFieldImagePickerLauncher.launch("image/*"));
+        }
+
+        if (btnSubmit != null) {
+            btnSubmit.setOnClickListener(v -> {
+                String name = readText(etName);
+                String type = isViewSelected(chipSan7) ? "SEVEN_A_SIDE" : "FIVE_A_SIDE";
+                String description = readText(etDescription);
+                String status = ivCheckAvailable.getVisibility() == View.VISIBLE ? "AVAILABLE" : "MAINTENANCE";
+                String cover = ivPreview.getVisibility() == View.VISIBLE && field.getImageUrl() != null ? field.getImageUrl() : "";
+                if (name.isEmpty()) {
+                    Toast.makeText(requireContext(), "Vui lòng nhập tên sân.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 viewModel.updateField(field.getId(), new FieldUpdateRequest(
                         name,
                         type,
-                        readText(etAddress),
-                        readText(etDescription),
-                        readText(etCoverImage),
-                        readText(etStatus)));
-            } else {
-                viewModel.createField(new FieldCreateRequest(
-                        name,
-                        type,
-                        readText(etAddress),
-                        readText(etDescription),
-                        readText(etCoverImage),
-                        readText(etStatus)));
-            }
-            dialog.dismiss();
-        });
+                        field.getAddress() == null ? "" : field.getAddress(),
+                        description,
+                        cover,
+                        status));
+                dialog.dismiss();
+            });
+        }
+
+        if (btnDelete != null) {
+            btnDelete.setOnClickListener(v -> {
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Xóa sân bóng")
+                        .setMessage("Bạn có chắc chắn muốn xóa sân \"" + field.getName() + "\"?")
+                        .setNegativeButton("Hủy", null)
+                        .setPositiveButton("Xóa", (d, which) -> viewModel.deleteField(field.getId()))
+                        .show();
+            });
+        }
 
         dialog.show();
+    }
+
+    private void showCreateFieldForm() {
+        Dialog dialog = createDialog(R.layout.dialog_owner_create_field);
+        createFieldImageUri = null;
+
+        View closeButton = dialog.findViewById(R.id.btnCloseCreateField);
+        View cancelButton = dialog.findViewById(R.id.btnCancelCreateField);
+        View submitButton = dialog.findViewById(R.id.btnSubmitCreateField);
+        View imagePickerContainer = dialog.findViewById(R.id.containerImagePicker);
+        createFieldNoImageContainer = dialog.findViewById(R.id.llNoImage);
+        createFieldImagePreviewContainer = dialog.findViewById(R.id.frameImagePreview);
+        createFieldImagePreview = dialog.findViewById(R.id.ivFieldImagePreview);
+        createFieldNameError = dialog.findViewById(R.id.tvFieldNameError);
+
+        EditText etFieldName = dialog.findViewById(R.id.etFieldName);
+        EditText etDescription = dialog.findViewById(R.id.etDescription);
+        LinearLayout chipTypeSan5 = dialog.findViewById(R.id.chipTypeSan5);
+        LinearLayout chipTypeSan7 = dialog.findViewById(R.id.chipTypeSan7);
+        LinearLayout rbStatusAvailable = dialog.findViewById(R.id.rbStatusAvailable);
+        LinearLayout rbStatusMaintenance = dialog.findViewById(R.id.rbStatusMaintenance);
+        TextView ivCheckAvailable = dialog.findViewById(R.id.ivCheckAvailable);
+        TextView ivCheckMaintenance = dialog.findViewById(R.id.ivCheckMaintenance);
+
+        View.OnClickListener pickImage = v -> {
+            if (createFieldImagePickerLauncher != null) {
+                createFieldImagePickerLauncher.launch("image/*");
+            }
+        };
+
+        if (imagePickerContainer != null) {
+            imagePickerContainer.setOnClickListener(pickImage);
+        }
+        if (createFieldNoImageContainer != null) {
+            createFieldNoImageContainer.setOnClickListener(pickImage);
+        }
+        if (createFieldImagePreviewContainer != null) {
+            createFieldImagePreviewContainer.setOnClickListener(pickImage);
+        }
+
+        updateCreateFieldTypeSelection("FIVE_A_SIDE", chipTypeSan5, chipTypeSan7);
+        updateCreateFieldStatusSelection("AVAILABLE", rbStatusAvailable, rbStatusMaintenance, ivCheckAvailable, ivCheckMaintenance);
+
+        if (chipTypeSan5 != null) {
+            chipTypeSan5.setOnClickListener(v -> updateCreateFieldTypeSelection("FIVE_A_SIDE", chipTypeSan5, chipTypeSan7));
+        }
+        if (chipTypeSan7 != null) {
+            chipTypeSan7.setOnClickListener(v -> updateCreateFieldTypeSelection("SEVEN_A_SIDE", chipTypeSan5, chipTypeSan7));
+        }
+
+        if (rbStatusAvailable != null) {
+            rbStatusAvailable.setOnClickListener(v -> updateCreateFieldStatusSelection("AVAILABLE", rbStatusAvailable, rbStatusMaintenance, ivCheckAvailable, ivCheckMaintenance));
+        }
+        if (rbStatusMaintenance != null) {
+            rbStatusMaintenance.setOnClickListener(v -> updateCreateFieldStatusSelection("MAINTENANCE", rbStatusAvailable, rbStatusMaintenance, ivCheckAvailable, ivCheckMaintenance));
+        }
+
+        View.OnClickListener dismissListener = v -> dialog.dismiss();
+        if (closeButton != null) {
+            closeButton.setOnClickListener(dismissListener);
+        }
+        if (cancelButton != null) {
+            cancelButton.setOnClickListener(dismissListener);
+        }
+        if (submitButton != null) {
+            submitButton.setOnClickListener(v -> {
+                if (createFieldNameError != null) {
+                    createFieldNameError.setVisibility(View.GONE);
+                }
+
+                String name = readText(etFieldName);
+                if (name.isEmpty()) {
+                    if (createFieldNameError != null) {
+                        createFieldNameError.setVisibility(View.VISIBLE);
+                    }
+                    Toast.makeText(requireContext(), "Vui lòng nhập tên sân.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                String description = readText(etDescription);
+
+                String coverImage = createFieldImageUri == null ? "" : createFieldImageUri.toString();
+                viewModel.createField(new FieldCreateRequest(
+                        name,
+                        createFieldSelectedType,
+                        "",
+                        description,
+                        coverImage,
+                        createFieldSelectedStatus));
+                dialog.dismiss();
+            });
+        }
+
+        dialog.setOnDismissListener(d -> clearCreateFieldDialogState());
+        dialog.show();
+    }
+
+    private void updateCreateFieldTypeSelection(String type, LinearLayout chipTypeSan5, LinearLayout chipTypeSan7) {
+        createFieldSelectedType = type;
+        if (chipTypeSan5 == null || chipTypeSan7 == null) {
+            return;
+        }
+
+        boolean isSan5 = "FIVE_A_SIDE".equals(type);
+        boolean isSan7 = "SEVEN_A_SIDE".equals(type);
+
+        chipTypeSan5.setBackgroundResource(isSan5 ? R.drawable.bg_type_chip_active : R.drawable.bg_type_chip_inactive);
+        chipTypeSan7.setBackgroundResource(isSan7 ? R.drawable.bg_type_chip_active : R.drawable.bg_type_chip_inactive);
+
+        updateTypeChipTexts(chipTypeSan5, isSan5);
+        updateTypeChipTexts(chipTypeSan7, isSan7);
+    }
+
+    private void updateTypeChipTexts(LinearLayout chip, boolean selected) {
+        if (chip == null) {
+            return;
+        }
+        TextView titleView = (TextView) chip.getChildAt(0);
+        TextView subtitleView = (TextView) chip.getChildAt(1);
+        if (titleView != null) {
+            titleView.setTextColor(getResources().getColor(selected ? android.R.color.white : R.color.slate_600, null));
+        }
+        if (subtitleView != null) {
+            subtitleView.setTextColor(getResources().getColor(selected ? android.R.color.white : R.color.slate_400, null));
+        }
+    }
+
+    private void updateCreateFieldStatusSelection(String status,
+                                                  LinearLayout rbStatusAvailable,
+                                                  LinearLayout rbStatusMaintenance,
+                                                  TextView ivCheckAvailable,
+                                                  TextView ivCheckMaintenance) {
+        createFieldSelectedStatus = status;
+        if (rbStatusAvailable == null || rbStatusMaintenance == null || ivCheckAvailable == null || ivCheckMaintenance == null) {
+            return;
+        }
+
+        boolean availableSelected = "AVAILABLE".equals(status);
+        rbStatusAvailable.setBackgroundResource(availableSelected ? R.drawable.bg_status_radio_active : R.drawable.bg_status_radio_inactive);
+        rbStatusMaintenance.setBackgroundResource(availableSelected ? R.drawable.bg_status_radio_inactive : R.drawable.bg_status_radio_active);
+        ivCheckAvailable.setVisibility(availableSelected ? View.VISIBLE : View.GONE);
+        ivCheckMaintenance.setVisibility(availableSelected ? View.GONE : View.VISIBLE);
+    }
+
+    private String buildCreateFieldSupplementalInfo(String capacity, String price) {
+        List<String> infoLines = new ArrayList<>();
+        if (!capacity.isEmpty()) {
+            infoLines.add("Sức chứa tối đa: " + capacity + " người");
+        }
+        if (!price.isEmpty()) {
+            infoLines.add("Giá thuê / giờ: " + price + " ₫");
+        }
+        return TextUtils.join("\n", infoLines);
+    }
+
+    private Integer parseInteger(String value) {
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (Exception exception) {
+            return null;
+        }
+    }
+
+    private void clearCreateFieldDialogState() {
+        createFieldImageUri = null;
+        createFieldNoImageContainer = null;
+        createFieldImagePreviewContainer = null;
+        createFieldImagePreview = null;
+        createFieldNameError = null;
+        createFieldSelectedType = "FIVE_A_SIDE";
+        createFieldSelectedStatus = "AVAILABLE";
+    }
+
+    private boolean isViewSelected(View v) {
+        if (v == null) return false;
+        Object tag = v.getTag();
+        return tag instanceof Boolean && (Boolean) tag;
     }
 
     private void confirmDeleteField(Field field) {
@@ -251,7 +612,7 @@ public class OwnerFieldsFragment extends Fragment {
         MaterialButton btnAdd = dialog.findViewById(R.id.btnAddOwnerTimeSlot);
 
         tvTitle.setText(field.getName());
-        tvSubtitle.setText(field.getTypeLabel() + " · " + safe(field.getStatus()));
+        tvSubtitle.setText(getString(R.string.owner_field_type_status_format, field.getTypeLabel(), safe(field.getStatus())));
 
         OwnerTimeSlotAdapter adapter = new OwnerTimeSlotAdapter(new OwnerTimeSlotAdapter.Listener() {
             @Override
@@ -302,9 +663,11 @@ public class OwnerFieldsFragment extends Fragment {
             etStartTime.setText(timeSlot.getStartTime());
             etEndTime.setText(timeSlot.getEndTime());
             etPrice.setText(timeSlot.getPrice() == null ? "" : String.valueOf(timeSlot.getPrice()));
-            etStatus.setText(timeSlot.isAvailable() ? "AVAILABLE" : safe(timeSlot.getStatus()), false);
+            String selectedStatus = timeSlot.isAvailable() ? "AVAILABLE" : safe(timeSlot.getStatus());
+            etStatus.setText(selectedStatus, false);
         } else {
-            etStatus.setText("AVAILABLE", false);
+            String defaultStatus = "AVAILABLE";
+            etStatus.setText(defaultStatus, false);
         }
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());

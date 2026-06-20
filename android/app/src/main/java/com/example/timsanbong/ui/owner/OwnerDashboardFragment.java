@@ -36,7 +36,7 @@ public class OwnerDashboardFragment extends Fragment {
 
     private OwnerFieldViewModel fieldViewModel;
     private OwnerBookingViewModel bookingViewModel;
-    private OwnerBookingAdapter bookingAdapter;
+    private RecentBookingAdapter bookingAdapter;
     private final List<Field> currentFields = new ArrayList<>();
     private final List<Booking> currentBookings = new ArrayList<>();
 
@@ -123,32 +123,47 @@ public class OwnerDashboardFragment extends Fragment {
 
         // 3. Các nút tính năng phụ (Tin nhắn / Thông báo) nếu chưa làm Fragment thì có thể giữ nguyên hoặc cập nhật sau
         view.findViewById(R.id.btnMessages).setOnClickListener(v -> {
-            // Tạm thời giữ nguyên hoặc chuyển đổi tương tự nếu có MessagesFragment
-            startActivity(new Intent(requireContext(), com.example.timsanbong.ui.customer.MessagesActivity.class));
+            // Open MessagesActivity if exists (customer.messages used as shared activity)
+            try {
+                startActivity(new Intent(requireContext(), com.example.timsanbong.ui.customer.MessagesActivity.class));
+            } catch (Exception ex) {
+                showMessage("Chức năng tin nhắn đang tạm thời không khả dụng");
+            }
         });
 
         view.findViewById(R.id.btnNotificationBell).setOnClickListener(v -> {
-            // Tạm thời giữ nguyên hoặc chuyển đổi tương tự
-            startActivity(new Intent(requireContext(), com.example.timsanbong.ui.customer.MessagesActivity.class));
+            // Open NotificationsActivity
+            try {
+                startActivity(new Intent(requireContext(), com.example.timsanbong.ui.customer.NotificationsActivity.class));
+            } catch (Exception ex) {
+                showMessage("Không thể mở thông báo");
+            }
+        });
+
+        // Logout button: confirm then clear session and navigate to LoginActivity
+        view.findViewById(R.id.btnLogout).setOnClickListener(v -> {
+            new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                    .setTitle("Đăng xuất")
+                    .setMessage("Bạn có chắc muốn đăng xuất không?")
+                    .setPositiveButton("Đăng xuất", (dialog, which) -> {
+                        SessionManager sessionManager = new SessionManager(requireContext());
+                        sessionManager.clearSession();
+                        android.content.Intent intent = new android.content.Intent(requireContext(), com.example.timsanbong.ui.auth.LoginActivity.class);
+                        intent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    })
+                    .setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss())
+                    .show();
         });
     }
 
     private void setupRecentBookings(View view) {
         RecyclerView rvRecentBookings = view.findViewById(R.id.rvRecentBookings);
-        bookingAdapter = new OwnerBookingAdapter(new OwnerBookingAdapter.Listener() {
+        bookingAdapter = new RecentBookingAdapter(new RecentBookingAdapter.Listener() {
             @Override
-            public void onCheckIn(Booking booking) {
-                bookingViewModel.checkInBooking(booking.getId());
-            }
-
-            @Override
-            public void onCollectRest(Booking booking) {
-                bookingViewModel.checkOutBooking(booking.getId());
-            }
-
-            @Override
-            public void onNoShow(Booking booking) {
-                bookingViewModel.markNoShow(booking.getId());
+            public void onItemClick(Booking booking) {
+                // For now show a short message; you can replace this with navigation to booking details
+                showMessage("Đơn #" + booking.getId());
             }
         });
 

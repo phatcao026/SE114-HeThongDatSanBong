@@ -329,145 +329,9 @@
                     android:textSize="10sp" />
 
             </LinearLayout>
-
-            <!-- Sân 11 chip -->
-            <LinearLayout
-                android:id="@+id/chipTypeSan11"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:background="@drawable/bg_type_chip_inactive">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Sân 11"
-                    android:textColor="@color/slate_600"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="11 - 22 người"
-                    android:textColor="@color/slate_400"
-                    android:textSize="10sp" />
-
-            </LinearLayout>
-
         </LinearLayout>
-        <!-- ══════════════════════════════════════════════
-             SECTION 4: SỐ NGƯỜI & GIÁ THUÊ (2-column)
-             ══════════════════════════════════════════════ -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="18dp">
 
-            <!-- Số người tối đa -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="10dp"
-                android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Số người tối đa"
-                    android:textColor="@color/slate_700"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/bg_outline_box"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="10dp">
-
-                    <EditText
-                        android:id="@+id/etCapacity"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@null"
-                        android:hint="10"
-                        android:textColorHint="@color/slate_400"
-                        android:textColor="@color/slate_900"
-                        android:textSize="14sp"
-                        android:inputType="number"
-                        android:singleLine="true" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="người"
-                        android:textColor="@color/slate_400"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <!-- Giá thuê / khung giờ -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Giá thuê / giờ  *"
-                    android:textColor="@color/slate_700"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/bg_outline_box"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="10dp">
-
-                    <EditText
-                        android:id="@+id/etPricePerSlot"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@null"
-                        android:hint="350000"
-                        android:textColorHint="@color/slate_400"
-                        android:textColor="@color/slate_900"
-                        android:textSize="14sp"
-                        android:inputType="numberDecimal"
-                        android:singleLine="true" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="₫"
-                        android:textColor="@color/emerald_600"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </LinearLayout>
         <!-- ══════════════════════════════════════════════
              SECTION 5: MÔ TẢ (Description — optional)
              ══════════════════════════════════════════════ -->
@@ -605,7 +469,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Maintenance"
-                        android:textColor="@color/slate_600"
+                        android:textColor="@color/amber_500"
                         android:textSize="13sp"
                         android:textStyle="bold" />
 
@@ -613,7 +477,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Đang bảo trì"
-                        android:textColor="@color/slate_400"
+                        android:textColor="@color/amber_400"
                         android:textSize="10sp" />
 
                 </LinearLayout>

@@ -47,16 +47,13 @@ public class FieldUpdateRequest {
             return null;
         }
         String normalized = value.trim().toUpperCase();
-        if (normalized.contains("11") || normalized.contains("ELEVEN")) {
-            return "ELEVEN_A_SIDE";
-        }
         if (normalized.contains("7") || normalized.contains("SEVEN")) {
             return "SEVEN_A_SIDE";
         }
         if (normalized.contains("5") || normalized.contains("FIVE")) {
             return "FIVE_A_SIDE";
         }
-        return normalized;
+        return "FIVE_A_SIDE";
     }
 
     private String normalizeStatus(String value) {
