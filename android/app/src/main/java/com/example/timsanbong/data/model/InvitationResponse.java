@@ -21,6 +21,7 @@ public class InvitationResponse {
     public long getId() { return id; }
     public long getTeamId() { return teamId; }
     public String getTeamName() { return teamName; }
+    public String getTeam() { return (teamName != null && !teamName.trim().isEmpty()) ? teamName : "Đội bóng"; }
     public String getStatus() { return status; }
     public String getCreatedAt() { return createdAt; }
 }

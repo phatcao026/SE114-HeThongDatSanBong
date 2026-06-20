@@ -69,12 +69,30 @@ public class MatchPost implements Serializable {
     @SerializedName("createdAt")
     private String createdAt;
 
+    @SerializedName("hasField")
+    private Boolean hasField;
+
+    @SerializedName("neededMembers")
+    private Integer neededMembers;
+
+    @SerializedName("joinedMembers")
+    private Integer joinedMembers;
+
+    @SerializedName("targetPositions")
+    private String targetPositions;
+
+    @SerializedName("ageRange")
+    private String ageRange;
+
     private boolean accepted;
     private boolean isHot;
     private String captainInitials;
     private String membersSlot;
     private String cost;
     private String timeAgo;
+
+    @SerializedName("team")
+    private String team;
 
     public MatchPost() {}
 
@@ -114,38 +132,56 @@ public class MatchPost implements Serializable {
     public String getPlayTime() { return getTime(); }
     public String getLocation() { return fieldName; }
     public String getStatus() { return status; }
+    public Boolean getHasField() { return hasField; }
+    public Integer getNeededMembers() { return neededMembers; }
+    public Integer getJoinedMembers() { return joinedMembers; }
+    public String getTargetPositions() { return targetPositions; }
+    public String getAgeRange() { return ageRange; }
 
     public String getTeamName() { return teamName; }
     public void setTeamName(String teamName) { this.teamName = teamName; }
     public String getCaptainName() { return userName; }
     public void setCaptainName(String captainName) { this.userName = captainName; }
-    public int getTrustScore() { return trustScore != null ? trustScore : 0; }
+    public int getTrustScore() { return trustScore != null ? trustScore : 100; }
     public void setTrustScore(int trustScore) { this.trustScore = trustScore; }
 
     public String getIdString() { return String.valueOf(id); }
     public String getType() { return postType != null ? postType : TYPE_FIND_OPPONENT; }
     public String getTypeLabel() {
-        if (TYPE_FIND_MEMBER.equals(postType)) return "Tim cau thu";
-        return "Tim doi";
+        if (TYPE_FIND_MEMBER.equals(postType)) return "Tìm cầu thủ";
+        return "Tìm đối thủ";
     }
-    public String getTeam() { return teamName != null ? teamName : "Doi bong"; }
-    public String getCaptain() { return userName != null ? userName : "Doi truong"; }
+    public String getTeam() {
+        if (teamName != null && !teamName.trim().isEmpty()) return teamName;
+        if (team != null && !team.trim().isEmpty()) return team;
+        return "Đội bóng";
+    }
+    public String getCaptain() { return userName != null ? userName : "Đội trưởng"; }
     public String getCaptainInitials() {
         if (captainInitials != null) return captainInitials;
         String captain = getCaptain();
-        return captain.isEmpty() ? "C" : captain.substring(0, 1).toUpperCase();
+        if (captain.isEmpty()) return "C";
+        String[] parts = captain.trim().split("\\s+");
+        if (parts.length > 1) {
+            return (parts[0].substring(0, 1) + parts[parts.length - 1].substring(0, 1)).toUpperCase();
+        }
+        return captain.substring(0, Math.min(captain.length(), 2)).toUpperCase();
     }
     public String getLevel() { return skillLevel != null ? skillLevel : "INTERMEDIATE"; }
     public String getDate() { return date != null ? date : ""; }
     public String getTime() {
         if (timeStart == null || timeStart.isEmpty()) return "";
-        if (timeEnd == null || timeEnd.isEmpty()) return timeStart;
-        return timeStart + "-" + timeEnd;
+        String start = timeStart.length() > 5 ? timeStart.substring(0, 5) : timeStart;
+        if (timeEnd == null || timeEnd.isEmpty()) return start;
+        String end = timeEnd.length() > 5 ? timeEnd.substring(0, 5) : timeEnd;
+        return start + " - " + end;
     }
-    public String getField() { return fieldName != null ? fieldName : "San bong"; }
+    public String getField() { return fieldName != null ? fieldName : "Sân bóng"; }
     public String getMembersSlot() {
-        if (membersSlot != null) return membersSlot;
-        return requestCount + " yeu cau";
+        if (TYPE_FIND_MEMBER.equals(postType)) {
+            return (neededMembers != null ? neededMembers : 0) + " thành viên";
+        }
+        return requestCount + " yêu cầu";
     }
     public String getCost() {
         if (cost != null) return cost;
@@ -154,7 +190,22 @@ public class MatchPost implements Serializable {
     public String getMessage() { return message != null ? message : ""; }
     public String getTimeAgo() {
         if (timeAgo != null) return timeAgo;
-        return createdAt != null ? createdAt : "Vua xong";
+        if (createdAt == null || createdAt.isEmpty()) return "Vừa xong";
+        try {
+            // Server format: 2026-06-20T16:02:28.868441
+            String cleanDate = createdAt.split("\\.")[0].replace("T", " ");
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US);
+            java.util.Date createdDate = sdf.parse(cleanDate);
+            long diff = System.currentTimeMillis() - createdDate.getTime();
+            long minutes = diff / (60 * 1000);
+            if (minutes < 1) return "Vừa xong";
+            if (minutes < 60) return minutes + " phút trước";
+            long hours = minutes / 60;
+            if (hours < 24) return hours + " giờ trước";
+            return (hours / 24) + " ngày trước";
+        } catch (Exception e) {
+            return createdAt;
+        }
     }
     public String getPostedAgo() { return getTimeAgo(); }
     public boolean isHot() { return isHot || requestCount > 0; }

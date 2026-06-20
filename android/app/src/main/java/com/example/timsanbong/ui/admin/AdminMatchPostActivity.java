@@ -85,7 +85,7 @@ public class AdminMatchPostActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             MatchPost p = posts.get(position);
-            holder.tvMatchPostTitle.setText(String.format("[%s] %s", p.getTypeLabel(), p.getTeamName()));
+            holder.tvMatchPostTitle.setText(String.format("[%s] %s", p.getTypeLabel(), p.getTeam()));
             holder.tvMatchPostDetails.setText(String.format("%s | %s | %s", p.getField(), p.getDate(), p.getTime()));
             holder.tvMatchPostMessage.setText(p.getMessage());
             holder.tvMatchPostStatus.setText(p.getStatus());

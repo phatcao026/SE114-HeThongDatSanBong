@@ -5,6 +5,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -49,25 +50,19 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         // Avatar
         int avatarColor = ContextCompat.getColor(ctx,
                 MatchPost.TYPE_FIND_OPPONENT.equals(match.getType()) ? R.color.primary : R.color.accent_orange);
-        GradientDrawable ovalBg = (GradientDrawable) ContextCompat.getDrawable(ctx, R.drawable.shape_oval).mutate();
+        GradientDrawable ovalBg = (GradientDrawable) holder.viewAvatarBg.getBackground().mutate();
         ovalBg.setColor(avatarColor);
-        holder.viewAvatarBg.setBackground(ovalBg);
         holder.tvInitials.setText(match.getCaptainInitials());
 
         // Trust badge
         int trust = match.getTrustScore();
-        int trustColor = trust >= 80
-                ? ContextCompat.getColor(ctx, R.color.trust_high)
-                : trust >= 60
-                ? ContextCompat.getColor(ctx, R.color.trust_mid)
-                : ContextCompat.getColor(ctx, R.color.trust_low);
-        GradientDrawable trustBg = (GradientDrawable) ContextCompat.getDrawable(ctx, R.drawable.bg_trust_badge).mutate();
-        trustBg.setColor(trustColor);
-        holder.tvTrustBadge.setBackground(trustBg);
         holder.tvTrustBadge.setText(String.valueOf(trust));
+        int trustColor = trust >= 80 ? R.color.trust_high : (trust >= 60 ? R.color.trust_mid : R.color.trust_low);
+        ((GradientDrawable) holder.tvTrustBadge.getBackground().mutate()).setColor(ContextCompat.getColor(ctx, trustColor));
 
         // Team name
-        holder.tvTeamName.setText(match.getTeam());
+        String teamDisplay = match.getTeam();
+        holder.tvTeamName.setText(teamDisplay);
 
         // LIVE badge
         holder.tvLiveBadge.setVisibility(match.isHot() ? View.VISIBLE : View.GONE);
@@ -83,22 +78,58 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         }
 
         // Level badge
-        holder.tvLevelBadge.setText(match.getLevel());
+        String level = match.getLevel();
+        if ("INTERMEDIATE".equals(level)) level = "Trung cấp";
+        else if ("BEGINNER".equals(level)) level = "Mới chơi";
+        else if ("ADVANCED".equals(level)) level = "Nâng cao";
+        holder.tvLevelBadge.setText(level);
+        holder.tvLevelBadge.setVisibility((level == null || level.trim().isEmpty()) ? View.GONE : View.VISIBLE);
 
         // Posted time
-        holder.tvPostedTime.setText(match.getPostedAgo());
+        holder.tvPostedTime.setText(match.getTimeAgo());
 
         // Message
-        holder.tvMatchMessage.setText(match.getMessage());
+        String message = match.getMessage();
+        holder.tvMatchMessage.setText(message);
+        holder.tvMatchMessage.setVisibility((message == null || message.trim().isEmpty()) ? View.GONE : View.VISIBLE);
 
         // Info
-        holder.tvDate.setText(match.getDate());
-        holder.tvTime.setText(match.getTime());
-        holder.tvField.setText(match.getField());
-        holder.tvCost.setText(match.getCost());
-        holder.tvMembers.setText(match.getMembersSlot());
+        String date = match.getDate();
+        holder.tvDate.setText(date);
+        holder.itemView.findViewById(R.id.containerDate).setVisibility((date == null || date.trim().isEmpty()) ? View.GONE : View.VISIBLE);
 
-        // Accept state
+        String time = match.getTime();
+        holder.tvTime.setText(time);
+        holder.itemView.findViewById(R.id.containerTime).setVisibility((time == null || time.trim().isEmpty()) ? View.GONE : View.VISIBLE);
+
+        holder.itemView.findViewById(R.id.rowDateTime).setVisibility(
+                (holder.itemView.findViewById(R.id.containerDate).getVisibility() == View.VISIBLE ||
+                 holder.itemView.findViewById(R.id.containerTime).getVisibility() == View.VISIBLE) ? View.VISIBLE : View.GONE);
+
+        String field = match.getField();
+        holder.tvField.setText(field);
+        holder.itemView.findViewById(R.id.containerField).setVisibility((field == null || field.trim().isEmpty() || "Sân bóng".equals(field)) ? View.GONE : View.VISIBLE);
+
+        String cost = match.getCost();
+        holder.tvCost.setText(cost);
+        holder.itemView.findViewById(R.id.containerCost).setVisibility((cost == null || cost.trim().isEmpty()) ? View.GONE : View.VISIBLE);
+        
+        if (MatchPost.TYPE_FIND_OPPONENT.equals(match.getType())) {
+            holder.itemView.findViewById(R.id.containerMembers).setVisibility(View.GONE);
+        } else {
+            String members = match.getMembersSlot();
+            holder.tvMembers.setText(members);
+            holder.itemView.findViewById(R.id.containerMembers).setVisibility((members == null || members.trim().isEmpty() || members.startsWith("0")) ? View.GONE : View.VISIBLE);
+        }
+
+        holder.layoutInfoGrid.setVisibility(
+                (holder.itemView.findViewById(R.id.rowDateTime).getVisibility() == View.VISIBLE ||
+                 holder.itemView.findViewById(R.id.containerField).getVisibility() == View.VISIBLE ||
+                 holder.itemView.findViewById(R.id.containerCost).getVisibility() == View.VISIBLE ||
+                 holder.itemView.findViewById(R.id.containerMembers).getVisibility() == View.VISIBLE) ? View.VISIBLE : View.GONE);
+
+        holder.btnAccept.setText(R.string.match_action_accept);
+        holder.btnChatMatch.setText(R.string.match_action_chat);
         if (match.isAccepted()) {
             holder.btnAccept.setVisibility(View.GONE);
             holder.btnChatMatch.setVisibility(View.GONE);
@@ -141,6 +172,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         final TextView tvField;
         final TextView tvCost;
         final TextView tvMembers;
+        final View layoutInfoGrid;
         final MaterialButton btnAccept;
         final MaterialButton btnChatMatch;
         final TextView tvAccepted;
@@ -161,6 +193,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
             tvField = view.findViewById(R.id.tvField);
             tvCost = view.findViewById(R.id.tvCost);
             tvMembers = view.findViewById(R.id.tvMembers);
+            layoutInfoGrid = view.findViewById(R.id.layoutInfoGrid);
             btnAccept = view.findViewById(R.id.btnAccept);
             btnChatMatch = view.findViewById(R.id.btnChatMatch);
             tvAccepted = view.findViewById(R.id.tvAccepted);

@@ -94,6 +94,19 @@ public interface ApiService {
     @GET("match-posts/me")
     Call<List<MatchPost>> getMyMatchPosts();
 
+    @GET("match-posts/recommendations")
+    Call<List<RecommendedMatch>> getSmartRecommendations(
+            @Query("playstyleNote") String playstyleNote,
+            @Query("teamName") String teamName,
+            @Query("date") String date,
+            @Query("timeStart") String timeStart,
+            @Query("timeEnd") String timeEnd,
+            @Query("skillLevel") String skillLevel,
+            @Query("hasField") Boolean hasField,
+            @Query("postType") String postType,
+            @Query("position") String position
+    );
+
     // Match requests
     @POST("match-posts/{id}/requests")
     Call<MatchRequestResponse> createMatchRequest(@Path("id") long postId, @Body Map<String, String> body);

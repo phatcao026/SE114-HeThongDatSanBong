@@ -87,6 +87,16 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ui.customer.FindOpponentActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+        <activity
+            android:name=".ui.customer.QuickFindResultsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+        <activity
             android:name=".ui.customer.MatchmakingActivity"
             android:exported="false"
             android:theme="@style/Theme.TimSanBong.NoActionBar" />

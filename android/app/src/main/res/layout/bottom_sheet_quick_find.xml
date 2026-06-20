@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_6"
+    android:background="@drawable/bg_bottom_sheet_container">
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="@dimen/spacing_6"
+        android:background="@drawable/bg_bottom_sheet_handle" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/quick_find_title"
+        android:textColor="@color/text_primary"
+        android:textSize="@dimen/text_heading3"
+        android:textStyle="bold"
+        android:fontFamily="@font/bricolage_grotesque" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_1"
+        android:text="@string/quick_find_subtitle"
+        android:textColor="@color/text_secondary"
+        android:textSize="@dimen/text_body_small" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilPlaystyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_4"
+        android:hint="@string/hint_playstyle"
+        app:boxStrokeColor="@color/primary"
+        app:hintTextColor="@color/primary"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etPlaystyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:inputType="textMultiLine"
+            android:minLines="2" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilTeam"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_4"
+        android:hint="@string/hint_team_name"
+        app:boxStrokeColor="@color/primary"
+        app:hintTextColor="@color/primary"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+        <AutoCompleteTextView
+            android:id="@+id/etTeamName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/spacing_4"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:completionThreshold="1"
+            android:background="@null"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_4"
+        android:orientation="horizontal">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/hint_play_date"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="false"
+                android:fontFamily="@font/be_vietnam_pro" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/spacing_3"
+            android:hint="@string/hint_play_time"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="false"
+                android:fontFamily="@font/be_vietnam_pro" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSearch"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height_large"
+        android:layout_marginTop="@dimen/spacing_6"
+        android:text="@string/action_search_now"
+        android:textColor="@color/text_on_primary"
+        android:textStyle="bold"
+        app:backgroundTint="@color/primary"
+        app:cornerRadius="@dimen/radius_button" />
+
+</LinearLayout>

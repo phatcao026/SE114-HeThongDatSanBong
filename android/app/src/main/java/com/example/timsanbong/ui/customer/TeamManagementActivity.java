@@ -260,8 +260,8 @@ public class TeamManagementActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             InvitationResponse invitation = invitations.get(position);
-            holder.tvTeamInitials.setText(initials(invitation.getTeamName()));
-            holder.tvTeamName.setText(invitation.getTeamName());
+            holder.tvTeamInitials.setText(initials(invitation.getTeam()));
+            holder.tvTeamName.setText(invitation.getTeam());
             holder.tvTeamLevel.setText(invitation.getStatus());
             holder.tvMemberCount.setText("");
             holder.tvTeamDescription.setVisibility(View.GONE);

@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="quick_find_title">Tìm kiếm nhanh</string>
+    <string name="quick_find_subtitle">Hãy cho chúng tôi biết bạn đang tìm kiếm điều gì</string>
+    <string name="hint_playstyle">Lối đá, phong cách (vd: đá phủi vui vẻ, không cay cú)</string>
+    <string name="hint_play_date">Ngày đá</string>
+    <string name="hint_play_time">Giờ đá</string>
+    <string name="hint_team_name">Tên đội (Chọn đội có sẵn hoặc tự điền)</string>
+    <string name="action_search_now">Tìm kiếm ngay</string>
+
+    <string name="match_captain_role_format">%1$s · %2$s</string>
+    <string name="default_role">Đội trưởng</string>
+    <string name="match_members_format">%1$s %2$s</string>
     <string name="app_name">TimSanBong</string>
 
     <!-- Auth -->
@@ -70,11 +81,11 @@
     <string name="action_quick_book">Đặt nhanh</string>
     <string name="label_quick_book">Đặt sân ngay!</string>
     <string name="nav_search">Tìm sân</string>
-    <string name="nav_match">Bắt kèo</string>
+    <string name="nav_match">Tìm đối thủ</string>
     <string name="nav_bookings_label">Lịch đặt</string>
     <string name="nav_messages_label">Tin nhắn</string>
     <string name="cd_nav_search">Tìm sân</string>
-    <string name="cd_nav_match">Bắt kèo</string>
+    <string name="cd_nav_match">Tìm đối thủ</string>
 
     <!-- Filter -->
     <string name="filter_title">Bộ lọc</string>
@@ -132,11 +143,14 @@
     <string name="action_keep">Giữ lại</string>
     <string name="action_confirm_cancel">Hủy đặt</string>
     <string name="action_view_bookings">Xem lịch sử đặt sân</string>
+    <string name="action_create_post">Tạo kèo</string>
+    <string name="action_quick_find">Tìm nhanh</string>
+    <string name="empty_matches_found">Không tìm thấy kèo nào</string>
 
-    <!-- Matchmaking (Bắt kèo) -->
+    <!-- Matchmaking (Tìm đối thủ) -->
     <string name="matchmaking_title">Bắt kèo</string>
     <string name="tab_all">Tất cả</string>
-    <string name="tab_find_opponent">Tìm đối</string>
+    <string name="tab_find_opponent">Tìm đối thủ</string>
     <string name="tab_find_member">Tìm cầu thủ</string>
     <string name="tab_suggested">Gợi ý</string>
     <string name="match_hot_badge">LIVE</string>

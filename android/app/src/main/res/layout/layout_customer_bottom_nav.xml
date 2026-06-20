@@ -52,6 +52,42 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/navMatchmaking"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:id="@+id/wrapNavMatchmaking"
+                android:layout_width="@dimen/nav_active_pill_width"
+                android:layout_height="@dimen/nav_active_pill_height">
+
+                <ImageView
+                    android:id="@+id/ivNavMatchmaking"
+                    android:layout_width="@dimen/spacing_20"
+                    android:layout_height="@dimen/spacing_20"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/matchmaking_title"
+                    android:src="@drawable/ic_megaphone" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvNavMatchmaking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_1"
+                android:fontFamily="@font/be_vietnam_pro"
+                android:text="@string/matchmaking_title"
+                android:textColor="@color/text_on_primary"
+                android:textSize="@dimen/text_caption"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/navSearch"
             android:layout_width="0dp"
             android:layout_height="match_parent"

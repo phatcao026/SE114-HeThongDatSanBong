@@ -17,13 +17,14 @@ import com.example.timsanbong.data.model.MatchPost;
 import com.example.timsanbong.data.repository.ChatRepository;
 import com.example.timsanbong.utils.Constants;
 import com.example.timsanbong.utils.RepositoryCallback;
+import com.example.timsanbong.utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.Locale;
 
 public class MatchDetailActivity extends AppCompatActivity {
 
-    private View viewDetailAvatarBg;
+    private View viewDetailAvatarBg, layoutDetailField;
     private TextView tvDetailInitials;
     private TextView tvDetailTrust;
     private TextView tvDetailTeam;
@@ -42,10 +43,12 @@ public class MatchDetailActivity extends AppCompatActivity {
     private TextView tvTrustRating;
     private MaterialButton btnDetailAccept;
     private MaterialButton btnDetailChat;
+    private MaterialButton btnDetailDelete;
 
     private MatchPost match;
     private MatchViewModel matchViewModel;
     private final ChatRepository chatRepository = new ChatRepository();
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,13 +78,16 @@ public class MatchDetailActivity extends AppCompatActivity {
         tvDetailMembers = findViewById(R.id.tvDetailMembers);
         tvDetailCost = findViewById(R.id.tvDetailCost);
         tvDetailMessage = findViewById(R.id.tvDetailMessage);
+        layoutDetailField = (View) findViewById(R.id.tvDetailField).getParent().getParent();
         tvTrustMatches = findViewById(R.id.tvTrustMatches);
         tvTrustNoBail = findViewById(R.id.tvTrustNoBail);
         tvTrustRating = findViewById(R.id.tvTrustRating);
         btnDetailAccept = findViewById(R.id.btnDetailAccept);
         btnDetailChat = findViewById(R.id.btnDetailChat);
+        btnDetailDelete = findViewById(R.id.btnDetailDelete);
 
         matchViewModel = new ViewModelProvider(this).get(MatchViewModel.class);
+        sessionManager = new SessionManager(this);
 
         findViewById(R.id.ivDetailBack).setOnClickListener(v -> finish());
     }
@@ -95,13 +101,30 @@ public class MatchDetailActivity extends AppCompatActivity {
 
         btnDetailChat.setOnClickListener(v -> openDirectConversation());
 
+        btnDetailDelete.setOnClickListener(v -> {
+            if (match != null) {
+                matchViewModel.deleteMatchPost(match.getId());
+            }
+        });
+
         matchViewModel.matchRequestState.observe(this, resource -> {
             if (resource == null) return;
             if (resource.status == com.example.timsanbong.utils.Resource.Status.SUCCESS) {
                 match.setAccepted(true);
                 btnDetailAccept.setText(getString(R.string.match_cta_accepted));
                 btnDetailAccept.setEnabled(false);
-                Toast.makeText(this, "Da gui yeu cau bat keo.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Đã gửi yêu cầu bắt kèo.", Toast.LENGTH_SHORT).show();
+            } else if (resource.status == com.example.timsanbong.utils.Resource.Status.ERROR) {
+                Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        matchViewModel.deleteMatchState.observe(this, resource -> {
+            if (resource == null) return;
+            if (resource.status == com.example.timsanbong.utils.Resource.Status.SUCCESS) {
+                Toast.makeText(this, "Đã gỡ kèo thành công.", Toast.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
+                finish();
             } else if (resource.status == com.example.timsanbong.utils.Resource.Status.ERROR) {
                 Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
             }
@@ -127,7 +150,10 @@ public class MatchDetailActivity extends AppCompatActivity {
         tvDetailTrust.setText(String.valueOf(trust));
 
         tvDetailTeam.setText(match.getTeam());
-        tvDetailCaptain.setText(match.getCaptain());
+        
+        String captainName = match.getCaptain();
+        tvDetailCaptain.setText(getString(R.string.match_captain_role_format, captainName, getString(R.string.default_role)));
+        
         tvDetailLiveBadge.setVisibility(match.isHot() ? View.VISIBLE : View.GONE);
         tvDetailTypeBadge.setText(match.getTypeLabel());
         tvDetailTypeBadge.setBackgroundResource(match.getType().equals(MatchPost.TYPE_FIND_OPPONENT)
@@ -135,12 +161,26 @@ public class MatchDetailActivity extends AppCompatActivity {
         tvDetailTypeBadge.setTextColor(ContextCompat.getColor(this,
                 match.getType().equals(MatchPost.TYPE_FIND_OPPONENT)
                         ? R.color.badge_green_text : R.color.badge_orange_text));
-        tvDetailLevelBadge.setText(match.getLevel());
+        // Level badge
+        String level = match.getLevel();
+        if ("INTERMEDIATE".equals(level)) level = "Trung cấp";
+        else if ("BEGINNER".equals(level)) level = "Mới chơi";
+        else if ("ADVANCED".equals(level)) level = "Nâng cao";
+        tvDetailLevelBadge.setText(level);
+        tvDetailLevelBadge.setVisibility(level.isEmpty() ? View.GONE : View.VISIBLE);
 
         tvDetailDate.setText(match.getDate());
         tvDetailTime.setText(match.getTime());
         tvDetailField.setText(match.getField());
-        tvDetailMembers.setText(match.getMembersSlot());
+        layoutDetailField.setVisibility(Boolean.TRUE.equals(match.getHasField()) ? View.VISIBLE : View.GONE);
+        
+        if (MatchPost.TYPE_FIND_OPPONENT.equals(match.getType())) {
+            ((View) findViewById(R.id.tvDetailMembers).getParent().getParent()).setVisibility(View.GONE);
+        } else {
+            ((View) findViewById(R.id.tvDetailMembers).getParent().getParent()).setVisibility(View.VISIBLE);
+            tvDetailMembers.setText(match.getMembersSlot());
+        }
+
         tvDetailCost.setText(match.getCost());
         tvDetailMessage.setText(match.getMessage());
 
@@ -151,6 +191,17 @@ public class MatchDetailActivity extends AppCompatActivity {
         if (match.isAccepted()) {
             btnDetailAccept.setText(getString(R.string.match_cta_accepted));
             btnDetailAccept.setEnabled(false);
+        }
+
+        // Show delete button if current user is the poster
+        if (match.getUserId() == sessionManager.getUserId()) {
+            btnDetailDelete.setVisibility(View.VISIBLE);
+            btnDetailAccept.setVisibility(View.GONE);
+            btnDetailChat.setVisibility(View.GONE);
+        } else {
+            btnDetailDelete.setVisibility(View.GONE);
+            btnDetailAccept.setVisibility(View.VISIBLE);
+            btnDetailChat.setVisibility(View.VISIBLE);
         }
     }
 
