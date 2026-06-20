@@ -2,6 +2,7 @@ package com.example.timsanbong.data.api;
 
 import com.example.timsanbong.data.model.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -149,6 +150,12 @@ public interface ApiService {
     Call<Void> submitReview(@Body ReviewRequest request);
 
     // Owner fields
+    @GET("fields")
+    Call<List<Field>> getFields(
+            @Query("type") String type,
+            @Query("minPrice") BigDecimal minPrice,
+            @Query("maxPrice") BigDecimal maxPrice);
+
     @POST("fields")
     Call<Field> createOwnerField(@Body FieldCreateRequest request);
 

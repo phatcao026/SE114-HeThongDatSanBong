@@ -25,18 +25,13 @@ import retrofit2.Response;
 public class OwnerFieldRepository {
 
     public void getOwnerFields(Context context, RepositoryCallback<List<Field>> callback) {
-        long ownerId = getCurrentUserId(context);
+        // Thay getFields() bằng getOwnerFields()
         ApiClient.getService(context).getFields().enqueue(new Callback<List<Field>>() {
             @Override
             public void onResponse(Call<List<Field>> call, Response<List<Field>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<Field> ownerFields = new ArrayList<>();
-                    for (Field field : response.body()) {
-                        if (ownerId <= 0 || field.getOwnerId() == ownerId) {
-                            ownerFields.add(field);
-                        }
-                    }
-                    callback.onSuccess(ownerFields);
+                    // Không cần lọc thủ công nữa vì Server đã lọc sẵn cho tài khoản này
+                    callback.onSuccess(response.body());
                 } else {
                     callback.onError("Không tải được danh sách sân.");
                 }
@@ -44,7 +39,7 @@ public class OwnerFieldRepository {
 
             @Override
             public void onFailure(Call<List<Field>> call, Throwable t) {
-                callback.onError("Không thể kết nối máy chủ.");
+                callback.onError("Không thể kết nối máy chủ: " + t.getMessage());
             }
         });
     }
