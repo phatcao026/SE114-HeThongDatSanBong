@@ -15,6 +15,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.timsanbong.R;
+import com.example.timsanbong.utils.PushNotificationManager;
 
 public class OwnerMainActivity extends AppCompatActivity {
 
@@ -34,6 +35,7 @@ public class OwnerMainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_owner_main);
+        PushNotificationManager.prepareForAuthenticatedUser(this);
 
         // 1. Khởi tạo màu sắc từ Resources
         colorActive = ContextCompat.getColor(this, R.color.green_primary);

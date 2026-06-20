@@ -152,34 +152,6 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Address -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_2"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/ic_map_pin"
-                        app:tint="@color/text_secondary"
-                        android:contentDescription="@string/cd_map_pin" />
-
-                    <TextView
-                        android:id="@+id/tvAddress"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="@dimen/spacing_2"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="@dimen/text_body_medium"
-                        android:fontFamily="@font/be_vietnam_pro"
-                        android:maxLines="2"
-                        android:ellipsize="end"
-                        tools:text="123 Trần Bình, Cầu Giấy, Hà Nội" />
-                </LinearLayout>
 
                 <!-- Price -->
                 <TextView
@@ -269,6 +241,20 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_3"
                     android:clipToPadding="false" />
+
+                <TextView
+                    android:id="@+id/btnShowMoreSlots"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_2"
+                    android:gravity="center"
+                    android:padding="@dimen/spacing_2"
+                    android:text="@string/action_show_more_slots"
+                    android:textColor="@color/primary_dark"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:visibility="gone" />
 
                 <!-- Empty time slots state -->
                 <TextView

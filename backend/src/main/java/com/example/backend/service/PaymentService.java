@@ -11,5 +11,7 @@ public interface PaymentService {
 
     List<PaymentResponse> getBookingPayments(Long bookingId);
 
+    PaymentResponse verifyCheckoutSession(String sessionId);
+
     void handleStripeWebhook(String payload, String sigHeader);
 }

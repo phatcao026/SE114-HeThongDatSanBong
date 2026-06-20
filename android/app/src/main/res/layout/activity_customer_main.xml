@@ -608,28 +608,6 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnFloatingBook"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/button_height"
-        android:layout_marginEnd="@dimen/spacing_4"
-        android:layout_marginBottom="@dimen/spacing_64"
-        android:fontFamily="@font/be_vietnam_pro"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
-        android:text="@string/book_now"
-        android:textColor="@color/text_on_primary"
-        android:textSize="@dimen/text_body_medium"
-        android:textStyle="bold"
-        app:backgroundTint="@color/accent_orange"
-        app:cornerRadius="@dimen/radius_button"
-        app:elevation="0dp"
-        app:icon="@drawable/ic_plus"
-        app:iconPadding="@dimen/spacing_2"
-        app:iconTint="@color/text_on_primary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <include
         android:id="@+id/bottomNav"
         layout="@layout/layout_customer_bottom_nav"

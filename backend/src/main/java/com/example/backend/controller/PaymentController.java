@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -35,6 +36,11 @@ public class PaymentController {
     @PostMapping("/create-session/{bookingId}")
     public ResponseEntity<PaymentResponse> createPaymentSession(@PathVariable Long bookingId) {
         return ResponseEntity.ok(paymentService.createCheckoutSession(bookingId));
+    }
+
+    @PostMapping("/verify-session")
+    public ResponseEntity<PaymentResponse> verifyCheckoutSession(@RequestParam String sessionId) {
+        return ResponseEntity.ok(paymentService.verifyCheckoutSession(sessionId));
     }
 
     @PostMapping("/webhook")
