@@ -10,6 +10,7 @@ public class PaymentResponse {
     private Long userId;
     private BigDecimal amount;
     private String paymentMethod;
+    private String stripePaymentIntentId;
     private String status;
     private String createdAt;
 
@@ -38,8 +39,14 @@ public class PaymentResponse {
     public void setAmount(BigDecimal amount) { this.amount = amount; }
     public String getPaymentMethod() { return paymentMethod; }
     public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+    public String getStripePaymentIntentId() { return stripePaymentIntentId; }
+    public void setStripePaymentIntentId(String stripePaymentIntentId) { this.stripePaymentIntentId = stripePaymentIntentId; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+
+    public double getAmountValue() {
+        return amount == null ? 0 : amount.doubleValue();
+    }
 }

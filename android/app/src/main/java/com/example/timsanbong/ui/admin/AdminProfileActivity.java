@@ -11,9 +11,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.example.timsanbong.R;
+import com.example.timsanbong.data.api.ApiClient;
 import com.example.timsanbong.ui.auth.LoginActivity;
 import com.example.timsanbong.ui.customer.MainActivity;
 import com.example.timsanbong.ui.owner.OwnerDashboardActivity;
+import com.example.timsanbong.utils.PushNotificationManager;
 import com.example.timsanbong.utils.SessionManager;
 import com.google.android.material.card.MaterialCardView;
 
@@ -50,11 +52,14 @@ public class AdminProfileActivity extends AppCompatActivity {
         setupMenuItem(findViewById(R.id.menuConfig), R.drawable.ic_admin_dashboard, "Cấu hình nền tảng", "transparent", "#64748B", false, null);
         setupMenuItem(findViewById(R.id.menuApi), R.drawable.ic_admin_key, "API & webhooks", "transparent", "#64748B", false, null);
         setupMenuItem(findViewById(R.id.menuLogout), R.drawable.ic_admin_logout, "Đăng xuất", "transparent", "#EF4444", false, v -> {
-            new SessionManager(this).clearSession();
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
+            PushNotificationManager.deregisterCurrentToken(this, () -> {
+                new SessionManager(this).clearSession();
+                ApiClient.reset();
+                Intent intent = new Intent(this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            });
         });
 
         // Styling for System icons (no background card)

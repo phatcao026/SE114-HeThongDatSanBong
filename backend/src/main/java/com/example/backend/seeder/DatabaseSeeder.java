@@ -178,13 +178,26 @@ public class DatabaseSeeder implements CommandLineRunner {
     }
 
     private void ensureTimeSlots(Field field) {
-        if (!timeSlotRepository.findByFieldIdOrderByStartTimeAsc(field.getId()).isEmpty()) {
+        if (timeSlotRepository.findByFieldIdOrderByStartTimeAsc(field.getId()).size() >= 11) {
             return;
         }
+
+        // Just in case, delete existing so we don't have duplicates
+        entityManager.createNativeQuery("DELETE FROM public.bookings WHERE time_slot_id IN (SELECT id FROM public.time_slots WHERE field_id = :fieldId)")
+            .setParameter("fieldId", field.getId())
+            .executeUpdate();
+        entityManager.createNativeQuery("DELETE FROM public.time_slots WHERE field_id = :fieldId")
+            .setParameter("fieldId", field.getId())
+            .executeUpdate();
 
         List<TimeSlot> timeSlots = List.of(
                 buildTimeSlot(field.getId(), LocalTime.of(6, 0), LocalTime.of(7, 30), BigDecimal.valueOf(180000)),
                 buildTimeSlot(field.getId(), LocalTime.of(7, 30), LocalTime.of(9, 0), BigDecimal.valueOf(180000)),
+                buildTimeSlot(field.getId(), LocalTime.of(9, 0), LocalTime.of(10, 30), BigDecimal.valueOf(180000)),
+                buildTimeSlot(field.getId(), LocalTime.of(10, 30), LocalTime.of(12, 0), BigDecimal.valueOf(200000)),
+                buildTimeSlot(field.getId(), LocalTime.of(12, 0), LocalTime.of(13, 30), BigDecimal.valueOf(200000)),
+                buildTimeSlot(field.getId(), LocalTime.of(13, 30), LocalTime.of(15, 0), BigDecimal.valueOf(200000)),
+                buildTimeSlot(field.getId(), LocalTime.of(15, 0), LocalTime.of(16, 30), BigDecimal.valueOf(250000)),
                 buildTimeSlot(field.getId(), LocalTime.of(16, 30), LocalTime.of(18, 0), BigDecimal.valueOf(250000)),
                 buildTimeSlot(field.getId(), LocalTime.of(18, 0), LocalTime.of(19, 30), BigDecimal.valueOf(350000)),
                 buildTimeSlot(field.getId(), LocalTime.of(19, 30), LocalTime.of(21, 0), BigDecimal.valueOf(350000)),

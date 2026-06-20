@@ -106,7 +106,7 @@ public class RegisterActivity extends AppCompatActivity {
             btnRegister.setEnabled(resource.status != Resource.Status.LOADING);
             if (resource.status == Resource.Status.SUCCESS) {
                 Toast.makeText(this, "Đăng ký thành công.", Toast.LENGTH_SHORT).show();
-                navigateByRole();
+                finish();
             } else if (resource.status == Resource.Status.ERROR) {
                 Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
                 tilRegisterOtp.setError(resource.message);
@@ -224,26 +224,6 @@ public class RegisterActivity extends AppCompatActivity {
         tilPassword.setError(null);
         tilConfirmPassword.setError(null);
         tilRegisterOtp.setError(null);
-    }
-
-    private void navigateByRole() {
-        SessionManager sessionManager = new SessionManager(this);
-        Class<?> destination = MainActivity.class;
-
-        try {
-            JSONObject userJson = new JSONObject(sessionManager.getUserJson());
-            String role = userJson.optString("role", "PLAYER");
-            if ("OWNER".equalsIgnoreCase(role)) {
-                destination = OwnerDashboardActivity.class;
-            } else if ("ADMIN".equalsIgnoreCase(role)) {
-                destination = AdminMainActivity.class;
-            }
-        } catch (JSONException ignored) {
-        }
-
-        Intent intent = new Intent(this, destination);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
     }
 
     @Override

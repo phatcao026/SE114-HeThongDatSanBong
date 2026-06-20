@@ -17,6 +17,7 @@ import com.example.timsanbong.ui.profile.ProfileActivity;
 import com.example.timsanbong.ui.profile.ProfileViewModel;
 import com.example.timsanbong.utils.Constants;
 import com.example.timsanbong.utils.NavBarManager;
+import com.example.timsanbong.utils.PushNotificationManager;
 import com.example.timsanbong.utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton btnSearchNearby;
     private MaterialButton btnHomeBookings;
     private MaterialButton btnPaymentReminder;
-    private MaterialButton btnFloatingBook;
+
     private RecyclerView rvSuggestedFields;
 
     private FieldViewModel fieldViewModel;
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_main);
+        PushNotificationManager.prepareForAuthenticatedUser(this);
         initViews();
         setupListeners();
         loadData();
@@ -101,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         btnSearchNearby = findViewById(R.id.btnSearchNearby);
         btnHomeBookings = findViewById(R.id.btnHomeBookings);
         btnPaymentReminder = findViewById(R.id.btnPaymentReminder);
-        btnFloatingBook = findViewById(R.id.btnFloatingBook);
+
         rvSuggestedFields = findViewById(R.id.rvSuggestedFields);
 
         rvSuggestedFields.setLayoutManager(
@@ -116,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         tvAvatar.setOnClickListener(v ->
                 startActivity(new Intent(this, ProfileActivity.class)));
         btnSearchNearby.setOnClickListener(v -> openFindPitch());
-        btnFloatingBook.setOnClickListener(v -> openFindPitch());
+
         tvSuggestedMore.setOnClickListener(v -> openFindPitch());
         btnHomeBookings.setOnClickListener(v -> openBookings());
         tvUpcomingSeeAll.setOnClickListener(v -> openBookings());
@@ -289,16 +291,16 @@ public class MainActivity extends AppCompatActivity {
         if (pendingPaymentBooking == null) {
             return;
         }
-        double deposit = pendingPaymentBooking.getDepositAmount() > 0
+        double dueAmount = pendingPaymentBooking.getDepositAmount() > 0
                 ? pendingPaymentBooking.getDepositAmount()
                 : pendingPaymentBooking.getTotalAmount();
         Intent intent = new Intent(this, PaymentActivity.class);
         intent.putExtra(Constants.EXTRA_BOOKING_ID, pendingPaymentBooking.getId());
         intent.putExtra(Constants.EXTRA_PAYMENT_FIELD_NAME, pendingPaymentBooking.getFieldName());
-        intent.putExtra(Constants.EXTRA_TOTAL_PRICE, deposit);
-        intent.putExtra(Constants.EXTRA_DEPOSIT_AMOUNT, deposit);
+        intent.putExtra(Constants.EXTRA_TOTAL_PRICE, pendingPaymentBooking.getTotalAmount());
+        intent.putExtra(Constants.EXTRA_DEPOSIT_AMOUNT, dueAmount);
         intent.putExtra(Constants.EXTRA_REMAINDER_AMOUNT,
-                pendingPaymentBooking.getTotalAmount() - deposit);
+                pendingPaymentBooking.getTotalAmount() - dueAmount);
         startActivity(intent);
     }
 

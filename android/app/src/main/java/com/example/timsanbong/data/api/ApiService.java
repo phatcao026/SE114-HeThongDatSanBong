@@ -75,6 +75,9 @@ public interface ApiService {
     @POST("payments/create-session/{bookingId}")
     Call<PaymentResponse> createCheckoutSession(@Path("bookingId") long bookingId);
 
+    @POST("payments/verify-session")
+    Call<PaymentResponse> verifyCheckoutSession(@Query("sessionId") String sessionId);
+
     // Match posts
     @GET("match-posts")
     Call<List<MatchPost>> getMatchPosts(@Query("postType") String postType);
@@ -143,6 +146,12 @@ public interface ApiService {
 
     @PUT("notifications/read-all")
     Call<Void> markAllNotificationsRead();
+
+    @POST("notifications/fcm-token")
+    Call<Void> registerFcmToken(@Query("fcmToken") String fcmToken);
+
+    @DELETE("notifications/fcm-token")
+    Call<Void> deregisterFcmToken(@Query("fcmToken") String fcmToken);
 
     // Reviews
     @POST("fairplay/reviews")

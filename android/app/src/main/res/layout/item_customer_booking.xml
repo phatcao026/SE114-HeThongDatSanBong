@@ -174,25 +174,7 @@
                         app:iconPadding="@dimen/spacing_1"
                         app:iconTint="@color/text_on_primary" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnDirections"
-                        style="@style/Widget.TimSanBong.Button.Outlined"
-                        android:layout_width="0dp"
-                        android:layout_height="36dp"
-                        android:layout_weight="1"
-                        android:layout_marginStart="@dimen/spacing_2"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:minWidth="0dp"
-                        android:paddingHorizontal="@dimen/spacing_2"
-                        android:text="@string/action_directions"
-                        android:textSize="11sp"
-                        android:textColor="@color/primary"
-                        app:icon="@drawable/ic_map_pin"
-                        app:iconSize="14dp"
-                        app:iconPadding="@dimen/spacing_1"
-                        app:iconTint="@color/primary"
-                        app:strokeColor="@color/primary" />
+
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnCancel"

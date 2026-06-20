@@ -30,6 +30,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -116,6 +117,26 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
+    public PaymentResponse verifyCheckoutSession(String sessionId) {
+        requireStripeApiKey();
+        if (!StringUtils.hasText(sessionId)) {
+            throw new AppException(400, "Stripe checkout session id is required");
+        }
+
+        Session session = retrieveCheckoutSession(sessionId.trim());
+        if (!isPaidCheckoutSession(session)) {
+            throw new AppException(400, "Stripe checkout session has not been paid");
+        }
+
+        Booking booking = findBooking(parseBookingId(session));
+        ensureCanPayBooking(booking);
+
+        Payment payment = completeCheckoutSession(session);
+        return toResponse(payment, "Deposit payment verified successfully", null);
+    }
+
+    @Override
+    @Transactional
     public void handleStripeWebhook(String payload, String sigHeader) {
         requireWebhookSecret();
 
@@ -131,6 +152,9 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         Session session = extractCheckoutSession(event);
+        if (!isPaidCheckoutSession(session)) {
+            return;
+        }
         completeCheckoutSession(session);
     }
 
@@ -169,17 +193,14 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    private void completeCheckoutSession(Session session) {
+    private Payment completeCheckoutSession(Session session) {
         Long bookingId = parseBookingId(session);
         Booking booking = findBooking(bookingId);
 
-        if (StringUtils.hasText(session.getPaymentIntent())
-                && paymentRepository.findByStripePaymentIntentId(session.getPaymentIntent()).isPresent()) {
-            return;
-        }
-
-        if (paymentRepository.existsByBookingIdAndStatus(booking.getId(), Enums.PaymentStatus.SUCCESS)) {
-            return;
+        Optional<Payment> existingPayment = findExistingSuccessfulPayment(session, booking);
+        if (existingPayment.isPresent()) {
+            markBookingDepositPaid(booking);
+            return existingPayment.get();
         }
 
         BigDecimal paidAmount = resolvePaidAmount(session, booking);
@@ -192,13 +213,9 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setStripePaymentIntentId(session.getPaymentIntent());
         payment.setStatus(Enums.PaymentStatus.SUCCESS);
         payment.setCreatedAt(LocalDateTime.now());
-        paymentRepository.save(payment);
+        Payment savedPayment = paymentRepository.save(payment);
 
-        if (booking.getStatus() == Enums.BookingStatus.PENDING) {
-            booking.setStatus(Enums.BookingStatus.DEPOSIT_PAID);
-            booking.setUpdatedAt(LocalDateTime.now());
-            bookingRepository.save(booking);
-        }
+        markBookingDepositPaid(booking);
 
         notificationService.createNotification(
                 booking.getUserId(),
@@ -206,6 +223,44 @@ public class PaymentServiceImpl implements PaymentService {
                 "Your deposit payment for booking #" + booking.getId() + " was successful.",
                 Enums.NotificationType.PAYMENT_UPDATE
         );
+
+        return savedPayment;
+    }
+
+    private Session retrieveCheckoutSession(String sessionId) {
+        try {
+            return Session.retrieve(sessionId);
+        } catch (StripeException ex) {
+            throw new AppException(400, "Cannot retrieve Stripe checkout session: " + ex.getMessage());
+        }
+    }
+
+    private boolean isPaidCheckoutSession(Session session) {
+        return session != null
+                && "complete".equalsIgnoreCase(session.getStatus())
+                && "paid".equalsIgnoreCase(session.getPaymentStatus());
+    }
+
+    private Optional<Payment> findExistingSuccessfulPayment(Session session, Booking booking) {
+        if (StringUtils.hasText(session.getPaymentIntent())) {
+            Optional<Payment> byPaymentIntent = paymentRepository.findByStripePaymentIntentId(session.getPaymentIntent());
+            if (byPaymentIntent.isPresent()) {
+                return byPaymentIntent;
+            }
+        }
+
+        return paymentRepository.findFirstByBookingIdAndStatusOrderByCreatedAtDesc(
+                booking.getId(),
+                Enums.PaymentStatus.SUCCESS
+        );
+    }
+
+    private void markBookingDepositPaid(Booking booking) {
+        if (booking.getStatus() == Enums.BookingStatus.PENDING) {
+            booking.setStatus(Enums.BookingStatus.DEPOSIT_PAID);
+            booking.setUpdatedAt(LocalDateTime.now());
+            bookingRepository.save(booking);
+        }
     }
 
     private Session extractCheckoutSession(Event event) {

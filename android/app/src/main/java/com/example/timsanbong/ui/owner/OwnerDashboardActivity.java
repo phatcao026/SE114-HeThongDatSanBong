@@ -15,6 +15,7 @@ import com.example.timsanbong.R;
 import com.example.timsanbong.data.model.Booking;
 import com.example.timsanbong.data.model.Field;
 import com.example.timsanbong.data.model.OwnerDashboardStats;
+import com.example.timsanbong.utils.PushNotificationManager;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +37,7 @@ public class OwnerDashboardActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_owner_dashboard);
+        PushNotificationManager.prepareForAuthenticatedUser(this);
 
         fieldViewModel = new ViewModelProvider(this).get(OwnerFieldViewModel.class);
         bookingViewModel = new ViewModelProvider(this).get(OwnerBookingViewModel.class);

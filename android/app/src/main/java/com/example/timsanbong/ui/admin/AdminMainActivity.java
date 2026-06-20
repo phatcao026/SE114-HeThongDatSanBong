@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.timsanbong.R;
 import com.example.timsanbong.data.api.ApiClient;
 import com.example.timsanbong.data.model.AdminDashboardOverviewResponse;
+import com.example.timsanbong.utils.PushNotificationManager;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -29,6 +30,7 @@ public class AdminMainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_main);
+        PushNotificationManager.prepareForAuthenticatedUser(this);
         
         fetchStats();
         setupHealth();

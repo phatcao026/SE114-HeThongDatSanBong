@@ -100,8 +100,7 @@ public class AuthViewModel extends AndroidViewModel {
         authRepository.register(getApplication(), body, new RepositoryCallback<AuthResponse>() {
             @Override
             public void onSuccess(AuthResponse data) {
-                saveToken(data);
-                loadProfileAfterAuth();
+                _registerState.postValue(Resource.success(null));
             }
 
             @Override

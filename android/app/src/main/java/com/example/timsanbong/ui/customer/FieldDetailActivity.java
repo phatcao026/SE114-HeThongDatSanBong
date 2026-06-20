@@ -26,10 +26,14 @@ import java.util.List;
 public class FieldDetailActivity extends AppCompatActivity {
 
     private ImageView ivFieldImage, btnBack;
-    private TextView tvFieldName, tvAddress, tvPrice, tvDescription, tvRating;
+    private TextView tvFieldName, tvPrice, tvDescription, tvRating;
     private MaterialButton btnBook;
     private FieldViewModel fieldViewModel;
     private long fieldId;
+    private Field currentField;
+    private TextView btnShowMoreSlots;
+    private boolean isShowingAllSlots = false;
+    private List<TimeSlotAdapter.TimeSlot> allAvailableSlots = new ArrayList<>();
     private androidx.core.widget.NestedScrollView scrollContent;
     private android.widget.ProgressBar pbLoading;
     private TextView tvErrorState;
@@ -50,7 +54,7 @@ public class FieldDetailActivity extends AppCompatActivity {
     private String selectedTimeRange = "";
     private long selectedSlotId = -1;
     private double selectedPrice = 0;
-    private Field currentField;
+    private TimeSlotAdapter.TimeSlot selectedSlot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +67,7 @@ public class FieldDetailActivity extends AppCompatActivity {
         ivFieldImage = findViewById(R.id.ivFieldImage);
         btnBack = findViewById(R.id.btnBack);
         tvFieldName = findViewById(R.id.tvFieldName);
-        tvAddress = findViewById(R.id.tvAddress);
+
         tvPrice = findViewById(R.id.tvPrice);
         tvDescription = findViewById(R.id.tvDescription);
         tvRating = findViewById(R.id.tvRating);
@@ -78,6 +82,12 @@ public class FieldDetailActivity extends AppCompatActivity {
         tvSelectedSlotLabel = findViewById(R.id.tvSelectedSlotLabel);
         tvNoSlots = findViewById(R.id.tvNoSlots);
         pbSlots = findViewById(R.id.pbSlots);
+        btnShowMoreSlots = findViewById(R.id.btnShowMoreSlots);
+
+        btnShowMoreSlots.setOnClickListener(v -> {
+            isShowingAllSlots = !isShowingAllSlots;
+            updateSlotDisplay();
+        });
 
         btnBack.setOnClickListener(v -> finish());
         btnBook.setEnabled(false);
@@ -119,16 +129,28 @@ public class FieldDetailActivity extends AppCompatActivity {
                 tvNoSlots.setVisibility(View.GONE);
             } else if (resource.status == Resource.Status.SUCCESS && resource.data != null) {
                 pbSlots.setVisibility(View.GONE);
-                List<TimeSlotAdapter.TimeSlot> slots = new ArrayList<>();
+                allAvailableSlots.clear();
+                Calendar now = Calendar.getInstance();
+                String todayDate = String.format(java.util.Locale.US, "%04d-%02d-%02d",
+                        now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1, now.get(Calendar.DAY_OF_MONTH));
+                String currentTime = String.format(java.util.Locale.US, "%02d:%02d",
+                        now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE));
+
                 for (com.example.timsanbong.data.model.TimeSlotResponse slotResp : resource.data) {
+                    String startTime = formatTime(slotResp.getStartTime());
+                    if (selectedDate != null && selectedDate.equals(todayDate) && startTime.compareTo(currentTime) < 0) {
+                        continue;
+                    }
                     double price = slotResp.getPrice() != null ? slotResp.getPrice() : 0;
-                    slots.add(new TimeSlotAdapter.TimeSlot(slotResp.getId(),
-                            formatTime(slotResp.getStartTime()), formatTime(slotResp.getEndTime()),
+                    allAvailableSlots.add(new TimeSlotAdapter.TimeSlot(slotResp.getId(),
+                            startTime, formatTime(slotResp.getEndTime()),
                             slotResp.isAvailable(), price));
                 }
-                timeSlotAdapter.updateSlots(slots);
-                rvTimeSlots.setVisibility(slots.isEmpty() ? View.GONE : View.VISIBLE);
-                tvNoSlots.setVisibility(slots.isEmpty() ? View.VISIBLE : View.GONE);
+                
+                java.util.Collections.sort(allAvailableSlots, (s1, s2) -> s1.timeRange().compareTo(s2.timeRange()));
+                
+                isShowingAllSlots = false;
+                updateSlotDisplay();
             } else if (resource.status == Resource.Status.ERROR) {
                 pbSlots.setVisibility(View.GONE);
                 rvTimeSlots.setVisibility(View.GONE);
@@ -170,15 +192,51 @@ public class FieldDetailActivity extends AppCompatActivity {
     }
     
     private void setupTimeSlots() {
-        rvTimeSlots.setLayoutManager(new GridLayoutManager(this, 2));
         timeSlotAdapter = new TimeSlotAdapter(new ArrayList<>(), slot -> {
+            selectedSlot = slot;
             selectedTimeRange = slot.timeRange();
             selectedSlotId = slot.id;
             selectedPrice = slot.price;
             updateStickyBar();
         });
+        rvTimeSlots.setLayoutManager(new GridLayoutManager(this, 2));
         rvTimeSlots.setAdapter(timeSlotAdapter);
-        // Load initial empty slots until field is loaded
+    }
+
+    private void updateSlotDisplay() {
+        if (allAvailableSlots.isEmpty()) {
+            rvTimeSlots.setVisibility(View.GONE);
+            tvNoSlots.setVisibility(View.VISIBLE);
+            btnShowMoreSlots.setVisibility(View.GONE);
+            return;
+        }
+
+        tvNoSlots.setVisibility(View.GONE);
+        rvTimeSlots.setVisibility(View.VISIBLE);
+
+        List<TimeSlotAdapter.TimeSlot> slotsToShow;
+        if (allAvailableSlots.size() <= 6) {
+            slotsToShow = new ArrayList<>(allAvailableSlots);
+            btnShowMoreSlots.setVisibility(View.GONE);
+        } else {
+            btnShowMoreSlots.setVisibility(View.VISIBLE);
+            if (isShowingAllSlots) {
+                slotsToShow = new ArrayList<>(allAvailableSlots);
+                btnShowMoreSlots.setText(R.string.action_show_less_slots);
+            } else {
+                slotsToShow = new ArrayList<>(allAvailableSlots.subList(0, 6));
+                btnShowMoreSlots.setText(R.string.action_show_more_slots);
+            }
+        }
+        timeSlotAdapter.updateSlots(slotsToShow);
+        
+        // Reset selection if the selected slot is no longer visible
+        if (selectedSlot != null && !slotsToShow.contains(selectedSlot)) {
+            selectedSlot = null;
+            selectedTimeRange = "";
+            selectedSlotId = -1;
+            updateStickyBar();
+        }
     }
     
     private void loadTimeSlotsForDate(String date) {
@@ -208,7 +266,7 @@ public class FieldDetailActivity extends AppCompatActivity {
 
     private void bindField(Field field) {
         tvFieldName.setText(field.getName());
-        tvAddress.setText(field.getAddress());
+
         tvDescription.setText(field.getDescription());
         tvRating.setText(String.format("%.1f", field.getAverageRating() != null ? field.getAverageRating() : 0));
 

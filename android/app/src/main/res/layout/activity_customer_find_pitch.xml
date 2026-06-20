@@ -88,55 +88,7 @@
             app:tint="@color/primary_dark" />
     </LinearLayout>
 
-    <!-- Location pill -->
-    <LinearLayout
-        android:id="@+id/layoutLocation"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/spacing_4"
-        android:layout_marginTop="@dimen/spacing_3"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        app:layout_constraintTop_toBottomOf="@id/layoutSearch"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageView
-            android:layout_width="14dp"
-            android:layout_height="14dp"
-            android:src="@drawable/ic_map_pin"
-            app:tint="@color/primary"
-            android:contentDescription="@null" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/spacing_2"
-            android:text="@string/location_current"
-            android:textColor="@color/text_primary"
-            android:textSize="@dimen/text_body_small"
-            android:textStyle="bold"
-            android:fontFamily="@font/be_vietnam_pro" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="@dimen/spacing_1"
-            android:text="@string/location_radius"
-            android:textColor="@color/text_hint"
-            android:textSize="@dimen/text_caption"
-            android:fontFamily="@font/be_vietnam_pro" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/action_change"
-            android:textColor="@color/primary_dark"
-            android:textSize="@dimen/text_caption"
-            android:textStyle="bold"
-            android:fontFamily="@font/be_vietnam_pro" />
-    </LinearLayout>
 
     <!-- Field type chips -->
     <HorizontalScrollView
@@ -145,7 +97,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_3"
         android:scrollbars="none"
-        app:layout_constraintTop_toBottomOf="@id/layoutLocation"
+        app:layout_constraintTop_toBottomOf="@id/layoutSearch"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 

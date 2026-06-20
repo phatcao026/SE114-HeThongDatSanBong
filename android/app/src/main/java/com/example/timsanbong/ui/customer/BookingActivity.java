@@ -63,7 +63,7 @@ public class BookingActivity extends AppCompatActivity {
         String bookingDate = getIntent().getStringExtra("bookingDate");
         String bookingTime = getIntent().getStringExtra("bookingTime");
         double totalPrice = getIntent().getDoubleExtra("totalPrice", 0);
-        double depositAmount = totalPrice * 0.3; // 30% deposit (matches backend DEPOSIT_RATE)
+        double depositAmount = totalPrice * 0.3; // Matches the current backend deposit flow.
 
         tvFieldName.setText(fieldName);
 
@@ -127,7 +127,7 @@ public class BookingActivity extends AppCompatActivity {
                     Intent intent = new Intent(this, PaymentActivity.class);
                     intent.putExtra(Constants.EXTRA_BOOKING_ID, resource.data.getId());
                     intent.putExtra(Constants.EXTRA_PAYMENT_FIELD_NAME, fieldName);
-                    intent.putExtra(Constants.EXTRA_TOTAL_PRICE, deposit);
+                    intent.putExtra(Constants.EXTRA_TOTAL_PRICE, total);
                     intent.putExtra(Constants.EXTRA_DEPOSIT_AMOUNT, deposit);
                     intent.putExtra(Constants.EXTRA_REMAINDER_AMOUNT, total - deposit);
                     startActivity(intent);

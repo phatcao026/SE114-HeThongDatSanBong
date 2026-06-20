@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface PaymentRepository {
     interface Callback {
-        void onSuccess(String message, String checkoutUrl);
+        void onSuccess(PaymentResponse payment);
         void onError(String message);
     }
 
@@ -17,7 +17,7 @@ public interface PaymentRepository {
     }
 
     void processPayment(PaymentRequest request, Callback callback);
+    void verifyCheckoutSession(String sessionId, Callback callback);
     void getMyPayments(HistoryCallback callback);
     void getBookingPayments(long bookingId, HistoryCallback callback);
 }
-
