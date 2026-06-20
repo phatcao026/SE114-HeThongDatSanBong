@@ -24,11 +24,11 @@
 
         <ImageView
             android:id="@+id/ivDetailBack"
-            android:layout_width="@dimen/spacing_8"
-            android:layout_height="@dimen/spacing_8"
+            android:layout_width="@dimen/spacing_40"
+            android:layout_height="@dimen/spacing_40"
             android:padding="@dimen/spacing_2"
-            android:src="@android:drawable/ic_media_previous"
-            app:tint="@color/text_secondary"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/text_primary"
             android:background="@drawable/ripple_primary"
             android:clickable="true"
             android:focusable="true"
@@ -41,27 +41,29 @@
 
         <ImageView
             android:id="@+id/ivDetailReport"
-            android:layout_width="@dimen/spacing_8"
-            android:layout_height="@dimen/spacing_8"
+            android:layout_width="@dimen/spacing_40"
+            android:layout_height="@dimen/spacing_40"
             android:padding="@dimen/spacing_2"
             android:src="@drawable/ic_flag"
-            app:tint="@color/text_secondary"
+            app:tint="@color/text_primary"
             android:background="@drawable/ripple_primary"
             android:clickable="true"
             android:focusable="true"
-            android:contentDescription="@string/action_report" />
+            android:contentDescription="@string/action_report"
+            android:visibility="gone" />
 
         <ImageView
             android:id="@+id/ivDetailShare"
-            android:layout_width="@dimen/spacing_8"
-            android:layout_height="@dimen/spacing_8"
+            android:layout_width="@dimen/spacing_40"
+            android:layout_height="@dimen/spacing_40"
             android:padding="@dimen/spacing_2"
             android:src="@drawable/ic_share"
-            app:tint="@color/text_secondary"
+            app:tint="@color/text_primary"
             android:background="@drawable/ripple_primary"
             android:clickable="true"
             android:focusable="true"
-            android:contentDescription="@string/action_share" />
+            android:contentDescription="@string/action_share"
+            android:visibility="gone" />
     </LinearLayout>
 
     <!-- Scrollable content -->
@@ -632,6 +634,8 @@
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:layout_marginEnd="@dimen/spacing_3"
+            app:icon="@drawable/ic_message"
+            app:iconTint="@color/primary_dark"
             app:strokeColor="@color/primary_dark"
             app:cornerRadius="@dimen/radius_button" />
 
@@ -645,9 +649,23 @@
             android:fontFamily="@font/be_vietnam_pro"
             android:insetTop="0dp"
             android:insetBottom="0dp"
+            app:icon="@drawable/ic_bolt"
+            app:iconTint="@color/text_on_primary"
+            app:iconGravity="textStart"
             app:backgroundTint="@color/accent_orange"
             app:cornerRadius="@dimen/radius_button"
             app:rippleColor="@color/accent_orange_dark" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDetailDelete"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:text="Gỡ kèo này"
+            android:textColor="@color/error"
+            app:strokeColor="@color/error"
+            app:cornerRadius="@dimen/radius_button"
+            android:visibility="gone" />
     </LinearLayout>
 
     <!-- Top divider for CTA -->

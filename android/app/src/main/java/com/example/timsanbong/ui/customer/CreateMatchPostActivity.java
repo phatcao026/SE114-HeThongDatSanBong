@@ -13,10 +13,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.timsanbong.R;
+import com.example.timsanbong.data.model.MatchPost;
 import com.example.timsanbong.data.model.MatchPostRequest;
 import com.example.timsanbong.data.model.TeamResponse;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,7 +33,9 @@ public class CreateMatchPostActivity extends AppCompatActivity {
     private TextView tabFindOpponent, tabFindMember;
     private AutoCompleteTextView actvTeam;
     private TextView chipBeginner, chipIntermediate, chipAdvanced;
-    private TextInputEditText etPlayDate, etPlayTime, etLocation, etDescription;
+    private TextInputLayout tilLocation, tilNeededMembers, tilPositions, tilPlayDate, tilPlayTime, tilEndTime, tilBookingId;
+    private TextInputEditText etPlayDate, etPlayTime, etEndTime, etLocation, etDescription, etNeededMembers, etPositions, etAgeRange, etCostSharing, etBookingId;
+    private androidx.appcompat.widget.SwitchCompat swHasField;
     private MaterialButton btnSubmit;
 
     private String selectedType = "FIND_OPPONENT";
@@ -71,11 +75,49 @@ public class CreateMatchPostActivity extends AppCompatActivity {
         chipBeginner = findViewById(R.id.chipBeginner);
         chipIntermediate = findViewById(R.id.chipIntermediate);
         chipAdvanced = findViewById(R.id.chipAdvanced);
+        
+        tilPlayDate = findViewById(R.id.tilPlayDate);
+        tilPlayTime = findViewById(R.id.tilPlayTime);
+        tilEndTime = findViewById(R.id.tilEndTime);
+        tilLocation = findViewById(R.id.tilLocation);
+        tilNeededMembers = findViewById(R.id.tilNeededMembers);
+        tilPositions = findViewById(R.id.tilPositions);
+        tilBookingId = findViewById(R.id.tilBookingId);
+
         etPlayDate = findViewById(R.id.etPlayDate);
         etPlayTime = findViewById(R.id.etPlayTime);
+        etEndTime = findViewById(R.id.etEndTime);
         etLocation = findViewById(R.id.etLocation);
         etDescription = findViewById(R.id.etDescription);
+        etNeededMembers = findViewById(R.id.etNeededMembers);
+        etPositions = findViewById(R.id.etPositions);
+        etAgeRange = findViewById(R.id.etAgeRange);
+        etCostSharing = findViewById(R.id.etCostSharing);
+        etBookingId = findViewById(R.id.etBookingId);
+        swHasField = findViewById(R.id.swHasField);
         btnSubmit = findViewById(R.id.btnSubmit);
+
+        // Initial visibilities
+        updateInputVisibilities();
+        
+        swHasField.setOnCheckedChangeListener((v, isChecked) -> updateInputVisibilities());
+    }
+
+    private void updateInputVisibilities() {
+        boolean isFindMember = MatchPost.TYPE_FIND_MEMBER.equals(selectedType);
+        boolean hasField = swHasField.isChecked();
+
+        tilNeededMembers.setVisibility(isFindMember ? View.VISIBLE : View.GONE);
+        tilPositions.setVisibility(isFindMember ? View.VISIBLE : View.GONE);
+        
+        // Show date/time for BOTH types now as per request
+        tilPlayDate.setVisibility(View.VISIBLE);
+        tilPlayTime.setVisibility(View.VISIBLE);
+        tilEndTime.setVisibility(isFindMember ? View.VISIBLE : View.GONE);
+        
+        tilLocation.setVisibility(hasField ? View.VISIBLE : View.GONE);
+        // BookingId remains hidden as requested "xoa cai booking id di"
+        tilBookingId.setVisibility(View.GONE);
     }
 
     private void setupTabs() {
@@ -88,6 +130,8 @@ public class CreateMatchPostActivity extends AppCompatActivity {
             tabFindMember.setBackgroundResource(android.R.color.transparent);
             tabFindMember.setTextColor(getColor(R.color.text_secondary));
             tabFindMember.setTypeface(null, android.graphics.Typeface.NORMAL);
+            
+            updateInputVisibilities();
         });
 
         tabFindMember.setOnClickListener(v -> {
@@ -99,6 +143,8 @@ public class CreateMatchPostActivity extends AppCompatActivity {
             tabFindOpponent.setBackgroundResource(android.R.color.transparent);
             tabFindOpponent.setTextColor(getColor(R.color.text_secondary));
             tabFindOpponent.setTypeface(null, android.graphics.Typeface.NORMAL);
+            
+            updateInputVisibilities();
         });
     }
 
@@ -142,8 +188,18 @@ public class CreateMatchPostActivity extends AppCompatActivity {
 
         etPlayTime.setOnClickListener(v -> {
             Calendar cal = Calendar.getInstance();
+            new TimePickerDialog(this, (view, hour, minute) -> {
+                String time = String.format(Locale.US, "%02d:%02d", hour, minute);
+                etPlayTime.setText(time);
+                // Pre-fill end time (90 mins later)
+                etEndTime.setText(buildEndTime(time));
+            }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show();
+        });
+
+        etEndTime.setOnClickListener(v -> {
+            Calendar cal = Calendar.getInstance();
             new TimePickerDialog(this, (view, hour, minute) ->
-                    etPlayTime.setText(String.format(Locale.US, "%02d:%02d", hour, minute)),
+                    etEndTime.setText(String.format(Locale.US, "%02d:%02d", hour, minute)),
                     cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show();
         });
     }
@@ -172,7 +228,8 @@ public class CreateMatchPostActivity extends AppCompatActivity {
                     break;
                 case SUCCESS:
                     btnSubmit.setEnabled(true);
-                    Toast.makeText(this, "Da tao bai dang thanh cong.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Đã tạo bài đăng thành công.", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK);
                     finish();
                     break;
                 case ERROR:
@@ -184,32 +241,68 @@ public class CreateMatchPostActivity extends AppCompatActivity {
     }
 
     private void validateAndSubmit() {
-        String team = actvTeam.getText().toString().trim();
+        String teamName = actvTeam.getText().toString().trim();
         String timeStart = etPlayTime.getText() != null ? etPlayTime.getText().toString().trim() : "";
+        String timeEnd = etEndTime.getText() != null ? etEndTime.getText().toString().trim() : "";
         String location = etLocation.getText() != null ? etLocation.getText().toString().trim() : "";
+        boolean hasField = swHasField.isChecked();
 
-        if (selectedDateIso.isEmpty() || timeStart.isEmpty() || location.isEmpty()) {
-            Toast.makeText(this, R.string.error_empty_fields, Toast.LENGTH_SHORT).show();
+        // Basic common validation
+        if (selectedDateIso.isEmpty() || timeStart.isEmpty()) {
+            Toast.makeText(this, "Vui lòng chọn ngày và giờ đá", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (!team.isEmpty() && !teamIdsByName.containsKey(team)) {
-            Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_SHORT).show();
+        
+        if (hasField && location.isEmpty()) {
+            Toast.makeText(this, "Vui lòng nhập địa điểm", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        selectedTeamId = team.isEmpty() ? null : teamIdsByName.get(team);
+        // Team ID resolution
+        if (teamIdsByName.containsKey(teamName)) {
+            selectedTeamId = teamIdsByName.get(teamName);
+        } else {
+            selectedTeamId = null;
+        }
 
         String description = etDescription.getText() != null ? etDescription.getText().toString().trim() : "";
-        String message = description.isEmpty() ? location : description + "\n" + location;
 
         MatchPostRequest request = new MatchPostRequest();
         request.setPostType(selectedType);
-        request.setTeamId(selectedTeamId);
-        request.setDate(selectedDateIso);
-        request.setTimeStart(timeStart);
-        request.setTimeEnd(buildEndTime(timeStart));
+        
+        // Use teamId if available, otherwise just use the typed teamName
+        if (teamIdsByName.containsKey(teamName)) {
+            request.setTeamId(teamIdsByName.get(teamName));
+        } else {
+            request.setTeamName(teamName.isEmpty() ? null : teamName);
+        }
+
         request.setSkillLevel(selectedSkill);
-        request.setMessage(message);
+        request.setMessage(description);
+        request.setHasField(hasField);
+        request.setFieldName(location);
+        
+        // Essential match info for BOTH now (date, timeStart)
+        request.setDate(selectedDateIso);
+        request.setTimeStart(timeStart + ":00");
+
+        if (MatchPost.TYPE_FIND_MEMBER.equals(selectedType)) {
+            // FIND_MEMBER needs explicit timeEnd
+            String finalEndTime = timeEnd.isEmpty() ? buildEndTime(timeStart) : timeEnd;
+            request.setTimeEnd(finalEndTime + ":00");
+            
+            String needed = etNeededMembers.getText() != null ? etNeededMembers.getText().toString().trim() : "";
+            if (!needed.isEmpty()) request.setNeededMembers(Integer.parseInt(needed));
+            
+            if (etPositions.getText() != null) request.setTargetPositions(etPositions.getText().toString().trim());
+        } else {
+            // FIND_OPPONENT might not strictly need timeEnd in JSON but good to have if provided
+            if (!timeEnd.isEmpty()) request.setTimeEnd(timeEnd + ":00");
+            else request.setTimeEnd(buildEndTime(timeStart) + ":00");
+        }
+
+        if (etAgeRange.getText() != null) request.setAgeRange(etAgeRange.getText().toString().trim());
+        if (etCostSharing.getText() != null) request.setCostSharing(etCostSharing.getText().toString().trim());
 
         matchViewModel.createMatchPost(request);
     }

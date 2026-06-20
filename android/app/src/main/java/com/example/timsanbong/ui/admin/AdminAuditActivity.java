@@ -164,16 +164,42 @@ public class AdminAuditActivity extends AppCompatActivity {
             });
         }
 
-        private void resolveReport(Long id, String status, View v) {
+        private void resolveReport(Long id, String action, View v) {
+            if (action.equals("APPROVED")) {
+                showDecisionDialog(id, v);
+            } else {
+                sendDecision(id, false, 0, v);
+            }
+        }
+
+        private void showDecisionDialog(Long id, View v) {
+            android.widget.EditText etPoints = new android.widget.EditText(v.getContext());
+            etPoints.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_SIGNED);
+            etPoints.setHint("Ví dụ: -10 hoặc 5");
+
+            new androidx.appcompat.app.AlertDialog.Builder(v.getContext())
+                    .setTitle("Phán quyết Fairplay")
+                    .setMessage("Nhập số điểm uy tín thay đổi cho người bị tố cáo:")
+                    .setView(etPoints)
+                    .setPositiveButton("Xác nhận vi phạm", (dialog, which) -> {
+                        String input = etPoints.getText().toString();
+                        int points = input.isEmpty() ? 0 : Integer.parseInt(input);
+                        sendDecision(id, true, points, v);
+                    })
+                    .setNegativeButton("Hủy", null)
+                    .show();
+        }
+
+        private void sendDecision(Long id, boolean isAccepted, int points, View v) {
             java.util.Map<String, Object> body = new java.util.HashMap<>();
-            body.put("status", status);
-            body.put("resolutionNote", status.equals("APPROVED") ? "Vi phạm đã được xử lý" : "Bỏ qua báo cáo");
+            body.put("isAccepted", isAccepted);
+            body.put("pointsApplied", points);
 
             ApiClient.getService(v.getContext()).resolveFairplayReview(id, body).enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                     if (response.isSuccessful()) {
-                        Toast.makeText(v.getContext(), "Đã cập nhật trạng thái", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(v.getContext(), "Đã xử lý phán quyết", Toast.LENGTH_SHORT).show();
                         if (v.getContext() instanceof AdminAuditActivity) {
                             ((AdminAuditActivity) v.getContext()).loadData(true);
                         }

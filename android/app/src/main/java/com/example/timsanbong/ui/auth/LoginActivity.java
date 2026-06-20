@@ -55,7 +55,17 @@ public class LoginActivity extends AppCompatActivity {
         tvRegisterLink.setOnClickListener(v ->
                 startActivity(new Intent(LoginActivity.this, RegisterActivity.class)));
 
-        authViewModel.loginMessage.observe(this, message -> tilPassword.setError(message));
+        authViewModel.loginMessage.observe(this, message -> {
+            if (message != null && message.toLowerCase().contains("locked")) {
+                new androidx.appcompat.app.AlertDialog.Builder(this)
+                        .setTitle("Tài khoản bị khóa")
+                        .setMessage("Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin để được hỗ trợ.")
+                        .setPositiveButton("Đồng ý", null)
+                        .show();
+            } else {
+                tilPassword.setError(message);
+            }
+        });
 
         authViewModel.registerState.observe(this, state -> {
             if (state == null) return;

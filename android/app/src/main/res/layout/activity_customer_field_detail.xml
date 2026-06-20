@@ -143,6 +143,7 @@
                         </LinearLayout>
 
                         <TextView
+                            android:id="@+id/tvReviewCountHint"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/review_count_hint"
@@ -152,34 +153,6 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Address -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_2"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/ic_map_pin"
-                        app:tint="@color/text_secondary"
-                        android:contentDescription="@string/cd_map_pin" />
-
-                    <TextView
-                        android:id="@+id/tvAddress"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="@dimen/spacing_2"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="@dimen/text_body_medium"
-                        android:fontFamily="@font/be_vietnam_pro"
-                        android:maxLines="2"
-                        android:ellipsize="end"
-                        tools:text="123 Trần Bình, Cầu Giấy, Hà Nội" />
-                </LinearLayout>
 
                 <!-- Price -->
                 <TextView
@@ -269,6 +242,20 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_3"
                     android:clipToPadding="false" />
+
+                <TextView
+                    android:id="@+id/btnShowMoreSlots"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_2"
+                    android:gravity="center"
+                    android:padding="@dimen/spacing_2"
+                    android:text="@string/action_show_more_slots"
+                    android:textColor="@color/primary_dark"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:visibility="gone" />
 
                 <!-- Empty time slots state -->
                 <TextView
@@ -519,6 +506,7 @@
                     android:gravity="center_vertical">
 
                     <TextView
+                        android:id="@+id/tvReviewsTitle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -538,10 +526,35 @@
                         android:fontFamily="@font/be_vietnam_pro" />
                 </LinearLayout>
 
+                <TextView
+                    android:id="@+id/tvFieldReviewsEmpty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_3"
+                    android:gravity="center"
+                    android:padding="@dimen/spacing_4"
+                    android:text="@string/field_reviews_empty"
+                    android:textColor="@color/text_hint"
+                    android:textSize="@dimen/text_body_medium"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:visibility="gone" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvFieldReviews"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_3"
+                    android:nestedScrollingEnabled="false"
+                    android:visibility="gone"
+                    tools:itemCount="2"
+                    tools:listitem="@layout/item_customer_field_review"
+                    tools:visibility="visible" />
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_3"
+                    android:visibility="gone"
                     app:cardCornerRadius="@dimen/radius_lg"
                     app:cardBackgroundColor="@color/background_primary"
                     app:cardElevation="0dp"

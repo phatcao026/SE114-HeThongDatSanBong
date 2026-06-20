@@ -9,6 +9,7 @@ public class UserResponse {
     private String phone;
     private String role;
     private Integer trustScore;
+    private Boolean isLocked;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -58,6 +59,14 @@ public class UserResponse {
 
     public void setTrustScore(Integer trustScore) {
         this.trustScore = trustScore;
+    }
+
+    public Boolean getIsLocked() {
+        return isLocked;
+    }
+
+    public void setIsLocked(Boolean isLocked) {
+        this.isLocked = isLocked;
     }
 
     public LocalDateTime getCreatedAt() {

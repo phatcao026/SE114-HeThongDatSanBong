@@ -76,6 +76,9 @@ public interface ApiService {
     @POST("payments/create-session/{bookingId}")
     Call<PaymentResponse> createCheckoutSession(@Path("bookingId") long bookingId);
 
+    @POST("payments/verify-session")
+    Call<PaymentResponse> verifyCheckoutSession(@Query("sessionId") String sessionId);
+
     // Match posts
     @GET("match-posts")
     Call<List<MatchPost>> getMatchPosts(@Query("postType") String postType);
@@ -91,6 +94,19 @@ public interface ApiService {
 
     @GET("match-posts/me")
     Call<List<MatchPost>> getMyMatchPosts();
+
+    @GET("match-posts/recommendations")
+    Call<List<RecommendedMatch>> getSmartRecommendations(
+            @Query("playstyleNote") String playstyleNote,
+            @Query("teamName") String teamName,
+            @Query("date") String date,
+            @Query("timeStart") String timeStart,
+            @Query("timeEnd") String timeEnd,
+            @Query("skillLevel") String skillLevel,
+            @Query("hasField") Boolean hasField,
+            @Query("postType") String postType,
+            @Query("position") String position
+    );
 
     // Match requests
     @POST("match-posts/{id}/requests")
@@ -145,9 +161,21 @@ public interface ApiService {
     @PUT("notifications/read-all")
     Call<Void> markAllNotificationsRead();
 
+    @POST("notifications/fcm-token")
+    Call<Void> registerFcmToken(@Query("fcmToken") String fcmToken);
+
+    @DELETE("notifications/fcm-token")
+    Call<Void> deregisterFcmToken(@Query("fcmToken") String fcmToken);
+
     // Reviews
     @POST("fairplay/reviews")
     Call<Void> submitReview(@Body ReviewRequest request);
+
+    @POST("reviews/field")
+    Call<FieldReviewResponse> createFieldReview(@Body FieldReviewRequest request);
+
+    @GET("reviews/field/{fieldId}")
+    Call<List<FieldReviewResponse>> getFieldReviews(@Path("fieldId") long fieldId);
 
     // Owner fields
     @GET("fields")
@@ -219,6 +247,12 @@ public interface ApiService {
 
     @GET("admin/reviews")
     Call<List<ReviewResponse>> getAdminReviews();
+
+    @PUT("admin/users/{id}/lock")
+    Call<Void> lockUser(@Path("id") long id);
+
+    @PUT("admin/users/{id}/unlock")
+    Call<Void> unlockUser(@Path("id") long id);
 
     @GET("admin/fairplay/pending")
     Call<List<OpponentReviewResponse>> getAdminFairplayPending();

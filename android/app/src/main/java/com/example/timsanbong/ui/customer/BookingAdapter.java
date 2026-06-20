@@ -22,8 +22,9 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
 
     public interface OnBookingActionListener {
         void onCancel(long bookingId);
+        void onPay(Booking booking);
         void onQrCheckin(Booking booking);
-        void onDirections(Booking booking);
+        void onRateField(Booking booking);
     }
 
     private final List<Booking> bookings = new ArrayList<>();
@@ -65,7 +66,7 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
         private final TextView tvFieldName, tvBookingRef, tvDate, tvTime, tvTotalPrice, tvStatus;
         private final TextView tvDepositFooter, tvRemainder;
         private final View layoutDepositFooter, layoutActions;
-        private final MaterialButton btnQr, btnDirections, btnCancel;
+        private final MaterialButton btnQr, btnCancel, btnRateField;
 
         BookingViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -80,8 +81,9 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
             layoutDepositFooter = itemView.findViewById(R.id.layoutDepositFooter);
             layoutActions = itemView.findViewById(R.id.layoutActions);
             btnQr = itemView.findViewById(R.id.btnQr);
-            btnDirections = itemView.findViewById(R.id.btnDirections);
+
             btnCancel = itemView.findViewById(R.id.btnCancel);
+            btnRateField = itemView.findViewById(R.id.btnRateField);
         }
 
         void bind(Booking booking) {
@@ -96,7 +98,11 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
 
             boolean active = "PENDING".equals(status) || "DEPOSIT_PAID".equals(status) || "CONFIRMED".equals(status);
             layoutActions.setVisibility(active ? View.VISIBLE : View.GONE);
-            if (active && booking.getDepositAmount() > 0) {
+            boolean canRate = "COMPLETED".equals(status);
+            btnRateField.setVisibility(canRate ? View.VISIBLE : View.GONE);
+            btnRateField.setOnClickListener(v -> listener.onRateField(booking));
+            double remaining = booking.getTotalAmount() - booking.getDepositAmount();
+            if (active && booking.getDepositAmount() > 0 && remaining > 0) {
                 layoutDepositFooter.setVisibility(View.VISIBLE);
                 tvDepositFooter.setText(itemView.getContext().getString(
                         R.string.booking_deposit_footer,
@@ -107,8 +113,16 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
                 layoutDepositFooter.setVisibility(View.GONE);
             }
 
-            btnQr.setOnClickListener(v -> listener.onQrCheckin(booking));
-            btnDirections.setOnClickListener(v -> listener.onDirections(booking));
+            if ("PENDING".equals(status)) {
+                btnQr.setText(R.string.action_pay_now);
+                btnQr.setIconResource(R.drawable.ic_credit_card);
+                btnQr.setOnClickListener(v -> listener.onPay(booking));
+            } else {
+                btnQr.setText(R.string.action_qr_checkin);
+                btnQr.setIconResource(R.drawable.ic_qr_code);
+                btnQr.setOnClickListener(v -> listener.onQrCheckin(booking));
+            }
+
             btnCancel.setOnClickListener(v -> listener.onCancel(booking.getId()));
         }
 
@@ -153,7 +167,7 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
             if ("PENDING".equals(status)) {
                 backgroundRes = R.color.status_pending_bg;
                 textRes = R.color.warning;
-            } else if ("DEPOSIT_PAID".equals(status) || "CONFIRMED".equals(status)) {
+            } else if ("DEPOSIT_PAID".equals(status) || "CONFIRMED".equals(status) || "COMPLETED".equals(status)) {
                 backgroundRes = R.color.status_confirmed_bg;
                 textRes = R.color.success;
             } else if ("CANCELLED".equals(status) || "CANCELED".equals(status)) {

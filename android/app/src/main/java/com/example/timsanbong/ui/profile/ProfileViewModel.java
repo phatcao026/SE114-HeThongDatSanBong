@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.timsanbong.data.api.ApiClient;
 import com.example.timsanbong.data.model.User;
 import com.example.timsanbong.data.repository.UserRepository;
+import com.example.timsanbong.utils.PushNotificationManager;
 import com.example.timsanbong.utils.RepositoryCallback;
 import com.example.timsanbong.utils.Resource;
 import com.example.timsanbong.utils.SessionManager;
@@ -68,8 +69,10 @@ public class ProfileViewModel extends AndroidViewModel {
     }
 
     public void logout() {
-        sessionManager.clearSession();
-        ApiClient.reset();
-        _logoutEvent.setValue(true);
+        PushNotificationManager.deregisterCurrentToken(getApplication(), () -> {
+            sessionManager.clearSession();
+            ApiClient.reset();
+            _logoutEvent.setValue(true);
+        });
     }
 }

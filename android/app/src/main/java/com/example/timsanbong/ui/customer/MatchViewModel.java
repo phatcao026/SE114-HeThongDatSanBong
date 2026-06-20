@@ -29,6 +29,9 @@ public class MatchViewModel extends AndroidViewModel {
     private final MutableLiveData<Resource<MatchRequestResponse>> _matchRequestState = new MutableLiveData<>();
     public LiveData<Resource<MatchRequestResponse>> matchRequestState = _matchRequestState;
 
+    private final MutableLiveData<Resource<Void>> _deleteMatchState = new MutableLiveData<>();
+    public LiveData<Resource<Void>> deleteMatchState = _deleteMatchState;
+
     public MatchViewModel(@NonNull Application application) {
         super(application);
     }
@@ -74,6 +77,21 @@ public class MatchViewModel extends AndroidViewModel {
             @Override
             public void onError(String message) {
                 _matchRequestState.postValue(Resource.error(message, null));
+            }
+        });
+    }
+
+    public void deleteMatchPost(long postId) {
+        _deleteMatchState.setValue(Resource.loading(null));
+        matchRepository.deleteMatchPost(getApplication(), postId, new RepositoryCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) {
+                _deleteMatchState.postValue(Resource.success(null));
+            }
+
+            @Override
+            public void onError(String message) {
+                _deleteMatchState.postValue(Resource.error(message, null));
             }
         });
     }

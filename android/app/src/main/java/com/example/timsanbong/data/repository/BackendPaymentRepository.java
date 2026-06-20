@@ -26,10 +26,29 @@ public class BackendPaymentRepository implements PaymentRepository {
                     @Override
                     public void onResponse(Call<PaymentResponse> call, Response<PaymentResponse> response) {
                         if (response.isSuccessful() && response.body() != null) {
-                            PaymentResponse paymentResponse = response.body();
-                            callback.onSuccess(paymentResponse.getMessage(), paymentResponse.getUrl());
+                            callback.onSuccess(response.body());
                         } else {
                             callback.onError("Khong the tao phien thanh toan.");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<PaymentResponse> call, Throwable t) {
+                        callback.onError("Khong the ket noi may chu.");
+                    }
+                });
+    }
+
+    @Override
+    public void verifyCheckoutSession(String sessionId, PaymentRepository.Callback callback) {
+        ApiClient.getService(context).verifyCheckoutSession(sessionId)
+                .enqueue(new retrofit2.Callback<PaymentResponse>() {
+                    @Override
+                    public void onResponse(Call<PaymentResponse> call, Response<PaymentResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            callback.onSuccess(response.body());
+                        } else {
+                            callback.onError("Khong the xac nhan thanh toan.");
                         }
                     }
 
@@ -81,4 +100,5 @@ public class BackendPaymentRepository implements PaymentRepository {
                     }
                 });
     }
+
 }

@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="quick_find_title">Tìm kiếm nhanh</string>
+    <string name="quick_find_subtitle">Hãy cho chúng tôi biết bạn đang tìm kiếm điều gì</string>
+    <string name="hint_playstyle">Lối đá, phong cách (vd: đá phủi vui vẻ, không cay cú)</string>
+    <string name="hint_play_date">Ngày đá</string>
+    <string name="hint_play_time">Giờ đá</string>
+    <string name="hint_team_name">Tên đội (Chọn đội có sẵn hoặc tự điền)</string>
+    <string name="action_search_now">Tìm kiếm ngay</string>
+
+    <string name="match_captain_role_format">%1$s · %2$s</string>
+    <string name="default_role">Đội trưởng</string>
+    <string name="match_members_format">%1$s %2$s</string>
     <string name="app_name">TimSanBong</string>
 
     <!-- Auth -->
@@ -70,11 +81,11 @@
     <string name="action_quick_book">Đặt nhanh</string>
     <string name="label_quick_book">Đặt sân ngay!</string>
     <string name="nav_search">Tìm sân</string>
-    <string name="nav_match">Bắt kèo</string>
+    <string name="nav_match">Tìm đối thủ</string>
     <string name="nav_bookings_label">Lịch đặt</string>
     <string name="nav_messages_label">Tin nhắn</string>
     <string name="cd_nav_search">Tìm sân</string>
-    <string name="cd_nav_match">Bắt kèo</string>
+    <string name="cd_nav_match">Tìm đối thủ</string>
 
     <!-- Filter -->
     <string name="filter_title">Bộ lọc</string>
@@ -132,11 +143,14 @@
     <string name="action_keep">Giữ lại</string>
     <string name="action_confirm_cancel">Hủy đặt</string>
     <string name="action_view_bookings">Xem lịch sử đặt sân</string>
+    <string name="action_create_post">Tạo kèo</string>
+    <string name="action_quick_find">Tìm nhanh</string>
+    <string name="empty_matches_found">Không tìm thấy kèo nào</string>
 
-    <!-- Matchmaking (Bắt kèo) -->
+    <!-- Matchmaking (Tìm đối thủ) -->
     <string name="matchmaking_title">Bắt kèo</string>
     <string name="tab_all">Tất cả</string>
-    <string name="tab_find_opponent">Tìm đối</string>
+    <string name="tab_find_opponent">Tìm đối thủ</string>
     <string name="tab_find_member">Tìm cầu thủ</string>
     <string name="tab_suggested">Gợi ý</string>
     <string name="match_hot_badge">LIVE</string>
@@ -189,13 +203,15 @@
     <string name="payment_success_title">Đã giữ sân!</string>
     <string name="payment_failed_title">Thanh toán thất bại</string>
     <string name="payment_success_message">Giao dịch đã được xác nhận.</string>
-    <string name="payment_failed_message">Giao dịch không thành công. Vui lòng thử lại.</string>
+    <string name="payment_failed_message">Giao dịch chưa hoàn tất. Vui lòng thử lại.</string>
+    <string name="payment_verifying_title">Đang xác minh thanh toán</string>
+    <string name="payment_verifying">Đang xác minh kết quả với máy chủ...</string>
     <string name="action_back_home">Về trang chủ</string>
     <string name="empty_payment">Thiếu thông tin đặt sân để thanh toán.</string>
 
     <!-- Field booking flow -->
     <string name="action_select_slot">Chọn khung giờ</string>
-    <string name="action_hold_slot">Cọc giữ sân</string>
+    <string name="action_hold_slot">Giữ sân</string>
     <string name="price_by_slot">Giá theo khung giờ</string>
     <string name="status_deposit_paid">Đã đặt cọc</string>
     <string name="status_completed">Hoàn thành</string>
@@ -226,6 +242,11 @@
     <string name="qr_dialog_title">QR check-in</string>
     <string name="qr_dialog_message">Đưa mã đặt sân này cho chủ sân khi check-in:\n\n#BK-%d</string>
     <string name="cd_cancel_booking">Hủy đặt sân</string>
+    <string name="action_rate_field">Đánh giá sân</string>
+    <string name="field_review_dialog_title">Đánh giá sân</string>
+    <string name="field_review_comment_hint">Chia sẻ trải nghiệm của bạn</string>
+    <string name="action_submit_review">Gửi đánh giá</string>
+    <string name="field_review_success">Đã gửi đánh giá sân.</string>
 
     <!-- Field detail (prototype parity) -->
     <string name="amenities_title">Tiện ích</string>
@@ -237,6 +258,11 @@
     <string name="amenity_cafe">Căng tin · cà phê</string>
     <string name="reviews_title">Đánh giá (126)</string>
     <string name="review_count_hint">126 đánh giá</string>
+    <string name="reviews_title_format">Đánh giá (%1$d)</string>
+    <string name="review_count_format">%1$d đánh giá</string>
+    <string name="field_reviews_empty">Chưa có đánh giá nào cho sân này.</string>
+    <string name="review_anonymous">Người dùng</string>
+    <string name="review_no_comment">Người dùng chưa để lại nhận xét.</string>
 
     <!-- Payment result (prototype parity) -->
     <string name="deposit_paid_row">Cọc đã thanh toán</string>
@@ -334,29 +360,31 @@
 
     <!-- Player UX refresh -->
     <string name="nav_notifications">Tin</string>
-    <string name="home_ready_to_book">Ready for your next booking</string>
-    <string name="home_greeting_name">Ready to book, %1$s</string>
-    <string name="home_booking_headline">Book a reliable field in minutes</string>
-    <string name="home_booking_subtitle">Browse available slots, reserve with a deposit, and track your booking from one place.</string>
-    <string name="home_next_booking_title">Next booking</string>
-    <string name="home_next_booking_empty">No upcoming booking</string>
-    <string name="home_next_booking_empty_time">Find a field and reserve your next slot.</string>
-    <string name="home_payment_due_title">Deposit required</string>
-    <string name="home_payment_due_body">%1$s needs a deposit of %2$s to hold the slot.</string>
-    <string name="home_payment_clear_title">No payment action needed</string>
-    <string name="home_payment_clear_body">Your active bookings are up to date.</string>
-    <string name="home_booking_tip_title">Peak hours fill quickly</string>
-    <string name="home_booking_tip_body">Evening slots are usually reserved first. Book early to keep the best time.</string>
-    <string name="stat_notifications_label">Alerts</string>
-    <string name="action_pay_deposit">Pay</string>
-    <string name="action_reopen_checkout">Open checkout</string>
-    <string name="payment_pending_message">Checkout opened in your browser. Return to bookings after payment to refresh the status.</string>
-    <string name="booking_confirm_title">Confirm booking</string>
-    <string name="booking_confirm_message">Create booking for %1$s on %2$s at %3$s. Deposit due: %4$s.</string>
-    <string name="profile_saved">Profile updated.</string>
+    <string name="home_ready_to_book">Sẵn sàng cho lần đặt sân tiếp theo</string>
+    <string name="home_greeting_name">Sẵn sàng đặt sân, %1$s</string>
+    <string name="home_booking_headline">Đặt sân uy tín chỉ trong vài phút</string>
+    <string name="home_booking_subtitle">Duyệt khung giờ trống, đặt cọc giữ sân và theo dõi lịch đặt từ một nơi duy nhất.</string>
+    <string name="home_next_booking_title">Lịch sắp tới</string>
+    <string name="home_next_booking_empty">Chưa có lịch đặt sắp tới</string>
+    <string name="home_next_booking_empty_time">Tìm sân và đặt khung giờ tiếp theo.</string>
+    <string name="home_payment_due_title">Cần đặt cọc</string>
+    <string name="home_payment_due_body">%1$s cần đặt cọc %2$s để giữ sân.</string>
+    <string name="home_payment_clear_title">Không cần thanh toán</string>
+    <string name="home_payment_clear_body">Các lịch đặt đang hoạt động đã cập nhật.</string>
+    <string name="home_booking_tip_title">Giờ cao điểm hết nhanh</string>
+    <string name="home_booking_tip_body">Khung giờ tối thường được đặt trước. Đặt sớm để giữ giờ đẹp.</string>
+    <string name="stat_notifications_label">Thông báo</string>
+    <string name="action_pay_deposit">Đặt cọc</string>
+    <string name="action_reopen_checkout">Mở thanh toán</string>
+    <string name="payment_pending_message">Đã mở trang thanh toán trên trình duyệt. Quay lại ứng dụng sau khi thanh toán để xác nhận.</string>
+    <string name="booking_confirm_title">Xác nhận đặt sân</string>
+    <string name="booking_confirm_message">Đặt sân %1$s ngày %2$s lúc %3$s. Cọc: %4$s.</string>
+    <string name="profile_saved">Đã cập nhật hồ sơ.</string>
     <string name="trust_score_value">%1$d/100</string>
-    <string name="field_surface_artificial">Artificial turf</string>
-    <string name="price_from_format">From %1$s %2$s</string>
+    <string name="field_surface_artificial">Cỏ nhân tạo</string>
+    <string name="price_from_format">Từ %1$s %2$s</string>
+    <string name="action_show_more_slots">Xem thêm</string>
+    <string name="action_show_less_slots">Thu gọn</string>
     <string name="time_range_arrow">-&gt; %1$s</string>
     <!-- Owner field management / item strings -->
     <string name="owner_management_label">QUẢN LÝ</string>

@@ -17,8 +17,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.timsanbong.R;
 import com.example.timsanbong.data.model.Booking;
+import com.example.timsanbong.utils.Constants;
 import com.example.timsanbong.utils.NavBarManager;
 import com.example.timsanbong.utils.Resource;
+import com.example.timsanbong.ui.customer.PaymentActivity;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.text.ParseException;
@@ -103,6 +105,15 @@ public class MyBookingsActivity extends AppCompatActivity implements BookingAdap
                     pendingCancelBookingId = -1;
                 }
                 Toast.makeText(this, R.string.booking_cancelled, Toast.LENGTH_SHORT).show();
+            } else if (resource.status == Resource.Status.ERROR) {
+                Toast.makeText(this, getSafeMessage(resource.message), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        bookingViewModel.fieldReviewState.observe(this, resource -> {
+            if (resource == null) return;
+            if (resource.status == Resource.Status.SUCCESS) {
+                Toast.makeText(this, R.string.field_review_success, Toast.LENGTH_SHORT).show();
             } else if (resource.status == Resource.Status.ERROR) {
                 Toast.makeText(this, getSafeMessage(resource.message), Toast.LENGTH_SHORT).show();
             }
@@ -233,6 +244,20 @@ public class MyBookingsActivity extends AppCompatActivity implements BookingAdap
     }
 
     @Override
+    public void onPay(Booking booking) {
+        double dueAmount = booking.getDepositAmount() > 0
+                ? booking.getDepositAmount()
+                : booking.getTotalAmount();
+        Intent intent = new Intent(this, PaymentActivity.class);
+        intent.putExtra(Constants.EXTRA_BOOKING_ID, booking.getId());
+        intent.putExtra(Constants.EXTRA_PAYMENT_FIELD_NAME, booking.getFieldName());
+        intent.putExtra(Constants.EXTRA_TOTAL_PRICE, booking.getTotalAmount());
+        intent.putExtra(Constants.EXTRA_DEPOSIT_AMOUNT, dueAmount);
+        intent.putExtra(Constants.EXTRA_REMAINDER_AMOUNT, booking.getTotalAmount() - dueAmount);
+        startActivity(intent);
+    }
+
+    @Override
     public void onQrCheckin(Booking booking) {
         new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.qr_dialog_title)
@@ -242,15 +267,10 @@ public class MyBookingsActivity extends AppCompatActivity implements BookingAdap
     }
 
     @Override
-    public void onDirections(Booking booking) {
-        String query = booking.getFieldName() != null ? booking.getFieldName() : "";
-        Intent intent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("geo:0,0?q=" + Uri.encode(query)));
-        try {
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_SHORT).show();
-        }
+    public void onRateField(Booking booking) {
+        FieldReviewDialog.show(this, booking,
+                (selectedBooking, rating, comment) ->
+                        bookingViewModel.submitFieldReview(selectedBooking.getId(), rating, comment));
     }
 
     private void removeBookingById(long bookingId) {

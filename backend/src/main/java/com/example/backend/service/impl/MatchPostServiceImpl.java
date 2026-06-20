@@ -578,6 +578,7 @@ public class MatchPostServiceImpl implements MatchPostService {
             response.setMatchId(fullMatchInfo.getId());
             response.setOpponentNote(fullMatchInfo.getMessage());
             response.setAiExplanation(aiRes.getAiReason());
+            response.setMatchPost(toResponse(fullMatchInfo));
             return response;
         }).filter(Objects::nonNull).toList();
     }

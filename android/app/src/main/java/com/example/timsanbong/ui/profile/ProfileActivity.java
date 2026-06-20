@@ -20,6 +20,8 @@ import com.example.timsanbong.ui.admin.AdminMainActivity;
 import com.example.timsanbong.ui.auth.LoginActivity;
 import com.example.timsanbong.ui.customer.BookingAdapter;
 import com.example.timsanbong.ui.customer.BookingViewModel;
+import com.example.timsanbong.ui.customer.PaymentActivity;
+import com.example.timsanbong.utils.Constants;
 import com.example.timsanbong.utils.NavBarManager;
 import com.example.timsanbong.utils.Resource;
 import com.example.timsanbong.utils.SessionManager;
@@ -152,6 +154,15 @@ public class ProfileActivity extends AppCompatActivity implements BookingAdapter
                 Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
             }
         });
+
+        bookingViewModel.fieldReviewState.observe(this, resource -> {
+            if (resource == null) return;
+            if (resource.status == Resource.Status.SUCCESS) {
+                Toast.makeText(this, R.string.field_review_success, Toast.LENGTH_SHORT).show();
+            } else if (resource.status == Resource.Status.ERROR) {
+                Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setupTabs() {
@@ -259,6 +270,20 @@ public class ProfileActivity extends AppCompatActivity implements BookingAdapter
     }
 
     @Override
+    public void onPay(Booking booking) {
+        double dueAmount = booking.getDepositAmount() > 0
+                ? booking.getDepositAmount()
+                : booking.getTotalAmount();
+        Intent intent = new Intent(this, PaymentActivity.class);
+        intent.putExtra(Constants.EXTRA_BOOKING_ID, booking.getId());
+        intent.putExtra(Constants.EXTRA_PAYMENT_FIELD_NAME, booking.getFieldName());
+        intent.putExtra(Constants.EXTRA_TOTAL_PRICE, booking.getTotalAmount());
+        intent.putExtra(Constants.EXTRA_DEPOSIT_AMOUNT, dueAmount);
+        intent.putExtra(Constants.EXTRA_REMAINDER_AMOUNT, booking.getTotalAmount() - dueAmount);
+        startActivity(intent);
+    }
+
+    @Override
     public void onQrCheckin(Booking booking) {
         new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.qr_dialog_title)
@@ -268,14 +293,10 @@ public class ProfileActivity extends AppCompatActivity implements BookingAdapter
     }
 
     @Override
-    public void onDirections(Booking booking) {
-        String query = booking.getFieldName() != null ? booking.getFieldName() : "";
-        Intent intent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("geo:0,0?q=" + Uri.encode(query)));
-        try {
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_SHORT).show();
-        }
+    public void onRateField(Booking booking) {
+        com.example.timsanbong.ui.customer.FieldReviewDialog.show(this, booking,
+                (selectedBooking, rating, comment) ->
+                        bookingViewModel.submitFieldReview(selectedBooking.getId(), rating, comment));
     }
+
 }

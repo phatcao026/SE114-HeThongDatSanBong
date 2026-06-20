@@ -19,29 +19,20 @@
             android:orientation="horizontal"
             android:paddingHorizontal="16dp">
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cvAdminAvatar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/text_heading"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="@color/text_heading"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="0dp">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="PK"
-                    android:textColor="@android:color/white"
-                    android:textStyle="bold" />
-            </com.google.android.material.card.MaterialCardView>
+                android:contentDescription="Back" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="16dp"
                 android:layout_weight="1"
                 android:text="Sân bóng"
                 android:textColor="@color/text_heading"
@@ -53,40 +44,47 @@
                 android:layout_height="24dp"
                 android:src="@drawable/ic_search"
                 app:tint="@color/text_heading"
+                android:visibility="gone"
                 android:contentDescription="Search" />
 
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingBottom="100dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="100dp">
 
-            <TextView
-                android:id="@+id/tvFieldCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0 sân bóng"
-                android:textColor="@color/text_hint"
-                android:textSize="14sp" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvAdminFields"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp" />
+                android:orientation="vertical"
+                android:padding="16dp">
 
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+                <TextView
+                    android:id="@+id/tvFieldCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 sân bóng"
+                    android:textColor="@color/text_hint"
+                    android:textSize="14sp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvAdminFields"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp" />
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <!-- Admin Bottom Navigation -->
     <include

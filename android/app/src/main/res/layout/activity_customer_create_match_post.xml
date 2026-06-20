@@ -108,14 +108,14 @@
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
 
-            <!-- Team Selector (dropdown) -->
+            <!-- Team Selector (dropdown with manual typing) -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilTeam"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_4"
-                android:hint="Chọn đội bóng"
+                android:hint="Tên đội bóng (Gõ để tìm hoặc tự điền)"
                 app:boxCornerRadiusBottomEnd="@dimen/radius_small"
                 app:boxCornerRadiusBottomStart="@dimen/radius_small"
                 app:boxCornerRadiusTopEnd="@dimen/radius_small"
@@ -125,8 +125,9 @@
                 <AutoCompleteTextView
                     android:id="@+id/actvTeam"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="none"
+                    android:layout_height="64dp"
+                    android:paddingHorizontal="@dimen/spacing_4"
+                    android:inputType="text"
                     android:textSize="@dimen/text_body_medium"
                     android:textColor="@color/text_primary" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -188,6 +189,38 @@
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
 
+            <!-- Needed Members (Only FIND_MEMBER) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilNeededMembers"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_3"
+                android:hint="Số người cần tìm"
+                app:boxStrokeColor="@color/border">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etNeededMembers"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Positions (Only FIND_MEMBER) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilPositions"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_3"
+                android:hint="Vị trí cần tìm (vd: Hậu vệ, Thủ môn)"
+                app:boxStrokeColor="@color/border">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPositions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text" />
+            </com.google.android.material.textfield.TextInputLayout>
+
             <!-- Play Date -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilPlayDate"
@@ -213,7 +246,7 @@
                     android:textColor="@color/text_primary" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Play Time -->
+            <!-- Play Time Start -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilPlayTime"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -238,7 +271,43 @@
                     android:textColor="@color/text_primary" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Location -->
+            <!-- Play Time End (Only FIND_MEMBER) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilEndTime"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_3"
+                android:hint="Giờ kết thúc"
+                app:startIconDrawable="@drawable/ic_clock"
+                app:boxCornerRadiusBottomEnd="@dimen/radius_small"
+                app:boxCornerRadiusBottomStart="@dimen/radius_small"
+                app:boxCornerRadiusTopEnd="@dimen/radius_small"
+                app:boxCornerRadiusTopStart="@dimen/radius_small"
+                app:boxStrokeColor="@color/border">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etEndTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:inputType="none"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textColor="@color/text_primary" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Has Field Toggle -->
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/swHasField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_3"
+                android:text="Đã có sân?"
+                android:fontFamily="@font/be_vietnam_pro"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_body_medium" />
+
+            <!-- Location (Conditional) -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilLocation"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -262,7 +331,56 @@
                     android:textColor="@color/text_primary" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Description -->
+            <!-- Booking ID (Hidden but in model) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilBookingId"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_3"
+                android:hint="Mã đặt sân (Booking ID)"
+                android:visibility="gone"
+                app:boxStrokeColor="@color/border">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etBookingId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Age Range -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilAgeRange"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_3"
+                android:hint="Độ tuổi (vd: 18-30 tuổi)"
+                app:boxStrokeColor="@color/border">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etAgeRange"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Cost Sharing -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilCostSharing"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_3"
+                android:hint="Quy tắc chia tiền (vd: 50-50, Thua trả hết)"
+                app:boxStrokeColor="@color/border">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etCostSharing"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Description (NOW AT THE BOTTOM) -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilDescription"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"

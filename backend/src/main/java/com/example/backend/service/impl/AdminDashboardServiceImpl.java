@@ -34,7 +34,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -192,6 +191,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         response.setPhone(user.getPhone());
         response.setRole(user.getRole() != null ? user.getRole().name() : null);
         response.setTrustScore(user.getTrustScore());
+        response.setIsLocked(user.getIsLocked());
         response.setCreatedAt(user.getCreatedAt());
         response.setUpdatedAt(user.getUpdatedAt());
         return response;
@@ -291,6 +291,12 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                 .map(MatchRequest::getId)
                 .orElse(null));
         response.setCreatedAt(post.getCreatedAt());
+        response.setNeededMembers(post.getNeededMembers());
+        response.setJoinedMembers(post.getJoinedMembers());
+        response.setConversationId(post.getConversationId());
+        response.setHasField(post.getHasField());
+        response.setTargetPositions(post.getTargetPositions());
+        response.setAgeRange(post.getAgeRange());
         return response;
     }
 

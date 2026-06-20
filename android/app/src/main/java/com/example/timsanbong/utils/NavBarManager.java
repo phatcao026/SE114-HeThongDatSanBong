@@ -24,11 +24,12 @@ import com.google.android.material.shape.ShapeAppearanceModel;
 public class NavBarManager {
 
     public static final int ITEM_HOME = 0;
-    public static final int ITEM_SEARCH = 1;
-    public static final int ITEM_BOOKINGS = 2;
-    public static final int ITEM_NOTIFICATIONS = 3;
-    public static final int ITEM_PROFILE = 4;
-    public static final int ITEM_MATCH = ITEM_SEARCH;
+    public static final int ITEM_MATCHMAKING = 1;
+    public static final int ITEM_SEARCH = 2;
+    public static final int ITEM_BOOKINGS = 3;
+    public static final int ITEM_NOTIFICATIONS = 4;
+    public static final int ITEM_PROFILE = 5;
+    public static final int ITEM_MATCH = ITEM_MATCHMAKING;
     public static final int ITEM_MESSAGES = ITEM_NOTIFICATIONS;
 
     private final Activity activity;
@@ -42,6 +43,7 @@ public class NavBarManager {
     public void setup() {
         LinearLayout navContainer = activity.findViewById(R.id.navContainer);
         LinearLayout navHome = activity.findViewById(R.id.navHome);
+        LinearLayout navMatchmaking = activity.findViewById(R.id.navMatchmaking);
         LinearLayout navSearch = activity.findViewById(R.id.navSearch);
         LinearLayout navBookings = activity.findViewById(R.id.navBookings);
         LinearLayout navNotifications = activity.findViewById(R.id.navNotifications);
@@ -50,6 +52,7 @@ public class NavBarManager {
         applyNavBarShape(navContainer);
 
         applyActiveState(navHome, R.id.wrapNavHome, R.id.ivNavHome, R.id.tvNavHome, activeItem == ITEM_HOME);
+        applyActiveState(navMatchmaking, R.id.wrapNavMatchmaking, R.id.ivNavMatchmaking, R.id.tvNavMatchmaking, activeItem == ITEM_MATCHMAKING);
         applyActiveState(navSearch, R.id.wrapNavSearch, R.id.ivNavSearch, R.id.tvNavSearch, activeItem == ITEM_SEARCH);
         applyActiveState(navBookings, R.id.wrapNavBookings, R.id.ivNavBookings, R.id.tvNavBookings, activeItem == ITEM_BOOKINGS);
         applyActiveState(navNotifications, R.id.wrapNavNotifications, R.id.ivNavNotifications, R.id.tvNavNotifications,
@@ -57,10 +60,13 @@ public class NavBarManager {
         applyActiveState(navProfile, R.id.wrapNavProfile, R.id.ivNavProfile, R.id.tvNavProfile, activeItem == ITEM_PROFILE);
 
         navHome.setOnClickListener(v -> {
-            if (activeItem != ITEM_HOME) navigate(MainActivity.class);
+            if (activeItem != ITEM_HOME) navigate(com.example.timsanbong.ui.customer.MainActivity.class);
+        });
+        navMatchmaking.setOnClickListener(v -> {
+            if (activeItem != ITEM_MATCHMAKING) navigate(com.example.timsanbong.ui.customer.FindOpponentActivity.class);
         });
         navSearch.setOnClickListener(v -> {
-            if (activeItem != ITEM_SEARCH) navigate(FindPitchActivity.class);
+            if (activeItem != ITEM_SEARCH) navigate(com.example.timsanbong.ui.customer.FindPitchActivity.class);
         });
         navBookings.setOnClickListener(v -> {
             if (activeItem != ITEM_BOOKINGS) navigate(MyBookingsActivity.class);

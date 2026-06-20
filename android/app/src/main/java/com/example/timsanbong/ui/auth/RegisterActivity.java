@@ -106,7 +106,7 @@ public class RegisterActivity extends AppCompatActivity {
             btnRegister.setEnabled(resource.status != Resource.Status.LOADING);
             if (resource.status == Resource.Status.SUCCESS) {
                 Toast.makeText(this, "Đăng ký thành công.", Toast.LENGTH_SHORT).show();
-                navigateByRole();
+                finish();
             } else if (resource.status == Resource.Status.ERROR) {
                 Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
                 tilRegisterOtp.setError(resource.message);

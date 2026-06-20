@@ -19,7 +19,7 @@ public class TeamResponse {
     private int memberCount;
 
     public long getId() { return id; }
-    public String getName() { return name; }
+    public String getName() { return (name != null && !name.trim().isEmpty()) ? name : "Đội bóng"; }
     public String getLevel() { return level; }
     public String getDescription() { return description; }
     public int getMemberCount() { return memberCount; }

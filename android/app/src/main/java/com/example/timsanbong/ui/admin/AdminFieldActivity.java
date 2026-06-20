@@ -42,13 +42,7 @@ public class AdminFieldActivity extends AppCompatActivity {
 
         fetchFields();
 
-        findViewById(R.id.cvAdminAvatar).setOnClickListener(v -> {
-            android.content.Intent intent = new android.content.Intent(this, AdminProfileActivity.class);
-            startActivity(intent);
-        });
-
-        AdminNavBarManager navBarManager = new AdminNavBarManager(this, AdminNavBarManager.ITEM_AUDIT);
-        navBarManager.setup();
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
 
     private void fetchFields() {
