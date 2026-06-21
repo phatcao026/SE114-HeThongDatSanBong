@@ -517,13 +517,16 @@
                         android:fontFamily="@font/bricolage_grotesque" />
 
                     <TextView
+                        android:id="@+id/btnViewAllReviews"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/action_view_all"
                         android:textColor="@color/primary_dark"
                         android:textSize="@dimen/text_caption"
                         android:textStyle="bold"
-                        android:fontFamily="@font/be_vietnam_pro" />
+                        android:fontFamily="@font/be_vietnam_pro"
+                        android:clickable="true"
+                        android:focusable="true" />
                 </LinearLayout>
 
                 <TextView
@@ -735,8 +738,9 @@
     <!-- Full-screen loading -->
     <ProgressBar
         android:id="@+id/pbLoading"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:indeterminateDrawable="@drawable/bg_custom_loading_spinner"
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

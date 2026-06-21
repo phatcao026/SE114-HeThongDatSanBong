@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.timsanbong.R;
 import com.example.timsanbong.ui.profile.ProfileFragment;
@@ -17,12 +18,16 @@ import com.example.timsanbong.utils.PushNotificationManager;
 public class CustomerMainActivity extends AppCompatActivity {
 
     private int currentTab = -1;
+    private NotificationViewModel notificationViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_main_container);
         PushNotificationManager.prepareForAuthenticatedUser(this);
+
+        notificationViewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
+        observeNotifications();
 
         int startTab = NavBarManager.ITEM_HOME;
         if (getIntent() != null) {
@@ -84,5 +89,27 @@ public class CustomerMainActivity extends AppCompatActivity {
         transaction.commit();
 
         new NavBarManager(this, tabIndex).setup();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (notificationViewModel != null) {
+            notificationViewModel.loadUnreadCount();
+        }
+    }
+
+    private void observeNotifications() {
+        notificationViewModel.unreadCountState.observe(this, resource -> {
+            if (resource == null || resource.status != com.example.timsanbong.utils.Resource.Status.SUCCESS
+                    || resource.data == null) {
+                return;
+            }
+            int count = resource.data;
+            android.view.View dot = findViewById(R.id.viewNavNotificationDot);
+            if (dot != null) {
+                dot.setVisibility(count > 0 ? android.view.View.VISIBLE : android.view.View.GONE);
+            }
+        });
     }
 }

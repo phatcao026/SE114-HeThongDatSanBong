@@ -27,7 +27,7 @@ import java.util.List;
 public class FieldDetailActivity extends AppCompatActivity {
 
     private ImageView ivFieldImage, btnBack;
-    private TextView tvFieldName, tvPrice, tvDescription, tvRating, tvReviewCountHint, tvReviewsTitle;
+    private TextView tvFieldName, tvPrice, tvDescription, tvRating, tvReviewCountHint, tvReviewsTitle, btnViewAllReviews;
     private MaterialButton btnBook;
     private FieldViewModel fieldViewModel;
     private long fieldId;
@@ -95,6 +95,16 @@ public class FieldDetailActivity extends AppCompatActivity {
         btnShowMoreSlots.setOnClickListener(v -> {
             isShowingAllSlots = !isShowingAllSlots;
             updateSlotDisplay();
+        });
+
+        btnViewAllReviews = findViewById(R.id.btnViewAllReviews);
+        btnViewAllReviews.setOnClickListener(v -> {
+            if (currentField != null) {
+                Intent intent = new Intent(this, FieldReviewsActivity.class);
+                intent.putExtra("fieldId", currentField.getId());
+                intent.putExtra("fieldName", currentField.getName());
+                startActivity(intent);
+            }
         });
 
         btnBack.setOnClickListener(v -> finish());

@@ -6,11 +6,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_secondary"
-    tools:context=".ui.customer.NotificationsActivity">
+    tools:context=".ui.customer.FieldReviewsActivity">
 
     <!-- App bar -->
     <LinearLayout
-        android:id="@+id/layoutNotifBar"
+        android:id="@+id/layoutReviewBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -23,7 +23,7 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
-            android:id="@+id/ivNotifBack"
+            android:id="@+id/ivReviewBack"
             android:layout_width="@dimen/spacing_8"
             android:layout_height="@dimen/spacing_8"
             android:padding="@dimen/spacing_2"
@@ -35,39 +35,76 @@
             android:contentDescription="@string/cd_back" />
 
         <TextView
-            android:layout_width="0dp"
+            android:id="@+id/tvReviewTitleText"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_marginStart="@dimen/spacing_2"
-            android:text="@string/notifications_title"
+            android:text="Đánh giá sân"
             android:textColor="@color/text_primary"
             android:textSize="@dimen/text_heading3"
             android:textStyle="bold"
             android:fontFamily="@font/bricolage_grotesque" />
-
-        <ImageView
-            android:id="@+id/ivMarkAllRead"
-            android:layout_width="@dimen/spacing_8"
-            android:layout_height="@dimen/spacing_8"
-            android:padding="@dimen/spacing_2"
-            android:src="@drawable/ic_check"
-            app:tint="@color/text_primary"
-            android:background="@drawable/bg_icon_button_light"
-            android:clickable="true"
-            android:focusable="true"
-            android:contentDescription="@string/cd_mark_all_read" />
     </LinearLayout>
 
-    <!-- Notifications list -->
+    <!-- Filter chips group -->
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chipGroupRatingFilter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_2"
+        android:paddingHorizontal="@dimen/spacing_4"
+        app:singleSelection="true"
+        app:selectionRequired="true"
+        app:layout_constraintTop_toBottomOf="@id/layoutReviewBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipFilterAll"
+            style="@style/Widget.TimSanBong.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tất cả"
+            android:checked="true"
+            android:textColor="@color/chip_text_color_state"
+            android:fontFamily="@font/be_vietnam_pro"
+            app:chipBackgroundColor="@color/chip_bg_color_state"
+            app:chipStrokeWidth="0dp" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipFilterPositive"
+            style="@style/Widget.TimSanBong.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tích cực (4-5 ★)"
+            android:textColor="@color/chip_text_color_state"
+            android:fontFamily="@font/be_vietnam_pro"
+            app:chipBackgroundColor="@color/chip_bg_color_state"
+            app:chipStrokeWidth="0dp" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipFilterNegative"
+            style="@style/Widget.TimSanBong.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tiêu cực (1-3 ★)"
+            android:textColor="@color/chip_text_color_state"
+            android:fontFamily="@font/be_vietnam_pro"
+            app:chipBackgroundColor="@color/chip_bg_color_state"
+            app:chipStrokeWidth="0dp" />
+
+    </com.google.android.material.chip.ChipGroup>
+
+    <!-- Reviews list -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvNotifications"
+        android:id="@+id/rvFieldReviews"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/spacing_3"
         android:clipToPadding="false"
         android:paddingHorizontal="@dimen/spacing_4"
         android:paddingBottom="@dimen/spacing_8"
-        app:layout_constraintTop_toBottomOf="@id/layoutNotifBar"
+        app:layout_constraintTop_toBottomOf="@id/chipGroupRatingFilter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -78,41 +115,25 @@
         android:layout_height="56dp"
         android:indeterminateDrawable="@drawable/bg_custom_loading_spinner"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/layoutNotifBar"
+        app:layout_constraintTop_toBottomOf="@id/chipGroupRatingFilter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
-        android:id="@+id/tvEmptyNotifications"
+        android:id="@+id/tvReviewsEmpty"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:visibility="gone"
         android:gravity="center"
-        android:text="@string/empty_notifications"
+        android:text="Không có đánh giá nào"
         android:textColor="@color/text_secondary"
         android:textSize="@dimen/text_body_large"
         android:fontFamily="@font/be_vietnam_pro"
         android:layout_marginHorizontal="@dimen/spacing_6"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <TextView
-        android:id="@+id/tvErrorState"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:gravity="center"
-        android:textColor="@color/text_secondary"
-        android:textSize="@dimen/text_body_large"
-        android:fontFamily="@font/be_vietnam_pro"
-        android:layout_marginHorizontal="@dimen/spacing_6"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chipGroupRatingFilter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

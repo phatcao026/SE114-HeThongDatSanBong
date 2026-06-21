@@ -56,6 +56,25 @@ public class NotificationsFragment extends Fragment {
             if (!notification.isRead()) {
                 notificationViewModel.markAsRead(notification.getId());
             }
+            String type = notification.getType();
+            if (type != null && getActivity() instanceof CustomerMainActivity) {
+                CustomerMainActivity mainActivity = (CustomerMainActivity) getActivity();
+                switch (type.toUpperCase(java.util.Locale.US)) {
+                    case "BOOKING_UPDATE":
+                    case "PAYMENT_UPDATE":
+                        mainActivity.switchToTab(NavBarManager.ITEM_BOOKINGS);
+                        break;
+                    case "MATCH_REQUEST":
+                        mainActivity.switchToTab(NavBarManager.ITEM_MATCHMAKING);
+                        break;
+                    case "NEW_MESSAGE":
+                        android.content.Intent chatIntent = new android.content.Intent(requireContext(), MessagesActivity.class);
+                        startActivity(chatIntent);
+                        break;
+                    default:
+                        break;
+                }
+            }
         });
         rvNotifications.setAdapter(adapter);
     }
