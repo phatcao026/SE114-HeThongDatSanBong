@@ -181,9 +181,7 @@ public class MatchDetailActivity extends AppCompatActivity {
         tvDetailTypeBadge.setText(match.getTypeLabel());
         tvDetailTypeBadge.setBackgroundResource(match.getType().equals(MatchPost.TYPE_FIND_OPPONENT)
                 ? R.drawable.bg_badge_green : R.drawable.bg_badge_orange);
-        tvDetailTypeBadge.setTextColor(ContextCompat.getColor(this,
-                match.getType().equals(MatchPost.TYPE_FIND_OPPONENT)
-                        ? R.color.badge_green_text : R.color.badge_orange_text));
+        tvDetailTypeBadge.setTextColor(ContextCompat.getColor(this, R.color.white));
         // Level badge
         String level = match.getLevel();
         if ("INTERMEDIATE".equals(level)) level = "Trung cấp";

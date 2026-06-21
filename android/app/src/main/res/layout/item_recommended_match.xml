@@ -31,7 +31,7 @@
                 android:paddingHorizontal="@dimen/spacing_2"
                 android:paddingVertical="@dimen/spacing_1"
                 android:text="GỢI Ý TỐT"
-                android:textColor="@color/accent_orange"
+                android:textColor="@color/white"
                 android:textSize="10sp"
                 android:textStyle="bold" />
 

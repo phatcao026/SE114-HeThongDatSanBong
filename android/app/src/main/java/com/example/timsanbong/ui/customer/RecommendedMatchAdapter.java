@@ -76,6 +76,11 @@ public class RecommendedMatchAdapter extends RecyclerView.Adapter<RecommendedMat
             ((GradientDrawable) holder.viewAvatarBg.getBackground().mutate())
                     .setColor(ContextCompat.getColor(holder.itemView.getContext(), avatarColor));
 
+            holder.tvTypeBadge.setText(post.getTypeLabel());
+            holder.tvTypeBadge.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.white));
+            holder.tvTypeBadge.setBackgroundResource(post.getType().equals(MatchPost.TYPE_FIND_OPPONENT)
+                    ? R.drawable.bg_badge_green : R.drawable.bg_badge_orange);
+
             if (post.isAccepted()) {
                 android.util.Log.d("MatchAdapter", "Binding match " + recommendation.getMatchId() + " as ACCEPTED");
                 holder.btnAccept.setText("Đã bắt kèo");
@@ -115,6 +120,7 @@ public class RecommendedMatchAdapter extends RecyclerView.Adapter<RecommendedMat
         TextView tvInitials, tvTrustBadge, tvTeamName, tvMatchMessage;
         TextView tvDate, tvTime, tvField, tvCost, tvMembers;
         MaterialButton btnAccept, btnChatMatch;
+        TextView tvTypeBadge;
 
         ViewHolder(View view) {
             super(view);
@@ -129,6 +135,7 @@ public class RecommendedMatchAdapter extends RecyclerView.Adapter<RecommendedMat
             tvField = view.findViewById(R.id.tvField);
             tvCost = view.findViewById(R.id.tvCost);
             tvMembers = view.findViewById(R.id.tvMembers);
+            tvTypeBadge = view.findViewById(R.id.tvTypeBadge);
             btnAccept = view.findViewById(R.id.btnAccept);
             btnChatMatch = view.findViewById(R.id.btnChatMatch);
         }

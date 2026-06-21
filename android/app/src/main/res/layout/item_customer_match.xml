@@ -109,7 +109,7 @@
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="2dp"
                     android:background="@drawable/bg_badge_green"
-                    android:textColor="@color/badge_green_text" />
+                    android:textColor="@color/white" />
 
                 <TextView
                     android:id="@+id/tvLevelBadge"

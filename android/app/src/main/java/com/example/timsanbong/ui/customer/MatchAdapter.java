@@ -98,10 +98,10 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         // Type badge
         holder.tvTypeBadge.setText(match.getTypeLabel());
         if (MatchPost.TYPE_FIND_OPPONENT.equals(match.getType())) {
-            holder.tvTypeBadge.setTextColor(ContextCompat.getColor(ctx, R.color.badge_green_text));
+            holder.tvTypeBadge.setTextColor(ContextCompat.getColor(ctx, R.color.white));
             holder.tvTypeBadge.setBackground(ContextCompat.getDrawable(ctx, R.drawable.bg_badge_green));
         } else {
-            holder.tvTypeBadge.setTextColor(ContextCompat.getColor(ctx, R.color.badge_orange_text));
+            holder.tvTypeBadge.setTextColor(ContextCompat.getColor(ctx, R.color.white));
             holder.tvTypeBadge.setBackground(ContextCompat.getDrawable(ctx, R.drawable.bg_badge_orange));
         }
 
