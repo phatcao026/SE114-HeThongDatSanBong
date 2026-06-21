@@ -72,7 +72,7 @@ public class CustomerMainActivity extends AppCompatActivity {
                 fragment = new MyBookingsFragment();
                 break;
             case NavBarManager.ITEM_NOTIFICATIONS:
-                fragment = new NotificationsFragment();
+                fragment = new MessagesFragment();
                 break;
             case NavBarManager.ITEM_PROFILE:
                 fragment = new ProfileFragment();

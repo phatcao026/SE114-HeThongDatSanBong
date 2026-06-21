@@ -32,10 +32,16 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
     private java.util.Map<Long, String> reviewStatuses = new java.util.HashMap<>();
     private long currentUserId = -1;
     private java.util.Set<Long> localAcceptedIds = new java.util.HashSet<>();
+    private boolean isHistoryMode = false;
 
     public MatchAdapter(List<MatchPost> matches, OnMatchActionListener listener) {
         this.matches = matches;
         this.listener = listener;
+    }
+
+    public void setHistoryMode(boolean historyMode) {
+        this.isHistoryMode = historyMode;
+        notifyDataSetChanged();
     }
 
     public void setLocalAcceptedIds(java.util.Set<Long> acceptedIds) {
@@ -153,7 +159,8 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         holder.btnAccept.setText(R.string.match_action_accept);
         holder.btnChatMatch.setText(R.string.match_action_chat);
         
-        boolean isHistoryView = "COMPLETED".equals(match.getStatus()) || 
+        boolean isHistoryView = isHistoryMode ||
+                               "COMPLETED".equals(match.getStatus()) ||
                                "EXPIRED".equals(match.getStatus()) ||
                                "MATCHED".equals(match.getStatus()) ||
                                "CLOSED".equals(match.getStatus());
@@ -178,6 +185,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
                 }
             } else {
                 holder.btnRate.setVisibility(View.VISIBLE);
+                holder.btnRate.setText("Đánh giá ngay");
                 holder.tvAccepted.setVisibility(View.GONE);
             }
         } else if (isOwner) {
@@ -188,7 +196,8 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         } else if (isAcceptedByMe) {
             holder.btnAccept.setVisibility(View.VISIBLE);
             holder.btnAccept.setEnabled(false);
-            holder.btnAccept.setAlpha(0.5f);
+            holder.btnAccept.setBackgroundColor(ContextCompat.getColor(ctx, R.color.pitch_800));
+            holder.btnAccept.setTextColor(ContextCompat.getColor(ctx, R.color.white));
             holder.btnAccept.setText("Đã bắt kèo");
             
             holder.btnChatMatch.setVisibility(View.VISIBLE);
@@ -196,9 +205,20 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
             holder.btnRate.setVisibility(View.GONE);
         } else if (match.isAccepted()) {
             // Match is accepted by SOMEONE ELSE on the server
-            holder.btnAccept.setVisibility(View.GONE);
-            holder.btnChatMatch.setVisibility(View.GONE);
-            holder.tvAccepted.setVisibility(View.VISIBLE);
+            // But if we want to show it as disabled for EVERYONE who hasn't accepted it?
+            // The user said: "khi minh chap nhan 1 keo thi no se bi dam mau chữ bắt kèo ko cho tương tác nữa (nhưng tài khoản khác vẫn có thể)"
+            // So if match.isAccepted() is true, it means SOMEONE ELSE accepted it.
+            // The requirements say others should see it as normal.
+            // Wait, if it's accepted by someone else, usually it should be hidden or shown as matched.
+            // But the user specifically said "nhưng tài khoản khác vẫn có thể".
+            // So we show it as available.
+            holder.btnAccept.setVisibility(View.VISIBLE);
+            holder.btnAccept.setEnabled(true);
+            holder.btnAccept.setAlpha(1.0f);
+            holder.btnAccept.setText(R.string.match_action_accept);
+
+            holder.btnChatMatch.setVisibility(View.VISIBLE);
+            holder.tvAccepted.setVisibility(View.GONE);
             holder.btnRate.setVisibility(View.GONE);
         } else {
             holder.btnAccept.setVisibility(View.VISIBLE);

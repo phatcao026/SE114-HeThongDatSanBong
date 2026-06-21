@@ -103,7 +103,7 @@
             android:layout_height="36dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="@string/tab_suggested"
+            android:text="@string/tab_history"
             android:textSize="12sp"
             android:fontFamily="@font/be_vietnam_pro"
             android:background="@android:color/transparent"

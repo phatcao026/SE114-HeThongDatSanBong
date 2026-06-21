@@ -24,6 +24,7 @@ public class RecommendedMatchAdapter extends RecyclerView.Adapter<RecommendedMat
 
     public interface OnRecommendedActionListener {
         void onAccept(RecommendedMatch recommendation);
+        void onChat(RecommendedMatch recommendation);
         void onCardClick(RecommendedMatch recommendation);
     }
 
@@ -46,6 +47,11 @@ public class RecommendedMatchAdapter extends RecyclerView.Adapter<RecommendedMat
         
         MatchPost post = recommendation.getMatchPost();
         if (post != null) {
+            // Apply accepted state to post if recommendation is marked as accepted
+            if (recommendation.isAccepted()) {
+                post.setAccepted(true);
+            }
+
             String teamDisplay = post.getTeamName();
             if (teamDisplay == null || teamDisplay.trim().isEmpty()) {
                 teamDisplay = post.getTeam();
@@ -70,8 +76,26 @@ public class RecommendedMatchAdapter extends RecyclerView.Adapter<RecommendedMat
             ((GradientDrawable) holder.viewAvatarBg.getBackground().mutate())
                     .setColor(ContextCompat.getColor(holder.itemView.getContext(), avatarColor));
 
+            if (post.isAccepted()) {
+                android.util.Log.d("MatchAdapter", "Binding match " + recommendation.getMatchId() + " as ACCEPTED");
+                holder.btnAccept.setText("Đã bắt kèo");
+                holder.btnAccept.setEnabled(false);
+                holder.btnAccept.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.pitch_800));
+                holder.btnAccept.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.white));
+                holder.btnAccept.setAlpha(1.0f);
+                holder.btnChatMatch.setVisibility(View.VISIBLE);
+                holder.btnChatMatch.setOnClickListener(v -> listener.onChat(recommendation));
+            } else {
+                android.util.Log.d("MatchAdapter", "Binding match " + recommendation.getMatchId() + " as AVAILABLE");
+                holder.btnAccept.setText("Bắt kèo");
+                holder.btnAccept.setEnabled(true);
+                holder.btnAccept.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.primary));
+                holder.btnAccept.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.white));
+                holder.btnAccept.setAlpha(1.0f);
+                holder.btnChatMatch.setVisibility(View.GONE);
+            }
+
             holder.btnAccept.setOnClickListener(v -> listener.onAccept(recommendation));
-            holder.btnChatMatch.setVisibility(View.GONE);
             holder.itemView.setOnClickListener(v -> listener.onCardClick(recommendation));
         }
     }

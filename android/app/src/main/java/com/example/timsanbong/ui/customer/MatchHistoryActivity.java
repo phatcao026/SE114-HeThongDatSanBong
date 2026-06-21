@@ -58,6 +58,7 @@ public class MatchHistoryActivity extends AppCompatActivity {
                 showReviewDialog(match);
             }
         });
+        adapter.setHistoryMode(true);
         rvMatchHistory.setAdapter(adapter);
 
         loadHistory();
@@ -107,54 +108,78 @@ public class MatchHistoryActivity extends AppCompatActivity {
     }
 
     private void forceHistoryStatus(MatchPost p) {
-        // We use reflection to set status to MATCHED to trigger the Rate button in the adapter
-        try {
-            java.lang.reflect.Field statusField = MatchPost.class.getDeclaredField("status");
-            statusField.setAccessible(true);
-            statusField.set(p, "MATCHED");
-        } catch (Exception e) {
-            // If reflection fails, we at least try the public setter if it exists (it doesn't in current model)
-        }
+        // Mark as MATCHED so the adapter shows the Rate button
+        p.setStatus("MATCHED");
     }
 
     private void showReviewDialog(MatchPost match) {
         boolean isOpponent = MatchPost.TYPE_FIND_OPPONENT.equals(match.getPostType());
         String title = isOpponent ? "Đánh giá đối thủ" : "Đánh giá đồng đội";
         
-        android.widget.RatingBar ratingBar = new android.widget.RatingBar(this);
-        ratingBar.setNumStars(5);
-        ratingBar.setStepSize(1.0f);
-        
         android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
         layout.setOrientation(android.widget.LinearLayout.VERTICAL);
-        layout.setPadding(50, 40, 50, 10);
-        layout.addView(ratingBar);
+        layout.setPadding(60, 40, 60, 20);
+
+        // Category Spinner (Dropbox)
+        android.widget.TextView tvLabelType = new android.widget.TextView(this);
+        tvLabelType.setText("Phân loại đánh giá:");
+        tvLabelType.setPadding(0, 0, 0, 10);
+        layout.addView(tvLabelType);
+
+        android.widget.Spinner spinnerType = new android.widget.Spinner(this);
+        String[] types = {"Khen ngợi (Tốt)", "Chơi xấu / Thô lỗ", "Không đến (No Show)", "Khác"};
+        String[] values = {"GOOD", "BAD_BEHAVIOR", "NO_SHOW", "OTHER"};
+        
+        android.widget.ArrayAdapter<String> adapterType = new android.widget.ArrayAdapter<>(
+                this, android.R.layout.simple_spinner_dropdown_item, types);
+        spinnerType.setAdapter(adapterType);
+        layout.addView(spinnerType);
+
+        // Comment EditText
+        android.widget.TextView tvLabelComment = new android.widget.TextView(this);
+        tvLabelComment.setText("Nhận xét chi tiết (không bắt buộc):");
+        tvLabelComment.setPadding(0, 40, 0, 10);
+        layout.addView(tvLabelComment);
+
+        android.widget.EditText etComment = new android.widget.EditText(this);
+        etComment.setHint("Nhập ý kiến của bạn...");
+        etComment.setMinLines(2);
+        etComment.setGravity(android.view.Gravity.TOP);
+        layout.addView(etComment);
 
         new MaterialAlertDialogBuilder(this)
                 .setTitle(title)
                 .setView(layout)
-                .setPositiveButton("Gửi", (dialog, which) -> {
-                    int rating = (int) ratingBar.getRating();
-                    submitReview(match, rating);
+                .setPositiveButton("Gửi đánh giá", (dialog, which) -> {
+                    String selectedType = values[spinnerType.getSelectedItemPosition()];
+                    String comment = etComment.getText().toString().trim();
+                    if (comment.isEmpty()) comment = types[spinnerType.getSelectedItemPosition()];
+                    
+                    submitReview(match, selectedType, comment);
                 })
-                .setNegativeButton("Hủy", null)
+                .setNegativeButton("Để sau", null)
                 .show();
     }
 
-    private void submitReview(MatchPost match, int rating) {
+    private void submitReview(MatchPost match, String ratingType, String comment) {
         long currentUserId = sessionManager.getUserId();
         long targetUserId = (match.getUserId() == currentUserId) ? 0 : match.getUserId(); 
         
-        ReviewRequest request = ReviewRequest.fromRating(targetUserId, match.getId(), rating, "Đánh giá từ lịch sử");
+        ReviewRequest request = new ReviewRequest(targetUserId, match.getId(), ratingType, comment);
         ApiClient.getService(this).submitReview(request).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(MatchHistoryActivity.this, "Cảm ơn bạn đã đánh giá!", Toast.LENGTH_SHORT).show();
+                    loadHistory(); // Refresh to hide Rate button
+                } else {
+                    Toast.makeText(MatchHistoryActivity.this, "Lỗi khi gửi đánh giá", Toast.LENGTH_SHORT).show();
                 }
             }
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {}
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(MatchHistoryActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }

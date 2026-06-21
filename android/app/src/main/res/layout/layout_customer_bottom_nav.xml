@@ -183,8 +183,8 @@
                         android:id="@+id/ivNavNotifications"
                         android:layout_width="@dimen/spacing_20"
                         android:layout_height="@dimen/spacing_20"
-                        android:contentDescription="@string/cd_notifications"
-                        android:src="@drawable/ic_bell" />
+                        android:contentDescription="@string/cd_nav_messages"
+                        android:src="@drawable/ic_message" />
 
                     <View
                         android:id="@+id/viewNavNotificationDot"
