@@ -76,7 +76,7 @@ public class GroqAiService {
                     .map(f -> String.format("%s (Sân %s)", f.getName(), f.getType().name()))
                     .collect(Collectors.joining("; "));
 
-            String systemContext = "Bạn là trợ lý ảo hỗ trợ khách hàng của Hệ thống Quản lý Sân bóng PitchSyn. " +
+            String systemContext = "Bạn là trợ lý ảo hỗ trợ khách hàng của Ứng dụng TimSanBong. " +
                     "Nhiệm vụ của bạn là giải đáp thắc mắc dựa trên các thông tin sau. TUYỆT ĐỐI KHÔNG BỊA ĐẶT THÊM SÂN HOẶC ĐỊA CHỈ KHÁC: " +
                     "- Danh sách sân thực tế lấy từ Database: " + realFieldData + ". " +
                     "- Công thức Trust Score (thang 0-100): Trust Score = (0.40 x TransactionScore) + (0.30 x RatingScore) + (0.20 x CancellationScore) + (0.10 x ActivityScore). " +
@@ -90,7 +90,7 @@ public class GroqAiService {
                     "- Khung giờ hoạt động: Từ 06:00 đến 23:30 hàng ngày. " +
                     "- Chính sách hủy sân: Hủy trước 24 giờ được hoàn 100% tiền cọc. Hủy trước 12 giờ hoàn 50%. Hủy sát giờ không được hoàn tiền. " +
                     "- Dịch vụ đi kèm: Miễn phí trà đá, nước và áo bíp. " +
-                    "- Lưu ý: Để xem lịch trống chi tiết hoặc đặt sân, hãy hướng dẫn khách truy cập mục Tìm Sân trên website. " +
+                    "- Lưu ý: Để xem lịch trống chi tiết hoặc đặt sân, hãy hướng dẫn khách truy cập mục Tìm Sân trên ứng dụng. " +
                     "Yêu cầu giao tiếp: Trả lời ngắn gọn, lịch sự, chuyên nghiệp.";
 
             ObjectNode requestBodyNode = objectMapper.createObjectNode();
