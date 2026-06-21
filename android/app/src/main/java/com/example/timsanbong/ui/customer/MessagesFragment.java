@@ -54,10 +54,15 @@ public class MessagesFragment extends Fragment {
         rvConversations = view.findViewById(R.id.rvConversations);
         tvEmptyMessages = view.findViewById(R.id.tvEmptyMessages);
 
-        // Hide bottom navigation in fragment since the main container handles it
+        // Handle bottom navigation visibility depending on hosting activity
         View bottomNav = view.findViewById(R.id.bottomNav);
         if (bottomNav != null) {
-            bottomNav.setVisibility(View.GONE);
+            if (getActivity() instanceof CustomerMainActivity) {
+                bottomNav.setVisibility(View.GONE);
+            } else {
+                bottomNav.setVisibility(View.VISIBLE);
+                new com.example.timsanbong.utils.NavBarManager(getActivity(), com.example.timsanbong.utils.NavBarManager.ITEM_MESSAGES).setup();
+            }
         }
 
         rvConversations.setLayoutManager(new LinearLayoutManager(requireContext()));
