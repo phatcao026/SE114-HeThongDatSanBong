@@ -167,7 +167,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
 
         String reviewStatus = reviewStatuses.get(match.getId());
         boolean isOwner = currentUserId != -1 && match.getUserId() == currentUserId;
-        boolean isAcceptedByMe = localAcceptedIds.contains(match.getId());
+        boolean isAcceptedByMe = localAcceptedIds.contains(match.getId()) || match.isAccepted();
 
         if (isHistoryView) {
             holder.btnAccept.setVisibility(View.GONE);

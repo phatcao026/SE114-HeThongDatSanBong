@@ -151,14 +151,22 @@ public class MatchmakingActivity extends AppCompatActivity {
             if (resource == null) return;
             if (resource.status == com.example.timsanbong.utils.Resource.Status.SUCCESS) {
                 if (pendingAcceptedMatch != null) {
-                    pendingAcceptedMatch.setAccepted(true);
-                    matchRepository.saveAcceptedMatchId(this, pendingAcceptedMatch.getId());
-                    localAcceptedIds.add(pendingAcceptedMatch.getId());
+                    long acceptedId = pendingAcceptedMatch.getId();
+                    matchRepository.saveAcceptedMatchId(this, acceptedId);
+                    localAcceptedIds.add(acceptedId);
+                    
+                    // Force update the state in the original list
+                    for (MatchPost m : allMatches) {
+                        if (m.getId() == acceptedId) {
+                            m.setAccepted(true);
+                        }
+                    }
+                    
                     matchAdapter.setLocalAcceptedIds(localAcceptedIds);
                     pendingAcceptedMatch = null;
                 }
                 matchAdapter.updateMatches(getFilteredList(currentTab));
-                Toast.makeText(this, "Da gui yeu cau bat keo.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Đã gửi yêu cầu bắt kèo.", Toast.LENGTH_SHORT).show();
             } else if (resource.status == com.example.timsanbong.utils.Resource.Status.ERROR) {
                 Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
                 pendingAcceptedMatch = null;

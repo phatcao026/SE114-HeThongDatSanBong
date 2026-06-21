@@ -156,6 +156,8 @@
     <string name="tab_find_opponent">Tìm đối thủ</string>
     <string name="tab_find_member">Tìm cầu thủ</string>
     <string name="tab_suggested">Gợi ý</string>
+    <string name="match_suggestion_hint">Gợi ý phù hợp với yêu cầu của bạn</string>
+    <string name="match_score_format">%1$d%% Match</string>
     <string name="match_hot_badge">LIVE</string>
     <string name="match_action_accept">Bắt kèo</string>
     <string name="match_action_chat">Nhắn</string>

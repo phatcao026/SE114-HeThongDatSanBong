@@ -20,6 +20,13 @@ public class RecommendedMatch implements Serializable {
     public String getOpponentNote() { return opponentNote; }
     public String getAiExplanation() { return aiExplanation; }
     public MatchPost getMatchPost() { return matchPost; }
+    public void setMatchPost(MatchPost matchPost) { this.matchPost = matchPost; }
+    public void setMatchId(Long matchId) { this.matchId = matchId; }
+    public void setAiExplanation(String aiExplanation) { this.aiExplanation = aiExplanation; }
+
+    private int matchScore;
+    public int getMatchScore() { return matchScore; }
+    public void setMatchScore(int matchScore) { this.matchScore = matchScore; }
 
     private boolean accepted;
     public boolean isAccepted() { return accepted; }

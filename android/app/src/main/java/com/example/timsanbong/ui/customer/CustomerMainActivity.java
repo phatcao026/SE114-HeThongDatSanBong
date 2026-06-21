@@ -37,6 +37,9 @@ public class CustomerMainActivity extends AppCompatActivity {
 
         notificationViewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
         observeNotifications();
+        
+        // Sync accepted matches from database
+        new com.example.timsanbong.data.repository.MatchRepository().fetchAndSyncAcceptedMatches(this);
 
         int startTab = NavBarManager.ITEM_HOME;
         if (getIntent() != null) {

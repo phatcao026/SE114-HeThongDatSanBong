@@ -94,6 +94,7 @@ public class QuickFindResultsActivity extends AppCompatActivity {
         String postType = getIntent().getStringExtra("postType");
         String skillLevel = getIntent().getStringExtra("skillLevel");
         String ageRange = getIntent().getStringExtra("ageRange");
+        String costSharing = getIntent().getStringExtra("costSharing");
         Boolean hasField = null;
         if (getIntent().hasExtra("hasField")) {
             hasField = getIntent().getBooleanExtra("hasField", false);
@@ -105,13 +106,14 @@ public class QuickFindResultsActivity extends AppCompatActivity {
         if (postType != null && postType.trim().isEmpty()) postType = null;
         if (skillLevel != null && skillLevel.trim().isEmpty()) skillLevel = null;
         if (ageRange != null && ageRange.trim().isEmpty()) ageRange = null;
+        if (costSharing != null && costSharing.trim().isEmpty()) costSharing = null;
 
         progressBar.setVisibility(View.VISIBLE);
         
         java.util.Set<Long> acceptedIds = new com.example.timsanbong.data.repository.MatchRepository().getAcceptedMatchIds(this);
 
         new com.example.timsanbong.data.repository.MatchRepository().getSmartRecommendations(
-                this, teamName, date, timeStart, timeEnd, skillLevel, hasField, postType, ageRange,
+                this, teamName, date, timeStart, timeEnd, skillLevel, hasField, postType, ageRange, costSharing,
                 new RepositoryCallback<List<RecommendedMatch>>() {
                     @Override
                     public void onSuccess(List<RecommendedMatch> data) {
@@ -123,6 +125,10 @@ public class QuickFindResultsActivity extends AppCompatActivity {
                                 rm.setAccepted(true);
                             }
                         }
+                        
+                        // Sort results: matches with more matching criteria first (optional, but good for "best fit")
+                        // For now, requirement is "1 or more matching criteria"
+
                         adapter.updateList(data);
                         if (tvTitle != null) {
                             if (data.isEmpty()) {
@@ -160,7 +166,13 @@ public class QuickFindResultsActivity extends AppCompatActivity {
                         // Save local state
                         android.util.Log.d("QuickFind", "Saving accepted match ID: " + recommendation.getMatchId());
                         new com.example.timsanbong.data.repository.MatchRepository().saveAcceptedMatchId(QuickFindResultsActivity.this, recommendation.getMatchId());
+                        
+                        // Update the object state
                         recommendation.setAccepted(true);
+                        if (recommendation.getMatchPost() != null) {
+                            recommendation.getMatchPost().setAccepted(true);
+                        }
+
                         adapter.notifyDataSetChanged();
 
                         // Show dialog ONLY after successful acceptance

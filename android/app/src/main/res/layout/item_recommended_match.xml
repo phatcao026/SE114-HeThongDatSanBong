@@ -44,10 +44,10 @@
                 android:id="@+id/tvMatchScore"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="95% Match"
                 android:textColor="@color/primary"
                 android:textSize="12sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="visible" />
         </LinearLayout>
 
         <TextView
@@ -57,7 +57,7 @@
             android:layout_marginTop="@dimen/spacing_2"
             android:background="@color/background_secondary"
             android:padding="@dimen/spacing_2"
-            android:text="AI Explanation here..."
+            android:text="@string/match_suggestion_hint"
             android:textColor="@color/text_primary"
             android:textSize="13sp"
             android:fontStyle="italic" />

@@ -111,6 +111,9 @@ public interface ApiService {
             @Query("position") String position
     );
 
+    @GET("match-requests/my")
+    Call<List<MatchRequestResponse>> getMyMatchRequests();
+
     // Match requests
     @POST("match-posts/{id}/requests")
     Call<MatchRequestResponse> createMatchRequest(@Path("id") long postId, @Body Map<String, String> body);

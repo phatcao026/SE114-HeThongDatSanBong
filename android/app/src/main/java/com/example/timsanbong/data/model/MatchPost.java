@@ -136,6 +136,8 @@ public class MatchPost implements Serializable {
     public long getFieldId() { return fieldId; }
     public long getBookingId() { return bookingId; }
     public String getSkillLevel() { return skillLevel; }
+    public String getTimeStart() { return timeStart; }
+    public String getTimeEnd() { return timeEnd; }
     public String getDescription() { return message; }
     public String getPlayDate() { return date; }
     public String getPlayTime() { return getTime(); }

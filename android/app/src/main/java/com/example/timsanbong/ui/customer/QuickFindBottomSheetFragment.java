@@ -27,7 +27,7 @@ import java.util.Locale;
 public class QuickFindBottomSheetFragment extends BottomSheetDialogFragment {
 
     private TextInputEditText etDate, etTime, etTimeEnd;
-    private AutoCompleteTextView etTeamName, actvPostType, actvSkillLevel, actvHasField, actvAgeRange;
+    private AutoCompleteTextView etTeamName, actvPostType, actvSkillLevel, actvHasField, actvAgeRange, actvCostSharing;
     private String selectedDateIso = "";
     private String selectedTimeStart = "";
     private String selectedTimeEnd = "";
@@ -51,6 +51,7 @@ public class QuickFindBottomSheetFragment extends BottomSheetDialogFragment {
         actvSkillLevel = view.findViewById(R.id.actvSkillLevel);
         actvHasField = view.findViewById(R.id.actvHasField);
         actvAgeRange = view.findViewById(R.id.actvAgeRange);
+        actvCostSharing = view.findViewById(R.id.actvCostSharing);
         View btnSearch = view.findViewById(R.id.btnSearch);
 
         setupTeamAutoComplete();
@@ -81,6 +82,9 @@ public class QuickFindBottomSheetFragment extends BottomSheetDialogFragment {
             if ("Có".equals(hasFieldStr)) hasField = true;
             else if ("Không".equals(hasFieldStr)) hasField = false;
 
+            String costSharing = actvCostSharing.getText().toString().trim();
+            if ("Tất cả".equals(costSharing)) costSharing = "";
+
             Intent intent = new Intent(getContext(), QuickFindResultsActivity.class);
             intent.putExtra("teamName", teamName);
             intent.putExtra("date", selectedDateIso);
@@ -89,6 +93,7 @@ public class QuickFindBottomSheetFragment extends BottomSheetDialogFragment {
             intent.putExtra("postType", postType);
             intent.putExtra("skillLevel", skillLevel);
             intent.putExtra("ageRange", ageRange);
+            intent.putExtra("costSharing", costSharing);
             if (hasField != null) intent.putExtra("hasField", hasField);
             
             startActivity(intent);
@@ -108,6 +113,9 @@ public class QuickFindBottomSheetFragment extends BottomSheetDialogFragment {
 
         String[] ageRanges = {"Tất cả", "Dưới 18 tuổi", "18-25 tuổi", "25-35 tuổi", "Trên 35 tuổi", "Mọi lứa tuổi"};
         actvAgeRange.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, ageRanges));
+
+        String[] costSharingOptions = {"Tất cả", "Chia đều (50-50)", "Đội thua trả", "Chủ kèo mời"};
+        actvCostSharing.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, costSharingOptions));
     }
 
     private void setupTeamAutoComplete() {
