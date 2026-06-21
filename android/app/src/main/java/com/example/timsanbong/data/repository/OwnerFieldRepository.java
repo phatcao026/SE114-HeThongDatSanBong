@@ -2,6 +2,8 @@ package com.example.timsanbong.data.repository;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import com.example.timsanbong.data.api.ApiClient;
 import com.example.timsanbong.data.model.Field;
 import com.example.timsanbong.data.model.FieldCreateRequest;
@@ -21,19 +23,25 @@ import retrofit2.Response;
 public class OwnerFieldRepository {
 
     public void getOwnerFields(Context context, String date, RepositoryCallback<List<Field>> callback) {
+        android.util.Log.d("API_DEBUG", "Calling getOwnerFields with date: " + date);
+
         ApiClient.getService(context).getOwnerFields(date).enqueue(new Callback<List<Field>>() {
             @Override
-            public void onResponse(Call<List<Field>> call, Response<List<Field>> response) {
+            public void onResponse(@NonNull Call<List<Field>> call, @NonNull Response<List<Field>> response) {
+                android.util.Log.d("API_DEBUG", "Full URL: " + call.request().url().toString());
+
                 if (response.isSuccessful() && response.body() != null) {
                     callback.onSuccess(response.body());
                 } else {
+                    android.util.Log.e("API_DEBUG", "Error Code: " + response.code());
+
                     callback.onError("Không tải được danh sách sân.");
                 }
             }
 
             @Override
             public void onFailure(Call<List<Field>> call, Throwable t) {
-                callback.onError("Không thể kết nối máy chủ.");
+                callback.onError("Không thể kết nối máy chủ: " + t.getMessage());
             }
         });
     }
@@ -147,7 +155,7 @@ public class OwnerFieldRepository {
     }
 
     public void getFieldAvailability(Context context, long fieldId, String date, RepositoryCallback<List<TimeSlotResponse>> callback) {
-        ApiClient.getService(context).getFieldAvailability(String.valueOf(fieldId), date).enqueue(new Callback<List<TimeSlotResponse>>() {
+        ApiClient.getService(context).getFieldAvailability(fieldId, date).enqueue(new Callback<List<TimeSlotResponse>>() {
             @Override
             public void onResponse(Call<List<TimeSlotResponse>> call, Response<List<TimeSlotResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {

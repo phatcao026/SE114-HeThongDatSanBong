@@ -115,20 +115,14 @@ public class OwnerMainActivity extends AppCompatActivity {
 
         // Tab Dashboard
         wrapDashboard.setBackgroundResource(android.R.color.transparent);
-        ivDashboard.setImageTintList(ColorStateList.valueOf(colorInactive));
-        tvDashboard.setTextColor(colorInactive);
         tvDashboard.setTypeface(null, Typeface.NORMAL);
 
         // Tab Fields
         wrapFields.setBackgroundResource(android.R.color.transparent);
-        ivFields.setImageTintList(ColorStateList.valueOf(colorInactive));
-        tvFields.setTextColor(colorInactive);
         tvFields.setTypeface(null, Typeface.NORMAL);
 
         // Tab Bookings
         wrapBookings.setBackgroundResource(android.R.color.transparent);
-        ivBookings.setImageTintList(ColorStateList.valueOf(colorInactive));
-        tvBookings.setTextColor(colorInactive);
         tvBookings.setTypeface(null, Typeface.NORMAL);
 
 
@@ -137,21 +131,18 @@ public class OwnerMainActivity extends AppCompatActivity {
             case 1: // Chọn Dashboard
                 wrapDashboard.setBackgroundResource(R.drawable.bg_nav_pill_active);
                 ivDashboard.setImageTintList(ColorStateList.valueOf(colorActive));
-                tvDashboard.setTextColor(colorActive);
                 tvDashboard.setTypeface(null, Typeface.BOLD); // Chữ đậm lên
                 break;
 
             case 2: // Chọn Fields
                 wrapFields.setBackgroundResource(R.drawable.bg_nav_pill_active);
                 ivFields.setImageTintList(ColorStateList.valueOf(colorActive));
-                tvFields.setTextColor(colorActive);
                 tvFields.setTypeface(null, Typeface.BOLD);
                 break;
 
             case 3: // Chọn Bookings
                 wrapBookings.setBackgroundResource(R.drawable.bg_nav_pill_active);
                 ivBookings.setImageTintList(ColorStateList.valueOf(colorActive));
-                tvBookings.setTextColor(colorActive);
                 tvBookings.setTypeface(null, Typeface.BOLD);
                 break;
         }

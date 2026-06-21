@@ -154,7 +154,7 @@
                         android:id="@+id/viewBookingAvatarBg"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:background="@drawable/bg_avatar_green" />
+                        android:background="@drawable/bg_avatar_circle" />
 
                     <TextView
                         android:id="@+id/tvBookingAvatarLetter"

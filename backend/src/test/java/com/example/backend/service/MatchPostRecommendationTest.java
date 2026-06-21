@@ -79,7 +79,7 @@ public class MatchPostRecommendationTest {
         post1.setUser(user2);
 
         Page<MatchPost> matchPage = new PageImpl<>(List.of(post1));
-        when(matchPostRepository.findPotentialMatches(eq(currentUserId), eq(Enums.PostType.FIND_OPPONENT), any())).thenReturn(matchPage);
+        when(matchPostRepository.findPotentialMatches(eq(currentUserId), eq(Enums.PostType.FIND_OPPONENT), any(), any(), any(), any())).thenReturn(Page.empty());
 
         AiRecommendationResult aiResult = new AiRecommendationResult(10L, "Highly compatible playstyle");
         when(groqAiService.recommendMatches(
@@ -116,7 +116,7 @@ public class MatchPostRecommendationTest {
         currentUser.setTrustScore(90);
         when(userRepository.findById(currentUserId)).thenReturn(Optional.of(currentUser));
 
-        when(matchPostRepository.findPotentialMatches(eq(currentUserId), eq(Enums.PostType.FIND_OPPONENT), any())).thenReturn(Page.empty());
+        when(matchPostRepository.findPotentialMatches(eq(currentUserId), eq(Enums.PostType.FIND_OPPONENT), any(), any(), any(), any())).thenReturn(Page.empty());
 
         List<RecommendedMatchResponse> recommendations = matchPostService.getSmartRecommendations(
                 "Fast paced", null, null, null, null, null, Enums.PostType.FIND_OPPONENT, null

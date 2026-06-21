@@ -38,10 +38,10 @@ public class FieldController {
     }
 
     @GetMapping("/mine")
-    public ResponseEntity<List<FieldResponse>> getOwnerFields() {
-        return ResponseEntity.ok(fieldService.getOwnerFields());
+    public ResponseEntity<List<FieldResponse>> getOwnerFields(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(fieldService.getOwnerFields(date));
     }
-
     @GetMapping
     public ResponseEntity<List<FieldResponse>> getFields(
             @RequestParam(required = false) Enums.FieldType type,

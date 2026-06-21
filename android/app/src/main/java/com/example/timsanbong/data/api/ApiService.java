@@ -47,8 +47,12 @@ public interface ApiService {
     @GET("fields")
     Call<List<Field>> getFields();
 
-    @GET("fields/{id}")
-    Call<Field> getFieldById(@Path("id") long id);
+    @GET("fields")
+    Call<List<Field>> getFields(
+            @Query("type") String type,
+            @Query("minPrice") BigDecimal minPrice,
+            @Query("maxPrice") BigDecimal maxPrice);
+
 
     @GET("fields/{id}/availability")
     Call<List<TimeSlotResponse>> getTimeslots(@Path("id") long id, @Query("date") String date);
@@ -186,31 +190,8 @@ public interface ApiService {
     @GET("fields/mine")
     Call<List<Field>> getOwnerFields(@Query("date") String date);
 
-    @GET("fields")
-    Call<List<Field>> getFields(
-            @Query("type") String type,
-            @Query("minPrice") BigDecimal minPrice,
-            @Query("maxPrice") BigDecimal maxPrice);
-
-    // GET /api/fields/page
-//    @GET("fields/page")
-//    Call<Page<Field>> getFieldsPage(
-//            @Query("type") String type,
-//            @Query("name") String name,
-//            @Query("page") int page,
-//            @Query("size") int size
-//    );
-
-    // GET /api/fields/{id}
     @GET("fields/{id}")
-    Call<Field> getFieldById(@Path("id") String id);
-
-    // GET /api/fields/{id}/availability
-    @GET("fields/{id}/availability")
-    Call<List<TimeSlotResponse>> getFieldAvailability(
-            @Path("id") String id,
-            @Query("date") String date // Format: "yyyy-MM-dd"
-    );
+    Call<Field> getFieldById(@Path("id") long id);
 
     @POST("fields")
     Call<Field> createOwnerField(@Body FieldCreateRequest request);
@@ -231,6 +212,9 @@ public interface ApiService {
 
     @DELETE("fields/{id}/time-slots/{slotId}")
     Call<TimeSlot> deleteOwnerTimeSlot(@Path("id") long fieldId, @Path("slotId") long slotId);
+
+    @GET("fields/{id}/availability")
+    Call<List<TimeSlotResponse>> getFieldAvailability(@Path("id") long id, @Query("date") String date);
 
     // Owner bookings
     @GET("bookings/owner")

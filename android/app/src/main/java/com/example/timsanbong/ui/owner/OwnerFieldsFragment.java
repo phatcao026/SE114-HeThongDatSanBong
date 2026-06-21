@@ -52,7 +52,7 @@ public class OwnerFieldsFragment extends Fragment {
     private TextView tvAvailableCount, tvMaintenanceCount, tvClosedCount;
     private TextView tvManagementLabel;
     private View btnDateFieldFilter;
-    private String selectedDate; // Định dạng yyyy-MM-dd
+    private String selectedDate; 
 
     private ActivityResultLauncher<String> createFieldImagePickerLauncher;
     private Uri createFieldImageUri;
@@ -75,7 +75,6 @@ public class OwnerFieldsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(OwnerFieldViewModel.class);
         
-        // Khởi tạo ngày mặc định là hôm nay
         Calendar cal = Calendar.getInstance();
         selectedDate = String.format(Locale.US, "%04d-%02d-%02d", 
                 cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));
@@ -95,7 +94,6 @@ public class OwnerFieldsFragment extends Fragment {
         setupActions(view);
         setupObservers();
 
-        // Tải dữ liệu ban đầu cho ngày hiện tại
         viewModel.loadFields(selectedDate);
     }
 
@@ -192,7 +190,9 @@ public class OwnerFieldsFragment extends Fragment {
         });
         
         viewModel.getMessage().observe(getViewLifecycleOwner(), msg -> {
-            if (msg != null && !msg.isEmpty()) Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show();
+            if (msg != null && !msg.isEmpty()) {
+                Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
@@ -203,13 +203,17 @@ public class OwnerFieldsFragment extends Fragment {
                 maintenance++;
             } else {
                 boolean hasAnyAvailable = false;
-                if (field.getTimeSlots() != null) {
+                if (field.getTimeSlots() != null && !field.getTimeSlots().isEmpty()) {
                     for (TimeSlotResponse ts : field.getTimeSlots()) {
                         if (ts.isAvailable()) { hasAnyAvailable = true; break; }
                     }
+                    if (hasAnyAvailable) available++;
+                    else closed++;
+                } else {
+                    // Nếu không có thông tin khung giờ, mặc định là có thể khả dụng nếu status không phải CLOSED
+                    if (!"CLOSED".equalsIgnoreCase(field.getStatus())) available++;
+                    else closed++;
                 }
-                if (hasAnyAvailable) available++;
-                else closed++;
             }
         }
         
@@ -231,14 +235,20 @@ public class OwnerFieldsFragment extends Fragment {
 
             boolean isMaintenance = "MAINTENANCE".equalsIgnoreCase(field.getStatus());
             boolean hasAvailable = false;
-            if (field.getTimeSlots() != null) {
+            boolean hasTimeSlotData = field.getTimeSlots() != null && !field.getTimeSlots().isEmpty();
+            
+            if (hasTimeSlotData) {
                 for (TimeSlotResponse ts : field.getTimeSlots()) {
                     if (ts.isAvailable()) { hasAvailable = true; break; }
                 }
+            } else {
+                // Giả định khả dụng nếu không có data khung giờ và status là AVAILABLE
+                hasAvailable = "AVAILABLE".equalsIgnoreCase(field.getStatus()) || field.getStatus() == null;
             }
+            
             boolean isClosed = !isMaintenance && !hasAvailable;
 
-            if (filterMode == FilterMode.AVAILABLE && !isMaintenance && hasAvailable) filtered.add(field);
+            if (filterMode == FilterMode.AVAILABLE && hasAvailable && !isMaintenance) filtered.add(field);
             else if (filterMode == FilterMode.MAINTENANCE && isMaintenance) filtered.add(field);
             else if (filterMode == FilterMode.CLOSED && isClosed) filtered.add(field);
             else if (filterMode == FilterMode.ALL) filtered.add(field);

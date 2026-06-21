@@ -156,7 +156,8 @@
                     android:textAllCaps="false"
                     app:icon="@android:drawable/ic_menu_manage"
                     app:iconSize="24dp"
-                    app:backgroundTint="@color/emerald_500"
+                    app:iconGravity="textStart"
+                    app:backgroundTint="@color/primary"
                     app:cornerRadius="12dp" />
 
                 <com.google.android.material.button.MaterialButton
