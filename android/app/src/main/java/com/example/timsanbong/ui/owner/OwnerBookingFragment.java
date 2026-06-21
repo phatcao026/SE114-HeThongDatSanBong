@@ -40,6 +40,8 @@ public class OwnerBookingFragment extends Fragment {
     private TextView tvTotalBookings;
     private TextView tvDepositCollected;
     private TextView tvPendingBadge;
+    private TextView tvTabAllCount, tvTabPendingCount, tvTabConfirmedCount, tvTabCompletedCount, tvTabCancelledCount;
+    private TextView tvRevenue;
     private View emptyState;
     private final TextView tvEmptyBookings = null;
     private View btnClearFilters;
@@ -81,8 +83,13 @@ public class OwnerBookingFragment extends Fragment {
     // 4. Cấu hình tìm kiếm phần tử thông qua biến gốc 'view' của Fragment
     private void bindViews(View view) {
         etSearchBookings = view.findViewById(R.id.etSearchBookings);
-        tvTotalBookings = view.findViewById(R.id.tvTabAllCount);
-        tvDepositCollected = view.findViewById(R.id.tvTabCompletedCount);
+
+        tvTabAllCount = view.findViewById(R.id.tvTabAllCount);
+        tvTabPendingCount = view.findViewById(R.id.tvTabPendingCount);
+        tvTabConfirmedCount = view.findViewById(R.id.tvTabConfirmedCount);
+        tvTabCompletedCount = view.findViewById(R.id.tvTabCompletedCount);
+        tvTabCancelledCount = view.findViewById(R.id.tvTabCancelledCount);
+
         tvPendingBadge = view.findViewById(R.id.tvPendingBadge);
         emptyState = view.findViewById(R.id.llEmptyState);
         btnClearFilters = view.findViewById(R.id.btnClearFilters);
@@ -189,11 +196,15 @@ public class OwnerBookingFragment extends Fragment {
         if (tab != null) {
             tab.setOnClickListener(v -> {
                 selectedStatus = status;
+                // QUAN TRỌNG: Xóa filter nâng cao để Tab hoạt động chính xác
+                if (filterStatuses != null) filterStatuses.clear();
+
                 updateTabState();
                 applyFilters();
             });
         }
     }
+
 
     private void updateTabState() {
         setTabSelected(R.id.tabAll, "ALL".equals(selectedStatus));
@@ -205,38 +216,79 @@ public class OwnerBookingFragment extends Fragment {
 
     private void setTabSelected(int viewId, boolean selected) {
         if (getView() != null) {
-            View tab = getView().findViewById(viewId);
-            if (tab != null) {
+            View tabView = getView().findViewById(viewId);
+
+            if (tabView instanceof android.widget.LinearLayout) {
+                android.widget.LinearLayout tab = (android.widget.LinearLayout) tabView;
                 tab.setSelected(selected);
+
+                // Đổi background dựa trên trạng thái chọn
+                tab.setBackgroundResource(selected ? R.drawable.bg_tab_active : R.drawable.bg_tab_inactive);
+
+                // Đổi màu chữ và kiểu chữ cho các TextView bên trong Tab
+                for (int i = 0; i < tab.getChildCount(); i++) {
+                    View child = tab.getChildAt(i);
+                    if (child instanceof TextView) {
+                        TextView tv = (TextView) child;
+                        tv.setTextColor(selected ? android.graphics.Color.WHITE :
+                                androidx.core.content.ContextCompat.getColor(requireContext(), R.color.slate_500));
+
+                        if (i == 0) { // Label (All, Pending...)
+                            tv.setTypeface(null, selected ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL);
+                        } else { // Count badge
+                            if (selected) {
+                                tv.setBackgroundColor(android.graphics.Color.parseColor("#40FFFFFF"));
+                            } else {
+                                tv.setBackgroundResource(R.color.slate_200);
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 
     // 5. Đồng bộ hóa bộ lắng nghe bằng 'getViewLifecycleOwner()' thay vì 'this'
     private void setupObservers() {
-        viewModel.getBookings().observe(getViewLifecycleOwner(), bookings -> {
-            allBookings.clear();
-            if (bookings != null) {
-                allBookings.addAll(bookings);
+        View loadingBar = getActivity() != null ? getActivity().findViewById(R.id.ownerLoadingBar) : null;
+        View fragmentRootView = getView();
+
+        // CHỈ DÙNG 1 OBSERVER DUY NHẤT CHO LOADING
+        viewModel.getLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            boolean loading = (isLoading != null && isLoading);
+
+            // 1. Xử lý vòng xoay của Activity
+            if (loadingBar != null) {
+                loadingBar.setVisibility(loading ? View.VISIBLE : View.GONE);
             }
-            applyFilters();
-            updateSummary();
-        });
-        viewModel.getBusyBookingId().observe(getViewLifecycleOwner(), busyId -> {
-            if (adapter != null) {
-                adapter.setActionState(Boolean.TRUE.equals(viewModel.getLoading().getValue()),
-                        busyId == null ? -1L : busyId);
+
+            // 2. Xử lý làm mờ Fragment
+            if (fragmentRootView != null) {
+                fragmentRootView.setAlpha(loading ? 0.4f : 1.0f);
+                fragmentRootView.setEnabled(!loading);
             }
-        });
-        viewModel.getLoading().observe(getViewLifecycleOwner(), loading -> {
+
+            // 3. Cập nhật trạng thái cho Adapter (nếu có đơn đang xử lý)
             if (adapter != null) {
                 long busyId = viewModel.getBusyBookingId().getValue() == null ? -1L : viewModel.getBusyBookingId().getValue();
-                adapter.setActionState(Boolean.TRUE.equals(loading), busyId);
+                adapter.setActionState(loading, busyId);
             }
         });
-        viewModel.getMessage().observe(getViewLifecycleOwner(), message -> {
-            if (message != null && !message.trim().isEmpty() && getContext() != null) {
-                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+
+        // Lắng nghe danh sách booking từ ViewModel
+        viewModel.getBookings().observe(getViewLifecycleOwner(), list -> {
+            allBookings.clear();
+            if (list != null) {
+                allBookings.addAll(list);
+            }
+            updateSummary();
+            applyFilters();
+        });
+
+        // Lắng nghe thông báo (Toast)
+        viewModel.getMessage().observe(getViewLifecycleOwner(), msg -> {
+            if (msg != null && !msg.isEmpty()) {
+                Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -271,23 +323,39 @@ public class OwnerBookingFragment extends Fragment {
     }
 
     private void updateSummary() {
-        if (tvTotalBookings == null || tvDepositCollected == null || tvPendingBadge == null) return;
 
-        tvTotalBookings.setText(String.valueOf(allBookings.size()));
+        int all = allBookings.size();
+        int pending = 0;
+        int confirmed = 0;
+        int completed = 0;
+        int cancelled = 0;
         double depositSum = 0;
-        int pendingCount = 0;
+
         for (Booking booking : allBookings) {
             String status = safeStatus(booking);
-            if ("PENDING".equals(status)) {
-                pendingCount++;
+            switch (status) {
+                case "PENDING": pending++; break;
+                case "CONFIRMED": confirmed++; break;
+                case "COMPLETED": completed++; break;
+                case "CANCELLED": cancelled++; break;
+                case "DEPOSIT_PAID": confirmed++; break; // Hoặc xử lý riêng tùy logic backend
             }
-            if ("DEPOSIT_PAID".equals(status) || "CONFIRMED".equals(status) || "COMPLETED".equals(status)) {
+
+            if (!"PENDING".equals(status) && !"CANCELLED".equals(status)) {
                 depositSum += booking.getDepositAmount();
             }
         }
-        tvDepositCollected.setText(NumberFormat.getNumberInstance(new Locale("vi", "VN")).format(depositSum));
-        tvPendingBadge.setText(pendingCount > 0 ? pendingCount + " chờ cọc" : "0 chờ cọc");
-        tvPendingBadge.setVisibility(pendingCount > 0 ? View.VISIBLE : View.GONE);
+
+        if (tvTabAllCount != null) tvTabAllCount.setText(String.valueOf(all));
+        if (tvTabPendingCount != null) tvTabPendingCount.setText(String.valueOf(pending));
+        if (tvTabConfirmedCount != null) tvTabConfirmedCount.setText(String.valueOf(confirmed));
+        if (tvTabCompletedCount != null) tvTabCompletedCount.setText(String.valueOf(completed));
+        if (tvTabCancelledCount != null) tvTabCancelledCount.setText(String.valueOf(cancelled));
+
+        if (tvPendingBadge != null) {
+            tvPendingBadge.setText(pending + " chờ cọc");
+            tvPendingBadge.setVisibility(pending > 0 ? View.VISIBLE : View.GONE);
+        }
     }
 
     private boolean matchesStatus(Booking booking) {
@@ -305,7 +373,12 @@ public class OwnerBookingFragment extends Fragment {
         if (selectedDate == null || selectedDate.trim().isEmpty()) {
             return true;
         }
-        return selectedDate.equals(safeString(booking.getBookingDate()));
+        String bDate = safeString(booking.getBookingDate());
+        // Chỉ lấy phần yyyy-MM-dd nếu bDate có chứa giờ (ISO format)
+        if (bDate.contains("T")) {
+            bDate = bDate.split("T")[0];
+        }
+        return selectedDate.equals(bDate);
     }
 
     private boolean matchesQuery(Booking booking) {

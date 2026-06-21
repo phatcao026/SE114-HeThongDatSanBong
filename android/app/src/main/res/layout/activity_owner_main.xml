@@ -9,6 +9,16 @@
         android:layout_height="match_parent"
         android:layout_above="@id/ownerBottomNavLayout" />
 
+    <!-- LOADING SPINNER: Đặt ở giữa màn hình -->
+    <ProgressBar
+        android:id="@+id/ownerLoadingBar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_centerInParent="true"
+        android:indeterminateTint="@color/green_primary"
+        android:visibility="gone"
+        android:elevation="10dp" />
+
     <include
         android:id="@+id/ownerBottomNavLayout"
         layout="@layout/layout_owner_bottom_nav"

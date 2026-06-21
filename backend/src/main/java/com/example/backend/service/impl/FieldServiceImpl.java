@@ -58,6 +58,16 @@ public class FieldServiceImpl implements FieldService {
     }
 
     @Override
+    public List<FieldResponse> getOwnerFields(LocalDate date) {
+        ensureOwnerOrAdminRole();
+        Long ownerId = TokenUtils.getCurrentUserId();
+        return fieldRepository.findByOwnerIdOrderByCreatedAtDesc(ownerId)
+                .stream()
+                .map(field -> this.toFieldResponseWithDate(field, date))
+                .toList();
+    }
+
+    @Override
     public FieldDetailResponse getFieldById(Long id) {
         Field field = findFieldWithTimeSlots(id);
         return toFieldDetailResponse(field);
@@ -268,11 +278,19 @@ public class FieldServiceImpl implements FieldService {
         response.setUpdatedAt(field.getUpdatedAt());
         response.setAverageRating(fieldReviewRepository.getAverageRatingForField(field.getId()));
         response.setReviewCount(fieldReviewRepository.getReviewCountForField(field.getId()));
+        // Include timeslots so clients (e.g. Owner dashboard) can show slot utilisation
+        if (field.getTimeSlots() != null) {
+            response.setTimeSlots(field.getTimeSlots()
+                    .stream()
+                    .map(this::toTimeSlotResponse)
+                    .toList());
+        }
         return response;
     }
 
     private FieldDetailResponse toFieldDetailResponse(Field field) {
         FieldDetailResponse response = new FieldDetailResponse();
+        // reuse common mapping
         response.setId(field.getId());
         response.setName(field.getName());
         response.setDescription(field.getDescription());
@@ -283,10 +301,12 @@ public class FieldServiceImpl implements FieldService {
         response.setUpdatedAt(field.getUpdatedAt());
         response.setAverageRating(fieldReviewRepository.getAverageRatingForField(field.getId()));
         response.setReviewCount(fieldReviewRepository.getReviewCountForField(field.getId()));
-        response.setTimeSlots(field.getTimeSlots()
-                .stream()
-                .map(this::toTimeSlotResponse)
-                .toList());
+        if (field.getTimeSlots() != null) {
+            response.setTimeSlots(field.getTimeSlots()
+                    .stream()
+                    .map(this::toTimeSlotResponse)
+                    .toList());
+        }
         return response;
     }
 
@@ -350,5 +370,42 @@ public class FieldServiceImpl implements FieldService {
             return null;
         }
         return value.trim();
+    }
+
+    private FieldResponse toFieldResponseWithDate(Field field, LocalDate date) {
+        FieldResponse response = new FieldResponse();
+        response.setId(field.getId());
+        response.setName(field.getName());
+        response.setDescription(field.getDescription());
+        response.setType(field.getType());
+        response.setStatus(field.getStatus());
+        response.setCoverImage(field.getCoverImage());
+        response.setCreatedAt(field.getCreatedAt());
+        response.setUpdatedAt(field.getUpdatedAt());
+        response.setAverageRating(fieldReviewRepository.getAverageRatingForField(field.getId()));
+        response.setReviewCount(fieldReviewRepository.getReviewCountForField(field.getId()));
+
+        if (field.getTimeSlots() != null && date != null) {
+            // Lấy danh sách các slot đã bị đặt trong ngày cụ thể đó
+            List<Booking> bookings = bookingRepository.findByFieldIdAndBookingDate(field.getId(), date);
+            Set<Long> bookedSlotIds = bookings.stream()
+                    .filter(booking -> booking.getStatus() != Enums.BookingStatus.CANCELLED)
+                    .map(Booking::getTimeSlotId)
+                    .collect(java.util.stream.Collectors.toSet());
+
+            // Map danh sách slot và gán trạng thái dựa trên lịch đặt sân thực tế
+            response.setTimeSlots(field.getTimeSlots()
+                    .stream()
+                    .map(timeSlot -> {
+                        TimeSlotResponse slotResp = this.toTimeSlotResponse(timeSlot);
+                        // Nếu slot id nằm trong danh sách bookedSlotIds, bạn có thể cập nhật trạng thái hiển thị
+                        if (bookedSlotIds.contains(timeSlot.getId())) {
+                            slotResp.setStatus(Enums.TimeSlotStatus.BOOKED); // Hoặc một trạng thái tương đương tùy bạn định nghĩa
+                        }
+                        return slotResp;
+                    })
+                    .toList());
+        }
+        return response;
     }
 }

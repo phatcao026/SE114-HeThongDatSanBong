@@ -97,6 +97,11 @@ public class OwnerMainActivity extends AppCompatActivity {
     private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.setCustomAnimations(
+                R.anim.slide_in_right,
+                R.anim.slide_out_left,
+                R.anim.slide_in_left,
+                R.anim.slide_out_right);
         transaction.replace(R.id.ownerFragmentContainer, fragment);
         transaction.commit();
     }
@@ -110,20 +115,14 @@ public class OwnerMainActivity extends AppCompatActivity {
 
         // Tab Dashboard
         wrapDashboard.setBackgroundResource(android.R.color.transparent);
-        ivDashboard.setImageTintList(ColorStateList.valueOf(colorInactive));
-        tvDashboard.setTextColor(colorInactive);
         tvDashboard.setTypeface(null, Typeface.NORMAL);
 
         // Tab Fields
         wrapFields.setBackgroundResource(android.R.color.transparent);
-        ivFields.setImageTintList(ColorStateList.valueOf(colorInactive));
-        tvFields.setTextColor(colorInactive);
         tvFields.setTypeface(null, Typeface.NORMAL);
 
         // Tab Bookings
         wrapBookings.setBackgroundResource(android.R.color.transparent);
-        ivBookings.setImageTintList(ColorStateList.valueOf(colorInactive));
-        tvBookings.setTextColor(colorInactive);
         tvBookings.setTypeface(null, Typeface.NORMAL);
 
 
@@ -132,34 +131,31 @@ public class OwnerMainActivity extends AppCompatActivity {
             case 1: // Chọn Dashboard
                 wrapDashboard.setBackgroundResource(R.drawable.bg_nav_pill_active);
                 ivDashboard.setImageTintList(ColorStateList.valueOf(colorActive));
-                tvDashboard.setTextColor(colorActive);
                 tvDashboard.setTypeface(null, Typeface.BOLD); // Chữ đậm lên
                 break;
 
             case 2: // Chọn Fields
                 wrapFields.setBackgroundResource(R.drawable.bg_nav_pill_active);
                 ivFields.setImageTintList(ColorStateList.valueOf(colorActive));
-                tvFields.setTextColor(colorActive);
                 tvFields.setTypeface(null, Typeface.BOLD);
                 break;
 
             case 3: // Chọn Bookings
                 wrapBookings.setBackgroundResource(R.drawable.bg_nav_pill_active);
                 ivBookings.setImageTintList(ColorStateList.valueOf(colorActive));
-                tvBookings.setTextColor(colorActive);
                 tvBookings.setTypeface(null, Typeface.BOLD);
                 break;
         }
     }
     public void switchToFieldsTab() {
-        if (tvFields != null) {
-            tvFields.performClick(); // Kích hoạt sự kiện bấm vào tab Sân Bóng giống như người dùng tự ấn
+        if (navFields != null) {
+            navFields.performClick(); // Gọi lệnh bấm vào LinearLayout điều hướng
         }
     }
 
     public void switchToBookingsTab() {
-        if (tvBookings != null) {
-            tvBookings.performClick(); // Kích hoạt sự kiện bấm vào tab Đơn Đặt
+        if (navBookings != null) {
+            navBookings.performClick(); // Gọi lệnh bấm vào LinearLayout điều hướng
         }
     }
 }

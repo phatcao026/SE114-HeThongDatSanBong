@@ -9,13 +9,13 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.widget.ImageButton;
 import com.example.timsanbong.R;
 import com.example.timsanbong.data.model.TimeSlotResponse;
-import com.google.android.material.button.MaterialButton;
 
-import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -35,7 +35,14 @@ public class OwnerTimeSlotAdapter extends RecyclerView.Adapter<OwnerTimeSlotAdap
     public void submitList(List<TimeSlotResponse> newTimeSlots) {
         timeSlots.clear();
         if (newTimeSlots != null) {
-            timeSlots.addAll(newTimeSlots);
+            List<TimeSlotResponse> sorted = new ArrayList<>(newTimeSlots);
+            // Sắp xếp theo thời gian bắt đầu tăng dần
+            Collections.sort(sorted, (o1, o2) -> {
+                String s1 = o1.getStartTime() == null ? "" : o1.getStartTime();
+                String s2 = o2.getStartTime() == null ? "" : o2.getStartTime();
+                return s1.compareTo(s2);
+            });
+            timeSlots.addAll(sorted);
         }
         notifyDataSetChanged();
     }
@@ -61,8 +68,8 @@ public class OwnerTimeSlotAdapter extends RecyclerView.Adapter<OwnerTimeSlotAdap
         private final TextView tvTimeRange;
         private final TextView tvPrice;
         private final TextView tvStatus;
-        private final MaterialButton btnEdit;
-        private final MaterialButton btnDelete;
+        private final ImageButton btnEdit;
+        private final ImageButton btnDelete;
 
         OwnerTimeSlotViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -76,9 +83,27 @@ public class OwnerTimeSlotAdapter extends RecyclerView.Adapter<OwnerTimeSlotAdap
         void bind(TimeSlotResponse timeSlot) {
             tvTimeRange.setText(formatTime(timeSlot));
             tvPrice.setText(formatMoney(timeSlot.getPrice()));
-            String status = timeSlot.isAvailable() ? "AVAILABLE" : safeStatus(timeSlot.getStatus());
+            
+            // Logic làm mờ khung giờ đã đặt
+            boolean available = timeSlot.isAvailable();
+            if (available) {
+                itemView.setAlpha(1.0f);
+                btnEdit.setEnabled(true);
+            } else {
+                itemView.setAlpha(0.4f); // Làm mờ các khung giờ đã đặt hoặc không khả dụng
+                btnEdit.setEnabled(false); // Thường khung giờ đã đặt sẽ không cho sửa trực tiếp ở đây
+            }
+
+            String status = timeSlot.getStatus();
+            if (status == null || status.trim().isEmpty()) {
+                status = available ? "AVAILABLE" : "BOOKED";
+            } else {
+                status = status.toUpperCase(Locale.US);
+            }
+            
             tvStatus.setText(labelForStatus(status));
             styleStatus(status);
+
             btnEdit.setOnClickListener(v -> listener.onEditTimeSlot(timeSlot));
             btnDelete.setOnClickListener(v -> listener.onDeleteTimeSlot(timeSlot));
         }
@@ -113,9 +138,7 @@ public class OwnerTimeSlotAdapter extends RecyclerView.Adapter<OwnerTimeSlotAdap
         }
 
         private String formatMoney(Double value) {
-            if (value == null) {
-                return "0 ₫";
-            }
+            if (value == null) return "0 ₫";
             return NumberFormat.getNumberInstance(new Locale("vi", "VN")).format(value) + " ₫";
         }
 
@@ -123,20 +146,12 @@ public class OwnerTimeSlotAdapter extends RecyclerView.Adapter<OwnerTimeSlotAdap
             return value == null ? "--:--" : value;
         }
 
-        private String safeStatus(String status) {
-            return status == null ? "AVAILABLE" : status.toUpperCase(Locale.US);
-        }
-
         private String labelForStatus(String status) {
             switch (status) {
-                case "AVAILABLE":
-                    return "Trống";
-                case "PENDING":
-                    return "Tạm giữ";
-                case "BOOKED":
-                    return "Đã đặt";
-                default:
-                    return status;
+                case "AVAILABLE": return "Trống";
+                case "PENDING": return "Tạm giữ";
+                case "BOOKED": return "Đã đặt";
+                default: return status;
             }
         }
     }

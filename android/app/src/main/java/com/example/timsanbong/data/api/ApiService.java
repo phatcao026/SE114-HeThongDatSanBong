@@ -47,8 +47,12 @@ public interface ApiService {
     @GET("fields")
     Call<List<Field>> getFields();
 
-    @GET("fields/{id}")
-    Call<Field> getFieldById(@Path("id") long id);
+    @GET("fields")
+    Call<List<Field>> getFields(
+            @Query("type") String type,
+            @Query("minPrice") BigDecimal minPrice,
+            @Query("maxPrice") BigDecimal maxPrice);
+
 
     @GET("fields/{id}/availability")
     Call<List<TimeSlotResponse>> getTimeslots(@Path("id") long id, @Query("date") String date);
@@ -183,11 +187,11 @@ public interface ApiService {
     Call<List<FieldReviewResponse>> getFieldReviews(@Path("fieldId") long fieldId);
 
     // Owner fields
-    @GET("fields")
-    Call<List<Field>> getFields(
-            @Query("type") String type,
-            @Query("minPrice") BigDecimal minPrice,
-            @Query("maxPrice") BigDecimal maxPrice);
+    @GET("fields/mine")
+    Call<List<Field>> getOwnerFields(@Query("date") String date);
+
+    @GET("fields/{id}")
+    Call<Field> getFieldById(@Path("id") long id);
 
     @POST("fields")
     Call<Field> createOwnerField(@Body FieldCreateRequest request);
@@ -208,6 +212,9 @@ public interface ApiService {
 
     @DELETE("fields/{id}/time-slots/{slotId}")
     Call<TimeSlot> deleteOwnerTimeSlot(@Path("id") long fieldId, @Path("slotId") long slotId);
+
+    @GET("fields/{id}/availability")
+    Call<List<TimeSlotResponse>> getFieldAvailability(@Path("id") long id, @Query("date") String date);
 
     // Owner bookings
     @GET("bookings/owner")

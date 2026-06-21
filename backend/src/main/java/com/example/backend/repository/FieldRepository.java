@@ -20,6 +20,9 @@ public interface FieldRepository extends JpaRepository<Field, Long> {
 
     List<Field> findByOwnerId(Long ownerId);
 
+    @EntityGraph(attributePaths = {"timeSlots"})
+    List<Field> findByOwnerIdOrderByCreatedAtDesc(Long ownerId);
+
     List<Field> findAllByOrderByCreatedAtDesc();
 
     List<Field> findByStatusOrderByCreatedAtDesc(Enums.FieldStatus status);
@@ -30,7 +33,8 @@ public interface FieldRepository extends JpaRepository<Field, Long> {
     @Query("SELECT f FROM Field f WHERE f.id = :id")
     Optional<Field> findByIdWithTimeSlots(@Param("id") Long id);
 
-    // 👉 Đã tối ưu cú pháp IS NULL, thêm dấu cách sau WHERE
+    // Fixed: use LEFT JOIN FETCH so fields without any timeslot are still included.
+    // Price filters are applied only when at least one timeslot matches.
     @Query("SELECT DISTINCT f FROM Field f LEFT JOIN FETCH f.timeSlots ts WHERE " +
             "(:type IS NULL OR f.type = :type) AND " +
             "(:minPrice IS NULL OR ts.price >= :minPrice) AND " +
@@ -38,4 +42,9 @@ public interface FieldRepository extends JpaRepository<Field, Long> {
     List<Field> findFieldsWithFilters(@Param("type") Enums.FieldType type,
                                       @Param("minPrice") BigDecimal minPrice,
                                       @Param("maxPrice") BigDecimal maxPrice);
+
+    // Used for the public browseable list (all fields with timeslots eagerly loaded)
+    @EntityGraph(attributePaths = {"timeSlots"})
+    @Query("SELECT f FROM Field f ORDER BY f.createdAt DESC")
+    List<Field> findAllWithTimeSlots();
 }

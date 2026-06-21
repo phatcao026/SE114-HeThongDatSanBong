@@ -421,44 +421,47 @@
          Item XML : item_booking_card.xml
          Manager  : LinearLayoutManager(context, VERTICAL, false)
          ══════════════════════════════════════════════════ -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvBookingList"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:paddingStart="14dp"
-        android:paddingEnd="14dp"
-        android:paddingTop="14dp"
-        android:paddingBottom="80dp"
-        android:clipToPadding="false"
-        android:scrollbarStyle="outsideOverlay" />
+        android:layout_weight="1">
 
-    <!-- Empty state (shown via View.VISIBLE when list is empty) -->
-    <LinearLayout
-        android:id="@+id/llEmptyState"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:paddingTop="48dp"
-        android:paddingBottom="48dp"
-        android:visibility="gone">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvBookingList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="80dp"
+            android:clipToPadding="false" />
 
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@android:drawable/ic_menu_search"
-            app:tint="@color/slate_300"
-            android:layout_marginBottom="12dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/llEmptyState"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/empty_bookings"
-            android:textColor="@color/slate_400"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
 
-    </LinearLayout>
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@android:drawable/ic_menu_search"
+                app:tint="@color/slate_300"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/empty_bookings"
+                android:textColor="@color/slate_400"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 </LinearLayout>

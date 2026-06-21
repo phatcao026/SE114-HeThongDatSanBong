@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -21,40 +20,18 @@
         android:paddingEnd="16dp"
         android:paddingBottom="14dp">
 
-
-        <!-- Title row: "My Football Fields" + FAB -->
         <LinearLayout
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
-
             android:layout_marginBottom="14dp"
-
             android:gravity="center_vertical"
-
             android:orientation="horizontal">
 
-
             <LinearLayout
-
                 android:layout_width="0dp"
-
                 android:layout_height="wrap_content"
-
                 android:layout_weight="1"
-
                 android:orientation="vertical">
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:letterSpacing="0.05"
-                    android:text="@string/owner_management_label"
-                    android:textAllCaps="true"
-                    android:textColor="@color/slate_400"
-                    android:textSize="11sp"
-                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -64,14 +41,44 @@
                     android:textColor="@color/slate_900"
                     android:textSize="19sp"
                     android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/tvManagementLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.05"
+                    android:text="Tình trạng sân ngày --/--"
+                    android:textAllCaps="true"
+                    android:textColor="@color/slate_400"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
+
+            <!-- Date Filter Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDateFieldFilter"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_btn_outline_gray"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                app:icon="@drawable/ic_calendar"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="22dp"
+                app:iconTint="@color/slate_500"
+
+                app:backgroundTint="@null"/>
+
             <!-- FAB: Add New Field -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/fabAddField"
                 android:layout_width="44dp"
                 android:layout_height="44dp"
-                android:background="@drawable/bg_small_green_btn"
+                android:background="@drawable/bg_btn_primary_green"
                 android:contextClickable="true"
                 android:elevation="0dp"
                 android:gravity="center"
@@ -79,163 +86,142 @@
                 android:text="@string/plus"
                 android:textColor="@color/white"
                 android:textSize="22sp"
+                android:textStyle="bold"
+                app:backgroundTint="@null" />
+
+        </LinearLayout>
+
+        <!-- Search bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_search_bar"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginEnd="10dp"
+                android:src="@android:drawable/ic_menu_search"
+                app:tint="@color/slate_400" />
+
+            <EditText
+                android:id="@+id/etSearchFields"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@null"
+                android:hint="@string/fields_search_hint"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:singleLine="true"
+                android:textColor="@color/slate_700"
+                android:textColorHint="@color/slate_400"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- Summary pills row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvAvailableCount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_status_completed"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:text="0 Trống"
+                android:textColor="@color/emerald_700"
+                android:textSize="13sp"
                 android:textStyle="bold" />
 
+            <TextView
+                android:id="@+id/tvMaintenanceCount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_status_maintenance"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:text="0 Bảo trì"
+                android:textColor="@color/orange_700"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvClosedCount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_status_cancelled"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:text="0 Hết sân"
+                android:textColor="@color/color_error"
+                android:textSize="13sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
     </LinearLayout>
 
-
-    <!-- Search bar -->
-
-    <LinearLayout
-
-        android:layout_width="match_parent"
-
-        android:layout_height="44dp"
-
-        android:layout_marginBottom="10dp"
-
-        android:background="@drawable/bg_search_bar"
-
-        android:gravity="center_vertical"
-
-        android:orientation="horizontal"
-
-        android:paddingStart="14dp"
-
-        android:paddingEnd="14dp">
-
-
-        <ImageView
-
-            android:layout_width="15dp"
-
-            android:layout_height="15dp"
-
-            android:layout_marginEnd="10dp"
-
-            android:src="@android:drawable/ic_menu_search"
-
-            app:tint="@color/slate_400" />
-
-
-        <EditText
-
-            android:id="@+id/etSearchFields"
-
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@null"
-            android:hint="@string/fields_search_hint"
-            android:imeOptions="actionSearch"
-            android:inputType="text"
-            android:singleLine="true"
-            android:textColor="@color/slate_700"
-            android:textColorHint="@color/slate_400"
-            android:textSize="13sp" />
-    </LinearLayout>
-
-
-    <!-- Summary pills row -->
-
-    <LinearLayout
-
-        android:layout_width="wrap_content"
-
-        android:layout_height="wrap_content"
-
-        android:orientation="horizontal">
-
-
-        <!-- Available pill -->
-
-        <TextView
-
-            android:id="@+id/tvAvailableCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:background="@drawable/bg_status_completed"
-            android:clickable="true"
-            android:focusable="true"
-            android:paddingStart="10dp"
-            android:paddingTop="3dp"
-            android:paddingEnd="10dp"
-            android:paddingBottom="3dp"
-            android:text="@string/owner_available_pill_preview"
-            android:textColor="@color/emerald_700"
-            android:textSize="11sp"
-            android:textStyle="bold" />
-
-        <!-- Maintenance pill -->
-
-        <TextView
-            android:id="@+id/tvMaintenanceCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_status_maintenance"
-            android:clickable="true"
-            android:focusable="true"
-            android:paddingStart="10dp"
-            android:paddingTop="3dp"
-            android:paddingEnd="10dp"
-            android:paddingBottom="3dp"
-            android:text="@string/owner_maintenance_pill_preview"
-            android:textColor="@color/orange_700"
-            android:textSize="11sp"
-            android:textStyle="bold" />
-
-        <!-- Closed / Full pill -->
-        <TextView
-            android:id="@+id/tvClosedCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:background="@drawable/bg_status_cancelled"
-            android:clickable="true"
-            android:focusable="true"
-            android:paddingStart="10dp"
-            android:paddingTop="3dp"
-            android:paddingEnd="10dp"
-            android:paddingBottom="3dp"
-            android:text="@string/owner_closed_pill_preview"
-            android:textColor="@color/color_error"
-            android:textSize="11sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/tvOwnerEmptyFields"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="@string/owner_empty_fields_message"
-        android:textColor="@color/slate_400"
-        android:textSize="12sp"
-        android:visibility="gone" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvFieldList"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingStart="14dp"
-        android:paddingTop="14dp"
-        android:paddingEnd="14dp"
-        android:paddingBottom="80dp"
-        android:scrollbarStyle="outsideOverlay"
-        tools:listitem="@layout/item_owner_field" />
+        android:layout_weight="1">
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvFieldList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingStart="12dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="80dp"
+            tools:listitem="@layout/item_owner_field" />
+
+        <LinearLayout
+            android:id="@+id/llEmptyState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginBottom="12dp"
+                android:src="@android:drawable/ic_menu_search"
+                app:tint="@color/slate_300" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/empty_fields"
+                android:textColor="@color/slate_400"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </FrameLayout>
 </LinearLayout>
-
-    <!-- ══════════════════════════════════════════════════
-         FIELD CARDS RecyclerView
-         Adapter  : FieldCardAdapter
-         Item XML : item_field_card.xml
-         Manager  : LinearLayoutManager(context, VERTICAL, false)
-         ══════════════════════════════════════════════════ -->
-
-

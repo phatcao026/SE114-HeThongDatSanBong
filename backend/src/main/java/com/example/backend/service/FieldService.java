@@ -17,6 +17,8 @@ import java.util.List;
 public interface FieldService {
     List<FieldResponse> getFields(Enums.FieldType type, BigDecimal minPrice, BigDecimal maxPrice);
 
+    List<FieldResponse> getOwnerFields(LocalDate date);
+
     FieldDetailResponse getFieldById(Long id);
 
     List<TimeSlotAvailabilityResponse> getFieldAvailability(Long id, LocalDate date);
