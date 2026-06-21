@@ -119,19 +119,8 @@ public class FindOpponentFragment extends Fragment {
         matchAdapter = new MatchAdapter(new ArrayList<>(), new MatchAdapter.OnMatchActionListener() {
             @Override
             public void onAccept(MatchPost match, int position) {
-                new MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Xác nhận bắt kèo")
-                        .setMessage("Bạn có muốn chuyển đến trang nhắn tin với chủ kèo không?")
-                        .setPositiveButton("Có", (dialog, which) -> {
-                            pendingAcceptMatchId = match.getId();
-                            matchViewModel.createMatchRequest(match.getId(), "Tôi muốn bắt kèo này!");
-                            openDirectConversation(match, true);
-                        })
-                        .setNegativeButton("Không", (dialog, which) -> {
-                            pendingAcceptMatchId = match.getId();
-                            matchViewModel.createMatchRequest(match.getId(), "Tôi muốn bắt kèo này!");
-                        })
-                        .show();
+                pendingAcceptMatchId = match.getId();
+                matchViewModel.createMatchRequest(match.getId(), "Tôi muốn bắt kèo này!");
             }
 
             @Override
@@ -183,7 +172,30 @@ public class FindOpponentFragment extends Fragment {
         matchViewModel.matchRequestState.observe(getViewLifecycleOwner(), resource -> {
             if (resource.status == Resource.Status.SUCCESS) {
                 if (pendingAcceptMatchId != -1) {
-                    matchRepository.saveAcceptedMatchId(requireContext(), pendingAcceptMatchId);
+                    final long acceptedId = pendingAcceptMatchId;
+                    matchRepository.saveAcceptedMatchId(requireContext(), acceptedId);
+                    
+                    // Find the match in allMatches to show dialog
+                    MatchPost acceptedMatch = null;
+                    for (MatchPost m : allMatches) {
+                        if (m.getId() == acceptedId) {
+                            acceptedMatch = m;
+                            break;
+                        }
+                    }
+                    
+                    if (acceptedMatch != null) {
+                        final MatchPost finalMatch = acceptedMatch;
+                        new MaterialAlertDialogBuilder(requireContext())
+                                .setTitle("Xác nhận bắt kèo")
+                                .setMessage("Bạn có muốn chuyển đến trang nhắn tin với chủ kèo không?")
+                                .setPositiveButton("Có", (dialog, which) -> {
+                                    openDirectConversation(finalMatch, true);
+                                })
+                                .setNegativeButton("Không", null)
+                                .show();
+                    }
+
                     pendingAcceptMatchId = -1;
                 }
                 Toast.makeText(requireContext(), "Gửi yêu cầu thành công!", Toast.LENGTH_SHORT).show();

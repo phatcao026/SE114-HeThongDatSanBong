@@ -80,21 +80,20 @@ public class RecommendedMatchAdapter extends RecyclerView.Adapter<RecommendedMat
                 android.util.Log.d("MatchAdapter", "Binding match " + recommendation.getMatchId() + " as ACCEPTED");
                 holder.btnAccept.setText("Đã bắt kèo");
                 holder.btnAccept.setEnabled(false);
-                holder.btnAccept.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.pitch_800));
+                holder.btnAccept.setBackgroundTintList(android.content.res.ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.pitch_800)));
                 holder.btnAccept.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.white));
                 holder.btnAccept.setAlpha(1.0f);
-                holder.btnChatMatch.setVisibility(View.VISIBLE);
-                holder.btnChatMatch.setOnClickListener(v -> listener.onChat(recommendation));
             } else {
                 android.util.Log.d("MatchAdapter", "Binding match " + recommendation.getMatchId() + " as AVAILABLE");
                 holder.btnAccept.setText("Bắt kèo");
                 holder.btnAccept.setEnabled(true);
-                holder.btnAccept.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.primary));
+                holder.btnAccept.setBackgroundTintList(android.content.res.ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.accent_orange)));
                 holder.btnAccept.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.white));
                 holder.btnAccept.setAlpha(1.0f);
-                holder.btnChatMatch.setVisibility(View.GONE);
             }
 
+            holder.btnChatMatch.setVisibility(View.VISIBLE);
+            holder.btnChatMatch.setOnClickListener(v -> listener.onChat(recommendation));
             holder.btnAccept.setOnClickListener(v -> listener.onAccept(recommendation));
             holder.itemView.setOnClickListener(v -> listener.onCardClick(recommendation));
         }

@@ -172,6 +172,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         if (isHistoryView) {
             holder.btnAccept.setVisibility(View.GONE);
             holder.btnChatMatch.setVisibility(View.GONE);
+            holder.tvAccepted.setVisibility(View.GONE); // Default
             
             if (reviewStatus != null) {
                 holder.btnRate.setVisibility(View.GONE);
@@ -196,34 +197,21 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         } else if (isAcceptedByMe) {
             holder.btnAccept.setVisibility(View.VISIBLE);
             holder.btnAccept.setEnabled(false);
-            holder.btnAccept.setBackgroundColor(ContextCompat.getColor(ctx, R.color.pitch_800));
+            holder.btnAccept.setAlpha(1.0f);
+            holder.btnAccept.setBackgroundTintList(android.content.res.ColorStateList.valueOf(ContextCompat.getColor(ctx, R.color.pitch_800)));
             holder.btnAccept.setTextColor(ContextCompat.getColor(ctx, R.color.white));
             holder.btnAccept.setText("Đã bắt kèo");
             
             holder.btnChatMatch.setVisibility(View.VISIBLE);
             holder.tvAccepted.setVisibility(View.GONE);
             holder.btnRate.setVisibility(View.GONE);
-        } else if (match.isAccepted()) {
-            // Match is accepted by SOMEONE ELSE on the server
-            // But if we want to show it as disabled for EVERYONE who hasn't accepted it?
-            // The user said: "khi minh chap nhan 1 keo thi no se bi dam mau chữ bắt kèo ko cho tương tác nữa (nhưng tài khoản khác vẫn có thể)"
-            // So if match.isAccepted() is true, it means SOMEONE ELSE accepted it.
-            // The requirements say others should see it as normal.
-            // Wait, if it's accepted by someone else, usually it should be hidden or shown as matched.
-            // But the user specifically said "nhưng tài khoản khác vẫn có thể".
-            // So we show it as available.
-            holder.btnAccept.setVisibility(View.VISIBLE);
-            holder.btnAccept.setEnabled(true);
-            holder.btnAccept.setAlpha(1.0f);
-            holder.btnAccept.setText(R.string.match_action_accept);
-
-            holder.btnChatMatch.setVisibility(View.VISIBLE);
-            holder.tvAccepted.setVisibility(View.GONE);
-            holder.btnRate.setVisibility(View.GONE);
         } else {
+            // Available or accepted by someone else
             holder.btnAccept.setVisibility(View.VISIBLE);
             holder.btnAccept.setEnabled(true);
             holder.btnAccept.setAlpha(1.0f);
+            holder.btnAccept.setBackgroundTintList(android.content.res.ColorStateList.valueOf(ContextCompat.getColor(ctx, R.color.accent_orange)));
+            holder.btnAccept.setTextColor(ContextCompat.getColor(ctx, R.color.white));
             holder.btnAccept.setText(R.string.match_action_accept);
 
             holder.btnChatMatch.setVisibility(View.VISIBLE);
