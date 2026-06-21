@@ -14,16 +14,25 @@ import com.example.timsanbong.R;
 import com.example.timsanbong.ui.profile.ProfileFragment;
 import com.example.timsanbong.utils.NavBarManager;
 import com.example.timsanbong.utils.PushNotificationManager;
+import com.example.timsanbong.ui.chat.ChatBotBottomSheetFragment;
+import com.example.timsanbong.utils.Constants;
+import com.example.timsanbong.utils.SessionManager;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class CustomerMainActivity extends AppCompatActivity {
 
     private int currentTab = -1;
     private NotificationViewModel notificationViewModel;
+    private FloatingActionButton fabChatBot;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_main_container);
+
+        fabChatBot = findViewById(R.id.fabChatBot);
+        fabChatBot.setOnClickListener(v -> openChatBot());
+
         PushNotificationManager.prepareForAuthenticatedUser(this);
 
         notificationViewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
@@ -111,5 +120,18 @@ public class CustomerMainActivity extends AppCompatActivity {
                 dot.setVisibility(count > 0 ? android.view.View.VISIBLE : android.view.View.GONE);
             }
         });
+    }
+
+    private void openChatBot() {
+        SessionManager sessionManager = new SessionManager(this);
+        String token = sessionManager.getToken();
+
+        // Khởi tạo Chatbot Bottom Sheet
+        ChatBotBottomSheetFragment chatBot = ChatBotBottomSheetFragment.newInstance(
+                Constants.BASE_URL,
+                token,
+                null
+        );
+        chatBot.show(getSupportFragmentManager(), "ChatBot");
     }
 }
