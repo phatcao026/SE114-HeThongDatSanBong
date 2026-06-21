@@ -174,39 +174,54 @@ public class AdminAuditActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             OpponentReviewResponse report = reports.get(position);
-            holder.tvTitle.setText(report.getRatingType());
-            holder.tvTime.setText(formatDateTime(report.getCreatedAt()));
-            holder.tvPriority.setText(report.getStatus());
-            holder.tvCategory.setText("Fairplay");
-            holder.tvContent.setText(report.getComment());
-            holder.tvReporter.setText(String.format("Từ: %s -> %s", report.getReviewerName(), report.getRevieweeName()));
-            holder.ivIcon.setImageResource(R.drawable.ic_admin_shield);
 
-            boolean isProcessed = !"PENDING".equals(report.getStatus());
-
+            String title;
             int colorInt;
             int bgColorInt;
 
-            String status = report.getStatus();
-            if ("RESOLVED".equals(status)) {
-                colorInt = Color.parseColor("#38A169"); // Green
-                bgColorInt = Color.parseColor("#F0FFF4");
-            } else if ("REJECTED".equals(status)) {
-                colorInt = Color.parseColor("#E53E3E"); // Red
-                bgColorInt = Color.parseColor("#FFF5F5");
-            } else {
-                // PENDING or others
-                colorInt = Color.parseColor("#D69E2E"); // Yellow/Amber
-                bgColorInt = Color.parseColor("#FFFFF0");
+            // Map rating type to Vietnamese labels and colors
+            String ratingType = report.getRatingType() != null ? report.getRatingType() : "";
+            switch (ratingType) {
+                case "GOOD":
+                    title = "Thi đấu đẹp / Thân thiện";
+                    colorInt = Color.parseColor("#38A169"); // Green
+                    bgColorInt = Color.parseColor("#F0FFF4");
+                    break;
+                case "NO_SHOW":
+                    title = "Bùng kèo / Hủy phút chót";
+                    colorInt = Color.parseColor("#E53E3E"); // Red
+                    bgColorInt = Color.parseColor("#FFF5F5");
+                    break;
+                case "BAD_BEHAVIOR":
+                    title = "Hành vi xấu / Bạo lực";
+                    colorInt = Color.parseColor("#DD6B20"); // Orange
+                    bgColorInt = Color.parseColor("#FFFAF0");
+                    break;
+                default:
+                    title = "Đánh giá Fairplay";
+                    colorInt = Color.parseColor("#D69E2E"); // Amber
+                    bgColorInt = Color.parseColor("#FFFFF0");
+                    break;
             }
 
+            holder.tvTitle.setText(title);
+            holder.tvTime.setText(formatDateTime(report.getCreatedAt()));
+            holder.tvPriority.setText(report.getStatus());
+            holder.tvCategory.setText("Fairplay");
+            holder.tvContent.setText(report.getComment() != null && !report.getComment().isEmpty()
+                    ? report.getComment() : "(Không có nội dung nhận xét)");
+            holder.tvReporter.setText(String.format("Từ: %s -> %s",
+                    report.getReviewerName() != null ? report.getReviewerName() : "N/A",
+                    report.getRevieweeName() != null ? report.getRevieweeName() : "N/A"));
+
+            holder.ivIcon.setImageResource(R.drawable.ic_admin_shield);
             holder.ivIcon.setImageTintList(ColorStateList.valueOf(colorInt));
             holder.cvIcon.setCardBackgroundColor(bgColorInt);
             holder.tvPriority.setTextColor(colorInt);
             holder.tvPriority.setBackgroundTintList(ColorStateList.valueOf(bgColorInt));
-            
             holder.vAccent.setBackgroundColor(colorInt);
 
+            boolean isProcessed = !"PENDING".equals(report.getStatus());
             if (isProcessed) {
                 holder.btnBlock.setVisibility(View.GONE);
                 holder.btnIgnore.setVisibility(View.GONE);
@@ -217,10 +232,6 @@ public class AdminAuditActivity extends AppCompatActivity {
                 holder.btnBlock.setOnClickListener(v -> resolveReport(report.getId(), "APPROVED", v));
                 holder.btnIgnore.setOnClickListener(v -> resolveReport(report.getId(), "DISMISSED", v));
             }
-
-            holder.itemView.setOnClickListener(v -> {
-                // Show detail if needed
-            });
         }
 
         private String formatDateTime(String isoString) {

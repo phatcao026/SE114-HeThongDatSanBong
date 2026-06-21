@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class FairplayServiceImpl implements FairplayService {
@@ -75,24 +76,42 @@ public class FairplayServiceImpl implements FairplayService {
     }
 
     private List<OpponentReviewResponse> getReviewsByStatuses(List<Enums.FairplayStatus> statuses) {
-        List<OpponentReview> reviews = reviewRepository.findByStatusInOrderByCreatedAtDesc(statuses);
-        if (reviews.isEmpty()) {
-            return List.of();
+        try {
+            List<OpponentReview> reviews = reviewRepository.findByStatusInOrderByCreatedAtDesc(statuses);
+            System.out.println("Fairplay Audit: Found " + (reviews != null ? reviews.size() : 0) + " reviews for statuses " + statuses);
+
+            if (reviews == null || reviews.isEmpty()) {
+                return List.of();
+            }
+
+            Set<Long> userIds = reviews.stream()
+                    .flatMap(r -> Stream.of(r.getReviewerId(), r.getRevieweeId()))
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .collect(Collectors.toSet());
+
+            Map<Long, User> usersMap = new HashMap<>();
+            if (!userIds.isEmpty()) {
+                List<User> users = userRepository.findAllById(userIds);
+                if (users != null) {
+                    for (User u : users) {
+                        if (u != null && u.getId() != null) {
+                            usersMap.put(u.getId(), u);
+                        }
+                    }
+                }
+            }
+
+            return reviews.stream()
+                    .map(r -> toResponse(r,
+                            r.getReviewerId() != null ? usersMap.get(r.getReviewerId()) : null,
+                            r.getRevieweeId() != null ? usersMap.get(r.getRevieweeId()) : null))
+                    .toList();
+        } catch (Exception e) {
+            System.err.println("Error in getReviewsByStatuses: " + e.getMessage());
+            e.printStackTrace();
+            return List.of(); // Return empty list instead of 500 error
         }
-
-        Set<Long> userIds = new HashSet<>();
-        for (OpponentReview r : reviews) {
-            userIds.add(r.getReviewerId());
-            userIds.add(r.getRevieweeId());
-        }
-
-        Map<Long, User> usersMap = userRepository.findAllById(userIds)
-                .stream()
-                .collect(Collectors.toMap(User::getId, Function.identity()));
-
-        return reviews.stream()
-                .map(r -> toResponse(r, usersMap.get(r.getReviewerId()), usersMap.get(r.getRevieweeId())))
-                .toList();
     }
 
     @Override
@@ -162,16 +181,18 @@ public class FairplayServiceImpl implements FairplayService {
 
         Set<Long> revieweeIds = reviews.stream()
                 .map(OpponentReview::getRevieweeId)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        Map<Long, User> usersById = userRepository.findAllById(revieweeIds)
+        Map<Long, User> usersById = revieweeIds.isEmpty() ? Map.of() : userRepository.findAllById(revieweeIds)
                 .stream()
-                .collect(Collectors.toMap(User::getId, java.util.function.Function.identity()));
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(User::getId, Function.identity(), (u1, u2) -> u1));
 
-        User reviewer = userRepository.findById(reviewerId).orElse(null);
+        User reviewer = reviewerId != null ? userRepository.findById(reviewerId).orElse(null) : null;
 
         return reviews.stream()
-                .map(r -> toResponse(r, reviewer, usersById.get(r.getRevieweeId())))
+                .map(r -> toResponse(r, reviewer, r.getRevieweeId() != null ? usersById.get(r.getRevieweeId()) : null))
                 .toList();
     }
 

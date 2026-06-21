@@ -149,7 +149,8 @@
 
     <!-- Matchmaking (Tìm đối thủ) -->
     <string name="matchmaking_title">Bắt kèo</string>
-    <string name="tab_all">Bảng chung</string>
+    <string name="tab_all">Tất cả</string>
+    <string name="tab_scope_all">Bảng chung</string>
     <string name="tab_my_posts">Bài của tôi</string>
     <string name="tab_history">Lịch sử</string>
     <string name="tab_find_opponent">Tìm đối thủ</string>

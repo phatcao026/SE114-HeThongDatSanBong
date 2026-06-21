@@ -116,7 +116,11 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         response.setExpiredMatchPosts(matchPostRepository.countByStatus(Enums.PostStatus.EXPIRED));
 
         response.setTotalReviews(reviewRepository.count() + opponentReviewRepository.count());
-        response.setPendingReviews(opponentReviewRepository.countByStatus(Enums.FairplayStatus.PENDING));
+
+        long pendingFairplay = opponentReviewRepository.countByStatus(Enums.FairplayStatus.PENDING);
+        long pendingUserReviews = reviewRepository.countByStatus(Enums.ReviewStatus.PENDING_ADMIN_REVIEW);
+        response.setPendingReviews(pendingFairplay + pendingUserReviews);
+
         response.setPenalizedReviews(opponentReviewRepository.countByStatus(Enums.FairplayStatus.RESOLVED));
         response.setTotalConversations(conversationRepository.count());
         response.setTotalMessages(messageRepository.count());

@@ -155,7 +155,7 @@ public class AdminMainActivity extends AppCompatActivity {
         setupHealthItem(findViewById(R.id.healthConversations), "Cuộc trò chuyện", String.valueOf(stats.getTotalConversations()), "Realtime");
         setupHealthItem(findViewById(R.id.healthMessages), "Tin nhắn hệ thống", String.valueOf(stats.getTotalMessages()), "Live");
         setupHealthItem(findViewById(R.id.healthFields), "Sân đang hoạt động", stats.getAvailableFields() + "/" + stats.getTotalFields(), "Ok");
-        // healthReviews will be updated by getAdminFairplayPending call
+        setupHealthItem(findViewById(R.id.healthReviews), "Đánh giá cần duyệt", String.valueOf(stats.getPendingReviews()), "Alert");
     }
 
     private void setupHealthItem(View view, String label, String value, String trend) {
