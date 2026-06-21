@@ -197,14 +197,17 @@ public class PaymentResultActivity extends AppCompatActivity {
 
     private void setupActions() {
         btnPrimary.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, CustomerMainActivity.class);
+            intent.putExtra("SELECT_TAB", 0); // ITEM_HOME
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
             finish();
         });
 
         btnSecondary.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MyBookingsActivity.class);
+            Intent intent = new Intent(this, CustomerMainActivity.class);
+            intent.putExtra("SELECT_TAB", 3); // ITEM_BOOKINGS
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
             finish();
         });

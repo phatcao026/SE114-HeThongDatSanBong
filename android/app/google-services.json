@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "246253562592",
+    "project_id": "se114-hethongdatsanbong",
+    "storage_bucket": "se114-hethongdatsanbong.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:246253562592:android:d905706138780e18b8fe85",
+        "android_client_info": {
+          "package_name": "com.example.timsanbong"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBjvP8lhpwx4-2g9noNOrConIofa6Ga4c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

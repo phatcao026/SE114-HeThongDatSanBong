@@ -11,7 +11,7 @@
     <string name="match_captain_role_format">%1$s · %2$s</string>
     <string name="default_role">Đội trưởng</string>
     <string name="match_members_format">%1$s %2$s</string>
-    <string name="app_name">TimSanBong</string>
+    <string name="app_name">Timsanbong</string>
 
     <!-- Auth -->
     <string name="login">Đăng nhập</string>
