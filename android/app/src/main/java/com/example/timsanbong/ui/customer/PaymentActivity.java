@@ -135,7 +135,9 @@ public class PaymentActivity extends AppCompatActivity {
         });
 
         btnViewBookings.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MyBookingsActivity.class);
+            Intent intent = new Intent(this, CustomerMainActivity.class);
+            intent.putExtra("SELECT_TAB", 3); // ITEM_BOOKINGS
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
             finish();
         });

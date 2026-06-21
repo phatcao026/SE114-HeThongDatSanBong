@@ -63,7 +63,7 @@ public class TimSanBongFirebaseMessagingService extends FirebaseMessagingService
             body = data.get("content");
         }
         return body == null || body.trim().isEmpty()
-                ? "You have a new TimSanBong update."
+                ? "You have a new Timsanbong update."
                 : body;
     }
 

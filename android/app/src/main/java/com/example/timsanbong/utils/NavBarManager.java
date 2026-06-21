@@ -12,9 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.widget.ImageViewCompat;
 
 import com.example.timsanbong.R;
-import com.example.timsanbong.ui.customer.FindPitchActivity;
-import com.example.timsanbong.ui.customer.MainActivity;
-import com.example.timsanbong.ui.customer.MyBookingsActivity;
+import com.example.timsanbong.ui.customer.CustomerMainActivity;
 import com.example.timsanbong.ui.customer.NotificationsActivity;
 import com.example.timsanbong.ui.profile.ProfileActivity;
 import com.google.android.material.shape.CornerFamily;
@@ -42,6 +40,7 @@ public class NavBarManager {
 
     public void setup() {
         LinearLayout navContainer = activity.findViewById(R.id.navContainer);
+        if (navContainer == null) return;
         LinearLayout navHome = activity.findViewById(R.id.navHome);
         LinearLayout navMatchmaking = activity.findViewById(R.id.navMatchmaking);
         LinearLayout navSearch = activity.findViewById(R.id.navSearch);
@@ -60,22 +59,22 @@ public class NavBarManager {
         applyActiveState(navProfile, R.id.wrapNavProfile, R.id.ivNavProfile, R.id.tvNavProfile, activeItem == ITEM_PROFILE);
 
         navHome.setOnClickListener(v -> {
-            if (activeItem != ITEM_HOME) navigate(com.example.timsanbong.ui.customer.MainActivity.class);
+            if (activeItem != ITEM_HOME) navigateToTab(ITEM_HOME);
         });
         navMatchmaking.setOnClickListener(v -> {
-            if (activeItem != ITEM_MATCHMAKING) navigate(com.example.timsanbong.ui.customer.FindOpponentActivity.class);
+            if (activeItem != ITEM_MATCHMAKING) navigateToTab(ITEM_MATCHMAKING);
         });
         navSearch.setOnClickListener(v -> {
-            if (activeItem != ITEM_SEARCH) navigate(com.example.timsanbong.ui.customer.FindPitchActivity.class);
+            if (activeItem != ITEM_SEARCH) navigateToTab(ITEM_SEARCH);
         });
         navBookings.setOnClickListener(v -> {
-            if (activeItem != ITEM_BOOKINGS) navigate(MyBookingsActivity.class);
+            if (activeItem != ITEM_BOOKINGS) navigateToTab(ITEM_BOOKINGS);
         });
         navNotifications.setOnClickListener(v -> {
-            if (activeItem != ITEM_NOTIFICATIONS) navigate(NotificationsActivity.class);
+            if (activeItem != ITEM_NOTIFICATIONS) navigateToTab(ITEM_NOTIFICATIONS);
         });
         navProfile.setOnClickListener(v -> {
-            if (activeItem != ITEM_PROFILE) navigate(ProfileActivity.class);
+            if (activeItem != ITEM_PROFILE) navigateToTab(ITEM_PROFILE);
         });
     }
 
@@ -120,10 +119,18 @@ public class NavBarManager {
         label.setTextColor(ContextCompat.getColor(activity, R.color.text_on_primary));
     }
 
-    private void navigate(Class<?> cls) {
-        Intent intent = new Intent(activity, cls);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        activity.startActivity(intent);
+    private void navigateToTab(int tabIndex) {
+        if (activity instanceof CustomerMainActivity) {
+            ((CustomerMainActivity) activity).switchToTab(tabIndex);
+        } else {
+            Intent intent = new Intent(activity, CustomerMainActivity.class);
+            intent.putExtra("SELECT_TAB", tabIndex);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            activity.startActivity(intent);
+            if (!(activity instanceof CustomerMainActivity)) {
+                activity.finish();
+            }
+        }
     }
 
 }

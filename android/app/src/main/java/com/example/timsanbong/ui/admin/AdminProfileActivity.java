@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat;
 import com.example.timsanbong.R;
 import com.example.timsanbong.data.api.ApiClient;
 import com.example.timsanbong.ui.auth.LoginActivity;
-import com.example.timsanbong.ui.customer.MainActivity;
+import com.example.timsanbong.ui.customer.CustomerMainActivity;
 import com.example.timsanbong.ui.owner.OwnerMainActivity;
 import com.example.timsanbong.utils.PushNotificationManager;
 import com.example.timsanbong.utils.SessionManager;
@@ -35,7 +35,7 @@ public class AdminProfileActivity extends AppCompatActivity {
     private void setupMenus() {
         // Role switching
         setupMenuItem(findViewById(R.id.menuPlayer), R.drawable.ic_person, "Người chơi", "#F0FDF4", "#166534", false, v -> {
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, CustomerMainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         });

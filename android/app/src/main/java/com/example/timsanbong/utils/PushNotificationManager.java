@@ -76,7 +76,7 @@ public final class PushNotificationManager {
 
         NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID,
-                "TimSanBong notifications",
+                "Timsanbong notifications",
                 NotificationManager.IMPORTANCE_HIGH
         );
         channel.setDescription("Booking, matchmaking, and system notification updates.");

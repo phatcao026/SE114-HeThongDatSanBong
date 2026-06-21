@@ -1,16 +1,19 @@
 package com.example.timsanbong.ui.customer;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,9 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.timsanbong.R;
 import com.example.timsanbong.data.model.Booking;
 import com.example.timsanbong.utils.Constants;
-import com.example.timsanbong.utils.NavBarManager;
 import com.example.timsanbong.utils.Resource;
-import com.example.timsanbong.ui.customer.PaymentActivity;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.text.ParseException;
@@ -31,10 +32,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public class MyBookingsActivity extends AppCompatActivity implements BookingAdapter.OnBookingActionListener {
+public class MyBookingsFragment extends Fragment implements BookingAdapter.OnBookingActionListener {
 
     private RecyclerView rvBookings;
-    private NavBarManager navBarManager;
     private BookingViewModel bookingViewModel;
     private android.widget.ProgressBar pbLoading;
     private android.widget.TextView tvEmptyState;
@@ -51,33 +51,35 @@ public class MyBookingsActivity extends AppCompatActivity implements BookingAdap
     private boolean showUpcoming = true;
     private long pendingCancelBookingId = -1;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_customer_my_bookings);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_customer_my_bookings, container, false);
+    }
 
-        rvBookings = findViewById(R.id.rvBookings);
-        rvBookings.setLayoutManager(new LinearLayoutManager(this));
-        pbLoading = findViewById(R.id.pbLoading);
-        tvEmptyState = findViewById(R.id.tvEmptyState);
-        tvErrorState = findViewById(R.id.tvErrorState);
-        tvTabUpcoming = findViewById(R.id.tvTabUpcoming);
-        tvTabPast = findViewById(R.id.tvTabPast);
-        indicatorUpcoming = findViewById(R.id.indicatorUpcoming);
-        indicatorPast = findViewById(R.id.indicatorPast);
-        layoutRefresh = findViewById(R.id.layoutRefresh);
-        tvRefreshLabel = findViewById(R.id.tvRefreshLabel);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        rvBookings = view.findViewById(R.id.rvBookings);
+        rvBookings.setLayoutManager(new LinearLayoutManager(requireContext()));
+        pbLoading = view.findViewById(R.id.pbLoading);
+        tvEmptyState = view.findViewById(R.id.tvEmptyState);
+        tvErrorState = view.findViewById(R.id.tvErrorState);
+        tvTabUpcoming = view.findViewById(R.id.tvTabUpcoming);
+        tvTabPast = view.findViewById(R.id.tvTabPast);
+        indicatorUpcoming = view.findViewById(R.id.indicatorUpcoming);
+        indicatorPast = view.findViewById(R.id.indicatorPast);
+        layoutRefresh = view.findViewById(R.id.layoutRefresh);
+        tvRefreshLabel = view.findViewById(R.id.tvRefreshLabel);
         pullThresholdPx = getResources().getDimensionPixelSize(R.dimen.pull_refresh_threshold);
 
         bookingAdapter = new BookingAdapter(new ArrayList<>(), this);
         rvBookings.setAdapter(bookingAdapter);
 
-        navBarManager = new NavBarManager(this, NavBarManager.ITEM_BOOKINGS);
-        navBarManager.setup();
-
         bookingViewModel = new ViewModelProvider(this).get(BookingViewModel.class);
 
-        bookingViewModel.bookingsState.observe(this, resource -> {
+        bookingViewModel.bookingsState.observe(getViewLifecycleOwner(), resource -> {
             if (resource.status == Resource.Status.LOADING) {
                 if (isRefreshing) {
                     showRefreshingState();
@@ -94,48 +96,48 @@ public class MyBookingsActivity extends AppCompatActivity implements BookingAdap
                 if (allBookings.isEmpty()) {
                     showErrorState(message);
                 }
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
             }
         });
 
-        bookingViewModel.cancelState.observe(this, resource -> {
+        bookingViewModel.cancelState.observe(getViewLifecycleOwner(), resource -> {
             if (resource.status == Resource.Status.SUCCESS) {
                 if (pendingCancelBookingId != -1) {
                     removeBookingById(pendingCancelBookingId);
                     pendingCancelBookingId = -1;
                 }
-                Toast.makeText(this, R.string.booking_cancelled, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.booking_cancelled, Toast.LENGTH_SHORT).show();
             } else if (resource.status == Resource.Status.ERROR) {
-                Toast.makeText(this, getSafeMessage(resource.message), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getSafeMessage(resource.message), Toast.LENGTH_SHORT).show();
             }
         });
 
-        bookingViewModel.fieldReviewState.observe(this, resource -> {
+        bookingViewModel.fieldReviewState.observe(getViewLifecycleOwner(), resource -> {
             if (resource == null) return;
             if (resource.status == Resource.Status.SUCCESS) {
-                Toast.makeText(this, R.string.field_review_success, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.field_review_success, Toast.LENGTH_SHORT).show();
             } else if (resource.status == Resource.Status.ERROR) {
-                Toast.makeText(this, getSafeMessage(resource.message), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getSafeMessage(resource.message), Toast.LENGTH_SHORT).show();
             }
         });
 
-        setupTabs();
+        setupTabs(view);
         setupPullToRefresh();
 
         bookingViewModel.loadMyBookings();
     }
 
-    private void setupTabs() {
-        findViewById(R.id.tabUpcoming).setOnClickListener(v -> selectTab(true));
-        findViewById(R.id.tabPast).setOnClickListener(v -> selectTab(false));
+    private void setupTabs(View view) {
+        view.findViewById(R.id.tabUpcoming).setOnClickListener(v -> selectTab(true));
+        view.findViewById(R.id.tabPast).setOnClickListener(v -> selectTab(false));
     }
 
     private void selectTab(boolean upcoming) {
         showUpcoming = upcoming;
-        tvTabUpcoming.setTextColor(getColor(upcoming ? R.color.primary_dark : R.color.text_secondary));
-        tvTabPast.setTextColor(getColor(upcoming ? R.color.text_secondary : R.color.primary_dark));
-        indicatorUpcoming.setBackgroundColor(getColor(upcoming ? R.color.primary : android.R.color.transparent));
-        indicatorPast.setBackgroundColor(getColor(upcoming ? android.R.color.transparent : R.color.primary));
+        tvTabUpcoming.setTextColor(ContextCompat.getColor(requireContext(), upcoming ? R.color.primary_dark : R.color.text_secondary));
+        tvTabPast.setTextColor(ContextCompat.getColor(requireContext(), upcoming ? R.color.text_secondary : R.color.primary_dark));
+        indicatorUpcoming.setBackgroundColor(ContextCompat.getColor(requireContext(), upcoming ? R.color.primary : android.R.color.transparent));
+        indicatorPast.setBackgroundColor(ContextCompat.getColor(requireContext(), upcoming ? android.R.color.transparent : R.color.primary));
         applyFilterAndSort();
     }
 
@@ -232,7 +234,7 @@ public class MyBookingsActivity extends AppCompatActivity implements BookingAdap
 
     @Override
     public void onCancel(long bookingId) {
-        new MaterialAlertDialogBuilder(this)
+        new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.cancel_booking_title)
                 .setMessage(R.string.cancel_booking_message)
                 .setNegativeButton(R.string.action_keep, null)
@@ -248,7 +250,7 @@ public class MyBookingsActivity extends AppCompatActivity implements BookingAdap
         double dueAmount = booking.getDepositAmount() > 0
                 ? booking.getDepositAmount()
                 : booking.getTotalAmount();
-        Intent intent = new Intent(this, PaymentActivity.class);
+        Intent intent = new Intent(requireContext(), PaymentActivity.class);
         intent.putExtra(Constants.EXTRA_BOOKING_ID, booking.getId());
         intent.putExtra(Constants.EXTRA_PAYMENT_FIELD_NAME, booking.getFieldName());
         intent.putExtra(Constants.EXTRA_TOTAL_PRICE, booking.getTotalAmount());
@@ -259,7 +261,7 @@ public class MyBookingsActivity extends AppCompatActivity implements BookingAdap
 
     @Override
     public void onQrCheckin(Booking booking) {
-        new MaterialAlertDialogBuilder(this)
+        new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.qr_dialog_title)
                 .setMessage(getString(R.string.qr_dialog_message, booking.getId()))
                 .setPositiveButton(android.R.string.ok, null)
@@ -268,7 +270,7 @@ public class MyBookingsActivity extends AppCompatActivity implements BookingAdap
 
     @Override
     public void onRateField(Booking booking) {
-        FieldReviewDialog.show(this, booking,
+        FieldReviewDialog.show(requireContext(), booking,
                 (selectedBooking, rating, comment) ->
                         bookingViewModel.submitFieldReview(selectedBooking.getId(), rating, comment));
     }

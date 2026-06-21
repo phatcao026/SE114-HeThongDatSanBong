@@ -2,10 +2,14 @@ package com.example.timsanbong.ui.customer;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,7 +21,6 @@ import com.example.timsanbong.ui.profile.ProfileActivity;
 import com.example.timsanbong.ui.profile.ProfileViewModel;
 import com.example.timsanbong.utils.Constants;
 import com.example.timsanbong.utils.NavBarManager;
-import com.example.timsanbong.utils.PushNotificationManager;
 import com.example.timsanbong.utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
@@ -31,7 +34,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class CustomerHomeFragment extends Fragment {
 
     private TextView tvAvatar;
     private TextView tvGreeting;
@@ -62,18 +65,22 @@ public class MainActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private Booking pendingPaymentBooking;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_customer_main);
-        PushNotificationManager.prepareForAuthenticatedUser(this);
-        initViews();
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_customer_main, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initViews(view);
         setupListeners();
         loadData();
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         if (bookingViewModel != null) {
             bookingViewModel.loadMyBookings();
@@ -83,42 +90,49 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void initViews() {
-        tvAvatar = findViewById(R.id.tvAvatar);
-        tvGreeting = findViewById(R.id.tvGreeting);
-        tvUpcomingCount = findViewById(R.id.tvUpcomingCount);
-        tvTrustScore = findViewById(R.id.tvTrustScore);
-        tvNotificationCount = findViewById(R.id.tvNotificationCount);
-        tvUpcomingFieldName = findViewById(R.id.tvUpcomingFieldName);
-        tvUpcomingTime = findViewById(R.id.tvUpcomingTime);
-        tvUpcomingStatus = findViewById(R.id.tvUpcomingStatus);
-        tvPaymentReminderTitle = findViewById(R.id.tvPaymentReminderTitle);
-        tvPaymentReminderBody = findViewById(R.id.tvPaymentReminderBody);
-        tvUpcomingSeeAll = findViewById(R.id.tvUpcomingSeeAll);
-        tvSuggestedMore = findViewById(R.id.tvSuggestedMore);
-        viewNotificationDot = findViewById(R.id.viewNotificationDot);
-        btnNotifications = findViewById(R.id.btnNotifications);
-        cardNextBooking = findViewById(R.id.cardNextBooking);
-        cardPaymentReminder = findViewById(R.id.cardPaymentReminder);
-        btnSearchNearby = findViewById(R.id.btnSearchNearby);
-        btnHomeBookings = findViewById(R.id.btnHomeBookings);
-        btnPaymentReminder = findViewById(R.id.btnPaymentReminder);
+    private void initViews(View view) {
+        tvAvatar = view.findViewById(R.id.tvAvatar);
+        tvGreeting = view.findViewById(R.id.tvGreeting);
+        tvUpcomingCount = view.findViewById(R.id.tvUpcomingCount);
+        tvTrustScore = view.findViewById(R.id.tvTrustScore);
+        tvNotificationCount = view.findViewById(R.id.tvNotificationCount);
+        tvUpcomingFieldName = view.findViewById(R.id.tvUpcomingFieldName);
+        tvUpcomingTime = view.findViewById(R.id.tvUpcomingTime);
+        tvUpcomingStatus = view.findViewById(R.id.tvUpcomingStatus);
+        tvPaymentReminderTitle = view.findViewById(R.id.tvPaymentReminderTitle);
+        tvPaymentReminderBody = view.findViewById(R.id.tvPaymentReminderBody);
+        tvUpcomingSeeAll = view.findViewById(R.id.tvUpcomingSeeAll);
+        tvSuggestedMore = view.findViewById(R.id.tvSuggestedMore);
+        viewNotificationDot = view.findViewById(R.id.viewNotificationDot);
+        btnNotifications = view.findViewById(R.id.btnNotifications);
+        cardNextBooking = view.findViewById(R.id.cardNextBooking);
+        cardPaymentReminder = view.findViewById(R.id.cardPaymentReminder);
+        btnSearchNearby = view.findViewById(R.id.btnSearchNearby);
+        btnHomeBookings = view.findViewById(R.id.btnHomeBookings);
+        btnPaymentReminder = view.findViewById(R.id.btnPaymentReminder);
 
-        rvSuggestedFields = findViewById(R.id.rvSuggestedFields);
+        rvSuggestedFields = view.findViewById(R.id.rvSuggestedFields);
 
         rvSuggestedFields.setLayoutManager(
-                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-
-        new NavBarManager(this, NavBarManager.ITEM_HOME).setup();
+                new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
     }
 
     private void setupListeners() {
-        btnNotifications.setOnClickListener(v ->
-                startActivity(new Intent(this, NotificationsActivity.class)));
-        tvAvatar.setOnClickListener(v ->
-                startActivity(new Intent(this, ProfileActivity.class)));
+        btnNotifications.setOnClickListener(v -> {
+            if (getActivity() instanceof CustomerMainActivity) {
+                ((CustomerMainActivity) getActivity()).switchToTab(NavBarManager.ITEM_NOTIFICATIONS);
+            } else {
+                startActivity(new Intent(requireContext(), NotificationsActivity.class));
+            }
+        });
+        tvAvatar.setOnClickListener(v -> {
+            if (getActivity() instanceof CustomerMainActivity) {
+                ((CustomerMainActivity) getActivity()).switchToTab(NavBarManager.ITEM_PROFILE);
+            } else {
+                startActivity(new Intent(requireContext(), ProfileActivity.class));
+            }
+        });
         btnSearchNearby.setOnClickListener(v -> openFindPitch());
-
         tvSuggestedMore.setOnClickListener(v -> openFindPitch());
         btnHomeBookings.setOnClickListener(v -> openBookings());
         tvUpcomingSeeAll.setOnClickListener(v -> openBookings());
@@ -128,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadData() {
-        sessionManager = new SessionManager(this);
+        sessionManager = new SessionManager(requireContext());
         fieldViewModel = new ViewModelProvider(this).get(FieldViewModel.class);
         bookingViewModel = new ViewModelProvider(this).get(BookingViewModel.class);
         notificationViewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
@@ -173,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void observeProfile() {
-        profileViewModel.profileState.observe(this, resource -> {
+        profileViewModel.profileState.observe(getViewLifecycleOwner(), resource -> {
             if (resource == null || resource.status != com.example.timsanbong.utils.Resource.Status.SUCCESS
                     || resource.data == null) {
                 return;
@@ -184,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void observeBookings() {
-        bookingViewModel.bookingsState.observe(this, resource -> {
+        bookingViewModel.bookingsState.observe(getViewLifecycleOwner(), resource -> {
             if (resource == null || resource.status != com.example.timsanbong.utils.Resource.Status.SUCCESS
                     || resource.data == null) {
                 return;
@@ -210,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void observeNotifications() {
-        notificationViewModel.unreadCountState.observe(this, resource -> {
+        notificationViewModel.unreadCountState.observe(getViewLifecycleOwner(), resource -> {
             if (resource == null || resource.status != com.example.timsanbong.utils.Resource.Status.SUCCESS
                     || resource.data == null) {
                 return;
@@ -222,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void observeFields() {
-        fieldViewModel.filteredFields.observe(this, fields -> {
+        fieldViewModel.filteredFields.observe(getViewLifecycleOwner(), fields -> {
             if (fields == null) return;
             List<SuggestedFieldItem> suggestedFields = new ArrayList<>();
             for (Field field : fields) {
@@ -244,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             SuggestedFieldAdapter suggestedFieldAdapter = new SuggestedFieldAdapter(suggestedFields, item -> {
-                Intent intent = new Intent(MainActivity.this, FieldDetailActivity.class);
+                Intent intent = new Intent(requireContext(), FieldDetailActivity.class);
                 intent.putExtra("fieldId", item.getId());
                 startActivity(intent);
             });
@@ -280,11 +294,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openFindPitch() {
-        startActivity(new Intent(this, FindPitchActivity.class));
+        if (getActivity() instanceof CustomerMainActivity) {
+            ((CustomerMainActivity) getActivity()).switchToTab(NavBarManager.ITEM_SEARCH);
+        } else {
+            Intent intent = new Intent(requireContext(), CustomerMainActivity.class);
+            intent.putExtra("SELECT_TAB", NavBarManager.ITEM_SEARCH);
+            startActivity(intent);
+        }
     }
 
     private void openBookings() {
-        startActivity(new Intent(this, MyBookingsActivity.class));
+        if (getActivity() instanceof CustomerMainActivity) {
+            ((CustomerMainActivity) getActivity()).switchToTab(NavBarManager.ITEM_BOOKINGS);
+        } else {
+            Intent intent = new Intent(requireContext(), CustomerMainActivity.class);
+            intent.putExtra("SELECT_TAB", NavBarManager.ITEM_BOOKINGS);
+            startActivity(intent);
+        }
     }
 
     private void openPendingPayment() {
@@ -294,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
         double dueAmount = pendingPaymentBooking.getDepositAmount() > 0
                 ? pendingPaymentBooking.getDepositAmount()
                 : pendingPaymentBooking.getTotalAmount();
-        Intent intent = new Intent(this, PaymentActivity.class);
+        Intent intent = new Intent(requireContext(), PaymentActivity.class);
         intent.putExtra(Constants.EXTRA_BOOKING_ID, pendingPaymentBooking.getId());
         intent.putExtra(Constants.EXTRA_PAYMENT_FIELD_NAME, pendingPaymentBooking.getFieldName());
         intent.putExtra(Constants.EXTRA_TOTAL_PRICE, pendingPaymentBooking.getTotalAmount());

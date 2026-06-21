@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.timsanbong.R;
 import com.example.timsanbong.ui.admin.AdminMainActivity;
-import com.example.timsanbong.ui.customer.MainActivity;
+import com.example.timsanbong.ui.customer.CustomerMainActivity;
 import com.example.timsanbong.ui.owner.OwnerMainActivity;
 import com.example.timsanbong.utils.Resource;
 import com.example.timsanbong.utils.SessionManager;
@@ -237,7 +237,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void navigateByRole() {
         SessionManager sessionManager = new SessionManager(this);
-        Class<?> destination = MainActivity.class;
+        Class<?> destination = CustomerMainActivity.class;
 
         try {
             JSONObject userJson = new JSONObject(sessionManager.getUserJson());
