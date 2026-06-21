@@ -24,10 +24,19 @@ public interface MatchPostRepository extends JpaRepository<MatchPost, Long>, Jpa
     long countByStatus(com.example.backend.utils.Enums.PostStatus status);
 
     @EntityGraph(attributePaths = {"user"})
-    @Query("SELECT m FROM MatchPost m WHERE m.status = 'OPEN' AND m.postType = :postType AND m.userId != :currentUserId ORDER BY m.createdAt DESC")
+    @Query("SELECT m FROM MatchPost m WHERE m.status = 'OPEN' " +
+           "AND m.postType = :postType " +
+           "AND m.userId != :currentUserId " +
+           "AND (:date IS NULL OR m.date = :date) " +
+           "AND (:skillLevel IS NULL OR m.skillLevel = :skillLevel) " +
+           "AND (:hasField IS NULL OR m.hasField = :hasField) " +
+           "ORDER BY m.createdAt DESC")
     Page<MatchPost> findPotentialMatches(
             @Param("currentUserId") Long currentUserId,
             @Param("postType") Enums.PostType postType,
+            @Param("date") java.time.LocalDate date,
+            @Param("skillLevel") Enums.TeamLevel skillLevel,
+            @Param("hasField") Boolean hasField,
             Pageable pageable
     );
 }

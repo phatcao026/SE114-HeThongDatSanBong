@@ -2,12 +2,14 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.response.AdminDashboardOverviewResponse;
 import com.example.backend.dto.response.BookingResponse;
+import com.example.backend.dto.response.FieldReviewResponse;
 import com.example.backend.dto.response.FieldResponse;
 import com.example.backend.dto.response.MatchPostResponse;
 import com.example.backend.dto.response.PaymentResponse;
 import com.example.backend.dto.response.ReviewResponse;
 import com.example.backend.dto.response.UserResponse;
 import com.example.backend.service.AdminDashboardService;
+import com.example.backend.service.FieldReviewService;
 import com.example.backend.utils.Enums;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,9 +25,11 @@ import java.util.List;
 @RequestMapping("/api/admin")
 public class AdminController {
     private final AdminDashboardService adminDashboardService;
+    private final FieldReviewService fieldReviewService;
 
-    public AdminController(AdminDashboardService adminDashboardService) {
+    public AdminController(AdminDashboardService adminDashboardService, FieldReviewService fieldReviewService) {
         this.adminDashboardService = adminDashboardService;
+        this.fieldReviewService = fieldReviewService;
     }
 
     @GetMapping("/dashboard/overview")
@@ -68,6 +72,11 @@ public class AdminController {
     public ResponseEntity<List<ReviewResponse>> getReviews(
             @RequestParam(required = false) Enums.ReviewStatus status) {
         return ResponseEntity.ok(adminDashboardService.getReviews(status));
+    }
+
+    @GetMapping("/field-reviews")
+    public ResponseEntity<List<FieldReviewResponse>> getAdminFieldReviews() {
+        return ResponseEntity.ok(fieldReviewService.getAllFieldReviews());
     }
 
     @PutMapping("/users/{id}/lock")

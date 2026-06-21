@@ -149,14 +149,16 @@
 
     <!-- Matchmaking (Tìm đối thủ) -->
     <string name="matchmaking_title">Bắt kèo</string>
-    <string name="tab_all">Tất cả</string>
+    <string name="tab_all">Bảng chung</string>
+    <string name="tab_my_posts">Bài của tôi</string>
+    <string name="tab_history">Lịch sử</string>
     <string name="tab_find_opponent">Tìm đối thủ</string>
     <string name="tab_find_member">Tìm cầu thủ</string>
     <string name="tab_suggested">Gợi ý</string>
     <string name="match_hot_badge">LIVE</string>
     <string name="match_action_accept">Bắt kèo</string>
     <string name="match_action_chat">Nhắn</string>
-    <string name="match_accepted">✓ Đã bắt kèo, đợi xác nhận</string>
+    <string name="match_accepted">✓ Đã bắt kèo</string>
     <string name="match_count">%d kèo đang mở</string>
     <string name="match_updated">Cập nhật vừa xong</string>
     <string name="empty_matches">Không có kèo nào phù hợp.</string>
@@ -172,7 +174,7 @@
     <string name="action_report">Báo cáo</string>
     <string name="action_share">Chia sẻ</string>
     <string name="match_cta_accept">Bắt kèo này</string>
-    <string name="match_cta_accepted">Đã bắt kèo, đợi xác nhận</string>
+    <string name="match_cta_accepted">Đã bắt kèo</string>
     <string name="match_cta_chat">Nhắn</string>
 
     <!-- Messages (Tin nhắn) -->
@@ -359,7 +361,7 @@
     <string name="booking_cancelled_msg">Đơn đặt sân này đã bị hủy.</string>
 
     <!-- Player UX refresh -->
-    <string name="nav_notifications">Tin</string>
+    <string name="nav_notifications">Tin nhắn</string>
     <string name="home_ready_to_book">Sẵn sàng cho lần đặt sân tiếp theo</string>
     <string name="home_greeting_name">Sẵn sàng đặt sân, %1$s</string>
     <string name="home_booking_headline">Đặt sân uy tín chỉ trong vài phút</string>

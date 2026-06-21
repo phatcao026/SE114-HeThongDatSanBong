@@ -65,7 +65,17 @@ public class FairplayServiceImpl implements FairplayService {
     @Override
     @Transactional(readOnly = true)
     public List<OpponentReviewResponse> getPendingReviews() {
-        List<OpponentReview> reviews = reviewRepository.findByStatusOrderByCreatedAtDesc(Enums.FairplayStatus.PENDING);
+        return getReviewsByStatuses(List.of(Enums.FairplayStatus.PENDING));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OpponentReviewResponse> getProcessedReviews() {
+        return getReviewsByStatuses(List.of(Enums.FairplayStatus.RESOLVED, Enums.FairplayStatus.REJECTED));
+    }
+
+    private List<OpponentReviewResponse> getReviewsByStatuses(List<Enums.FairplayStatus> statuses) {
+        List<OpponentReview> reviews = reviewRepository.findByStatusInOrderByCreatedAtDesc(statuses);
         if (reviews.isEmpty()) {
             return List.of();
         }
@@ -103,7 +113,8 @@ public class FairplayServiceImpl implements FairplayService {
                     .orElseThrow(() -> new AppException(404, "Không tìm thấy người dùng bị báo cáo"));
 
             int currentScore = reviewee.getTrustScore() != null ? reviewee.getTrustScore() : 100;
-            reviewee.setTrustScore(Math.max(0, currentScore + review.getPointsApplied()));
+            int newScore = currentScore + review.getPointsApplied();
+            reviewee.setTrustScore(Math.max(0, Math.min(100, newScore)));
             reviewee.setUpdatedAt(LocalDateTime.now());
             userRepository.save(reviewee);
 
@@ -141,6 +152,27 @@ public class FairplayServiceImpl implements FairplayService {
     @Transactional(readOnly = true)
     public List<Long> getMySubmittedMatchIds(Long reviewerId) {
         return reviewRepository.findMatchIdsByReviewerId(reviewerId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OpponentReviewResponse> getMyReviews(Long reviewerId) {
+        List<OpponentReview> reviews = reviewRepository.findByReviewerIdOrderByCreatedAtDesc(reviewerId);
+        if (reviews.isEmpty()) return List.of();
+
+        Set<Long> revieweeIds = reviews.stream()
+                .map(OpponentReview::getRevieweeId)
+                .collect(Collectors.toSet());
+
+        Map<Long, User> usersById = userRepository.findAllById(revieweeIds)
+                .stream()
+                .collect(Collectors.toMap(User::getId, java.util.function.Function.identity()));
+
+        User reviewer = userRepository.findById(reviewerId).orElse(null);
+
+        return reviews.stream()
+                .map(r -> toResponse(r, reviewer, usersById.get(r.getRevieweeId())))
+                .toList();
     }
 
     private OpponentReviewResponse toResponse(OpponentReview r, User reviewer, User reviewee) {

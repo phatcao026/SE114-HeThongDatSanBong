@@ -15,7 +15,7 @@ import com.example.timsanbong.R;
 import com.example.timsanbong.ui.customer.FindPitchActivity;
 import com.example.timsanbong.ui.customer.MainActivity;
 import com.example.timsanbong.ui.customer.MyBookingsActivity;
-import com.example.timsanbong.ui.customer.NotificationsActivity;
+import com.example.timsanbong.ui.customer.MessagesActivity;
 import com.example.timsanbong.ui.profile.ProfileActivity;
 import com.google.android.material.shape.CornerFamily;
 import com.google.android.material.shape.MaterialShapeDrawable;
@@ -72,7 +72,7 @@ public class NavBarManager {
             if (activeItem != ITEM_BOOKINGS) navigate(MyBookingsActivity.class);
         });
         navNotifications.setOnClickListener(v -> {
-            if (activeItem != ITEM_NOTIFICATIONS) navigate(NotificationsActivity.class);
+            if (activeItem != ITEM_NOTIFICATIONS) navigate(MessagesActivity.class);
         });
         navProfile.setOnClickListener(v -> {
             if (activeItem != ITEM_PROFILE) navigate(ProfileActivity.class);

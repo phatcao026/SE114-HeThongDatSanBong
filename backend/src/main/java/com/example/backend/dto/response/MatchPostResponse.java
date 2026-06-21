@@ -30,6 +30,11 @@ public class MatchPostResponse {
     private Boolean hasField;
     private String targetPositions;
     private String ageRange;
+    private String teamName;
+    private Integer trustScore;
+    private Integer matchesPlayed;
+    private Integer noShows;
+    private Double averageRating;
 
     public Long getId() {
         return id;
@@ -214,5 +219,45 @@ public class MatchPostResponse {
 
     public void setAgeRange(String ageRange) {
         this.ageRange = ageRange;
+    }
+
+    public String getTeamName() {
+        return teamName;
+    }
+
+    public void setTeamName(String teamName) {
+        this.teamName = teamName;
+    }
+
+    public Integer getTrustScore() {
+        return trustScore;
+    }
+
+    public void setTrustScore(Integer trustScore) {
+        this.trustScore = trustScore;
+    }
+
+    public Integer getMatchesPlayed() {
+        return matchesPlayed;
+    }
+
+    public void setMatchesPlayed(Integer matchesPlayed) {
+        this.matchesPlayed = matchesPlayed;
+    }
+
+    public Integer getNoShows() {
+        return noShows;
+    }
+
+    public void setNoShows(Integer noShows) {
+        this.noShows = noShows;
+    }
+
+    public Double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
     }
 }

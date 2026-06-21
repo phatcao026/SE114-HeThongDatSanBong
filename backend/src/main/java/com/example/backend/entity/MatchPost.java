@@ -66,6 +66,9 @@ public class MatchPost {
     @Column(name = "age_range")
     private String ageRange;
 
+    @Column(name = "team_name")
+    private String teamName;
+
     @ManyToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
@@ -154,4 +157,7 @@ public class MatchPost {
 
     public String getAgeRange() { return ageRange; }
     public void setAgeRange(String ageRange) { this.ageRange = ageRange; }
+
+    public String getTeamName() { return teamName; }
+    public void setTeamName(String teamName) { this.teamName = teamName; }
 }

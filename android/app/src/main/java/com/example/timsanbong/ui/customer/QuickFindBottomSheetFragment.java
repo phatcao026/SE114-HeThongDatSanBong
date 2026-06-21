@@ -26,10 +26,11 @@ import java.util.Locale;
 
 public class QuickFindBottomSheetFragment extends BottomSheetDialogFragment {
 
-    private TextInputEditText etPlaystyle, etDate, etTime;
-    private AutoCompleteTextView etTeamName;
+    private TextInputEditText etPlaystyle, etDate, etTime, etTimeEnd;
+    private AutoCompleteTextView etTeamName, actvPostType, actvSkillLevel, actvHasField, actvAgeRange;
     private String selectedDateIso = "";
-    private String selectedTime = "";
+    private String selectedTimeStart = "";
+    private String selectedTimeEnd = "";
     private TeamRepository teamRepository = new TeamRepository();
 
     @Nullable
@@ -46,27 +47,70 @@ public class QuickFindBottomSheetFragment extends BottomSheetDialogFragment {
         etTeamName = view.findViewById(R.id.etTeamName);
         etDate = view.findViewById(R.id.etDate);
         etTime = view.findViewById(R.id.etTime);
+        etTimeEnd = view.findViewById(R.id.etTimeEnd);
+        actvPostType = view.findViewById(R.id.actvPostType);
+        actvSkillLevel = view.findViewById(R.id.actvSkillLevel);
+        actvHasField = view.findViewById(R.id.actvHasField);
+        actvAgeRange = view.findViewById(R.id.actvAgeRange);
         View btnSearch = view.findViewById(R.id.btnSearch);
 
         setupTeamAutoComplete();
+        setupDropdowns();
 
         etDate.setOnClickListener(v -> showDatePicker());
-        etTime.setOnClickListener(v -> showTimePicker());
+        etTime.setOnClickListener(v -> showTimePicker(true));
+        etTimeEnd.setOnClickListener(v -> showTimePicker(false));
 
         btnSearch.setOnClickListener(v -> {
             String playstyle = etPlaystyle.getText() != null ? etPlaystyle.getText().toString().trim() : "";
             String teamName = etTeamName.getText() != null ? etTeamName.getText().toString().trim() : "";
+            String ageRange = actvAgeRange.getText().toString().trim();
+            if ("Tất cả".equals(ageRange)) ageRange = "";
             
-            // Note: date and time are already captured in variables when pickers close
+            String postType = actvPostType.getText().toString();
+            if ("Tìm đối thủ".equals(postType)) postType = "FIND_OPPONENT";
+            else if ("Tìm cầu thủ".equals(postType)) postType = "FIND_MEMBER";
+            else postType = "";
+
+            String skillLevel = actvSkillLevel.getText().toString();
+            if ("Mới chơi".equals(skillLevel)) skillLevel = "BEGINNER";
+            else if ("Trung cấp".equals(skillLevel)) skillLevel = "INTERMEDIATE";
+            else if ("Nâng cao".equals(skillLevel)) skillLevel = "ADVANCED";
+            else skillLevel = "";
+
+            String hasFieldStr = actvHasField.getText().toString();
+            Boolean hasField = null;
+            if ("Có".equals(hasFieldStr)) hasField = true;
+            else if ("Không".equals(hasFieldStr)) hasField = false;
 
             Intent intent = new Intent(getContext(), QuickFindResultsActivity.class);
             intent.putExtra("playstyle", playstyle);
             intent.putExtra("teamName", teamName);
             intent.putExtra("date", selectedDateIso);
-            intent.putExtra("time", selectedTime);
+            intent.putExtra("time", selectedTimeStart);
+            intent.putExtra("timeEnd", selectedTimeEnd);
+            intent.putExtra("postType", postType);
+            intent.putExtra("skillLevel", skillLevel);
+            intent.putExtra("ageRange", ageRange);
+            if (hasField != null) intent.putExtra("hasField", hasField);
+            
             startActivity(intent);
             dismiss();
         });
+    }
+
+    private void setupDropdowns() {
+        String[] postTypes = {"Tất cả", "Tìm đối thủ", "Tìm cầu thủ"};
+        actvPostType.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, postTypes));
+
+        String[] skillLevels = {"Tất cả", "Mới chơi", "Trung cấp", "Nâng cao"};
+        actvSkillLevel.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, skillLevels));
+
+        String[] hasFieldOptions = {"Tất cả", "Có", "Không"};
+        actvHasField.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, hasFieldOptions));
+
+        String[] ageRanges = {"Tất cả", "Dưới 18 tuổi", "18-25 tuổi", "25-35 tuổi", "Trên 35 tuổi", "Mọi lứa tuổi"};
+        actvAgeRange.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, ageRanges));
     }
 
     private void setupTeamAutoComplete() {
@@ -99,11 +143,17 @@ public class QuickFindBottomSheetFragment extends BottomSheetDialogFragment {
         }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show();
     }
 
-    private void showTimePicker() {
+    private void showTimePicker(boolean isStart) {
         Calendar cal = Calendar.getInstance();
         new TimePickerDialog(getContext(), (view, hourOfDay, minute) -> {
-            selectedTime = String.format(Locale.US, "%02d:%02d:00", hourOfDay, minute);
-            etTime.setText(selectedTime);
+            String time = String.format(Locale.US, "%02d:%02d:00", hourOfDay, minute);
+            if (isStart) {
+                selectedTimeStart = time;
+                etTime.setText(String.format(Locale.US, "%02d:%02d", hourOfDay, minute));
+            } else {
+                selectedTimeEnd = time;
+                etTimeEnd.setText(String.format(Locale.US, "%02d:%02d", hourOfDay, minute));
+            }
         }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show();
     }
 }

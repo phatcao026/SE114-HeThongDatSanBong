@@ -35,7 +35,7 @@ public class TimSanBongFirebaseMessagingService extends FirebaseMessagingService
 
         String title = getMessageTitle(remoteMessage);
         String body = getMessageBody(remoteMessage);
-        showNotification(title, body);
+        showNotification(title, body, remoteMessage.getData());
     }
 
     private String getMessageTitle(RemoteMessage remoteMessage) {
@@ -67,8 +67,17 @@ public class TimSanBongFirebaseMessagingService extends FirebaseMessagingService
                 : body;
     }
 
-    private void showNotification(String title, String body) {
-        Intent intent = new Intent(this, SplashActivity.class);
+    private void showNotification(String title, String body, Map<String, String> data) {
+        Intent intent;
+        String type = data.get("type");
+        if ("CHAT".equals(type) && data.containsKey("conversationId")) {
+            intent = new Intent(this, com.example.timsanbong.ui.customer.MessagesActivity.class);
+            // Optionally pass ID if MessagesActivity can auto-open it
+            intent.putExtra("conversationId", data.get("conversationId"));
+        } else {
+            intent = new Intent(this, SplashActivity.class);
+        }
+        
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         int flags = PendingIntent.FLAG_ONE_SHOT;
@@ -76,12 +85,12 @@ public class TimSanBongFirebaseMessagingService extends FirebaseMessagingService
             flags |= PendingIntent.FLAG_IMMUTABLE;
         }
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, flags);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, (int) System.currentTimeMillis(), intent, flags);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 this,
                 PushNotificationManager.CHANNEL_ID
         )
-                .setSmallIcon(R.drawable.ic_bell)
+                .setSmallIcon(R.drawable.ic_message)
                 .setContentTitle(title)
                 .setContentText(body)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(body))

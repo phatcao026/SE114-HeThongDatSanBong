@@ -51,6 +51,21 @@ public class MatchViewModel extends AndroidViewModel {
         });
     }
 
+    public void loadMyMatchPosts() {
+        _matchPostsState.setValue(Resource.loading(null));
+        matchRepository.getMyMatchPosts(getApplication(), new RepositoryCallback<List<MatchPost>>() {
+            @Override
+            public void onSuccess(List<MatchPost> data) {
+                _matchPostsState.postValue(Resource.success(data));
+            }
+
+            @Override
+            public void onError(String message) {
+                _matchPostsState.postValue(Resource.error(message, null));
+            }
+        });
+    }
+
     public void createMatchPost(MatchPostRequest request) {
         _createMatchState.setValue(Resource.loading(null));
         matchRepository.createMatchPost(getApplication(), request, new RepositoryCallback<MatchPost>() {

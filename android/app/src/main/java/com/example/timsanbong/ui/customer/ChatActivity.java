@@ -36,6 +36,7 @@ public class ChatActivity extends AppCompatActivity {
     private ChatMessageAdapter chatAdapter;
     private Conversation conversation;
     private ChatViewModel chatViewModel;
+    private com.example.timsanbong.service.WebSocketService webSocketService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +45,39 @@ public class ChatActivity extends AppCompatActivity {
         conversation = (Conversation) getIntent().getSerializableExtra(Constants.EXTRA_CONVERSATION);
         initViews();
         setupListeners();
+        setupWebSocket();
         loadData();
+    }
+
+    private void setupWebSocket() {
+        webSocketService = com.example.timsanbong.service.WebSocketService.getInstance(this);
+        webSocketService.connect(this);
+        webSocketService.setCallback((destination, body) -> {
+            if (destination.contains("/topic/conversations/" + getConversationId())) {
+                try {
+                    com.google.gson.Gson gson = new com.google.gson.Gson();
+                    com.example.timsanbong.data.model.ChatMessage message = 
+                            gson.fromJson(body, com.example.timsanbong.data.model.ChatMessage.class);
+                    
+                    runOnUiThread(() -> {
+                        if (message.getSenderId() != new SessionManager(this).getUserId()) {
+                            chatAdapter.addMessage(message);
+                            scrollToBottom();
+                        }
+                    });
+                } catch (Exception e) {
+                    android.util.Log.e("ChatActivity", "Error parsing websocket message", e);
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (webSocketService != null) {
+            webSocketService.setCallback(null);
+        }
     }
 
     private void initViews() {
@@ -83,6 +116,16 @@ public class ChatActivity extends AppCompatActivity {
             finish();
             return;
         }
+
+        try {
+            String json = new SessionManager(this).getUserJson();
+            if (json != null) {
+                String currentUserName = new org.json.JSONObject(json).optString("fullName");
+                if (!currentUserName.isEmpty()) {
+                    conversation.setCurrentUserName(currentUserName);
+                }
+            }
+        } catch (Exception ignored) {}
 
         tvChatName.setText(conversation.getName());
         tvChatInitials.setText(conversation.getInitials());
@@ -135,7 +178,11 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void scrollToBottom() {
-        int count = chatAdapter.getItemCount();
-        if (count > 0) rvMessages.scrollToPosition(count - 1);
+        rvMessages.post(() -> {
+            int count = chatAdapter.getItemCount();
+            if (count > 0) {
+                rvMessages.scrollToPosition(count - 1);
+            }
+        });
     }
 }

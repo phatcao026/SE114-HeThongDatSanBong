@@ -30,6 +30,7 @@ public class OpponentReviewResponse implements Serializable {
     private String createdAt;
 
     public Long getId() { return id; }
+    public Long getMatchId() { return matchId; }
     public String getReviewerName() { return reviewerName; }
     public String getRevieweeName() { return revieweeName; }
     public String getComment() { return comment; }

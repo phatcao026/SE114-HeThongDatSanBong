@@ -46,7 +46,12 @@ public class RecommendedMatchAdapter extends RecyclerView.Adapter<RecommendedMat
         
         MatchPost post = recommendation.getMatchPost();
         if (post != null) {
-            holder.tvTeamName.setText(post.getTeam());
+            String teamDisplay = post.getTeamName();
+            if (teamDisplay == null || teamDisplay.trim().isEmpty()) {
+                teamDisplay = post.getTeam();
+            }
+            holder.tvTeamName.setText(teamDisplay);
+
             holder.tvMatchMessage.setText(post.getMessage());
             holder.tvDate.setText(post.getDate());
             holder.tvTime.setText(post.getTime());

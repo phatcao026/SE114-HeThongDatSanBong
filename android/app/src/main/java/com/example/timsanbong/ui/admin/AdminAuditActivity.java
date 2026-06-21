@@ -106,7 +106,6 @@ public class AdminAuditActivity extends AppCompatActivity {
                         currentReports.addAll(response.body());
                         adapter.notifyDataSetChanged();
                         tvPendingBadge.setText(String.valueOf(currentReports.size()));
-                        tvProcessedBadge.setText("0");
                     } else {
                         Toast.makeText(AdminAuditActivity.this, "Không thể tải dữ liệu", Toast.LENGTH_SHORT).show();
                     }
@@ -117,9 +116,47 @@ public class AdminAuditActivity extends AppCompatActivity {
                     Toast.makeText(AdminAuditActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
                 }
             });
+
+            // Also update processed badge count in background
+            ApiClient.getService(this).getAdminFairplayProcessed().enqueue(new Callback<List<OpponentReviewResponse>>() {
+                @Override
+                public void onResponse(@NonNull Call<List<OpponentReviewResponse>> call, @NonNull Response<List<OpponentReviewResponse>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        tvProcessedBadge.setText(String.valueOf(response.body().size()));
+                    }
+                }
+                @Override public void onFailure(@NonNull Call<List<OpponentReviewResponse>> call, @NonNull Throwable t) {}
+            });
         } else {
-            currentReports.clear();
-            adapter.notifyDataSetChanged();
+            ApiClient.getService(this).getAdminFairplayProcessed().enqueue(new Callback<List<OpponentReviewResponse>>() {
+                @Override
+                public void onResponse(@NonNull Call<List<OpponentReviewResponse>> call, @NonNull Response<List<OpponentReviewResponse>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        currentReports.clear();
+                        currentReports.addAll(response.body());
+                        adapter.notifyDataSetChanged();
+                        tvProcessedBadge.setText(String.valueOf(currentReports.size()));
+                    } else {
+                        Toast.makeText(AdminAuditActivity.this, "Không thể tải dữ liệu", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<List<OpponentReviewResponse>> call, @NonNull Throwable t) {
+                    Toast.makeText(AdminAuditActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            // Also update pending badge count in background
+            ApiClient.getService(this).getAdminFairplayPending().enqueue(new Callback<List<OpponentReviewResponse>>() {
+                @Override
+                public void onResponse(@NonNull Call<List<OpponentReviewResponse>> call, @NonNull Response<List<OpponentReviewResponse>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        tvPendingBadge.setText(String.valueOf(response.body().size()));
+                    }
+                }
+                @Override public void onFailure(@NonNull Call<List<OpponentReviewResponse>> call, @NonNull Throwable t) {}
+            });
         }
     }
 
@@ -145,8 +182,23 @@ public class AdminAuditActivity extends AppCompatActivity {
             holder.tvReporter.setText(String.format("Từ: %s -> %s", report.getReviewerName(), report.getRevieweeName()));
             holder.ivIcon.setImageResource(R.drawable.ic_admin_shield);
 
-            int colorInt = Color.parseColor("#E53E3E");
-            int bgColorInt = Color.parseColor("#FEF2F2");
+            boolean isProcessed = !"PENDING".equals(report.getStatus());
+
+            int colorInt;
+            int bgColorInt;
+
+            String status = report.getStatus();
+            if ("RESOLVED".equals(status)) {
+                colorInt = Color.parseColor("#38A169"); // Green
+                bgColorInt = Color.parseColor("#F0FFF4");
+            } else if ("REJECTED".equals(status)) {
+                colorInt = Color.parseColor("#E53E3E"); // Red
+                bgColorInt = Color.parseColor("#FFF5F5");
+            } else {
+                // PENDING or others
+                colorInt = Color.parseColor("#D69E2E"); // Yellow/Amber
+                bgColorInt = Color.parseColor("#FFFFF0");
+            }
 
             holder.ivIcon.setImageTintList(ColorStateList.valueOf(colorInt));
             holder.cvIcon.setCardBackgroundColor(bgColorInt);
@@ -155,9 +207,16 @@ public class AdminAuditActivity extends AppCompatActivity {
             
             holder.vAccent.setBackgroundColor(colorInt);
 
-            holder.btnBlock.setOnClickListener(v -> resolveReport(report.getId(), "APPROVED", v));
-            holder.btnIgnore.setOnClickListener(v -> resolveReport(report.getId(), "DISMISSED", v));
-            holder.btnHide.setOnClickListener(v -> resolveReport(report.getId(), "DISMISSED", v));
+            if (isProcessed) {
+                holder.btnBlock.setVisibility(View.GONE);
+                holder.btnIgnore.setVisibility(View.GONE);
+            } else {
+                holder.btnBlock.setVisibility(View.VISIBLE);
+                holder.btnIgnore.setVisibility(View.VISIBLE);
+
+                holder.btnBlock.setOnClickListener(v -> resolveReport(report.getId(), "APPROVED", v));
+                holder.btnIgnore.setOnClickListener(v -> resolveReport(report.getId(), "DISMISSED", v));
+            }
 
             holder.itemView.setOnClickListener(v -> {
                 // Show detail if needed
@@ -173,17 +232,43 @@ public class AdminAuditActivity extends AppCompatActivity {
         }
 
         private void showDecisionDialog(Long id, View v) {
+            android.widget.LinearLayout layout = new android.widget.LinearLayout(v.getContext());
+            layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+            layout.setPadding(50, 40, 50, 10);
+
+            android.widget.RadioGroup rgType = new android.widget.RadioGroup(v.getContext());
+            rgType.setOrientation(android.widget.RadioGroup.HORIZONTAL);
+            
+            android.widget.RadioButton rbMinus = new android.widget.RadioButton(v.getContext());
+            rbMinus.setText("Trừ điểm");
+            rbMinus.setId(View.generateViewId());
+            rbMinus.setChecked(true);
+
+            android.widget.RadioButton rbPlus = new android.widget.RadioButton(v.getContext());
+            rbPlus.setText("Cộng điểm");
+            rbPlus.setId(View.generateViewId());
+
+            rgType.addView(rbMinus);
+            rgType.addView(rbPlus);
+
             android.widget.EditText etPoints = new android.widget.EditText(v.getContext());
-            etPoints.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_SIGNED);
-            etPoints.setHint("Ví dụ: -10 hoặc 5");
+            etPoints.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+            etPoints.setHint("Số điểm (ví dụ: 10)");
+
+            layout.addView(rgType);
+            layout.addView(etPoints);
 
             new androidx.appcompat.app.AlertDialog.Builder(v.getContext())
-                    .setTitle("Phán quyết Fairplay")
-                    .setMessage("Nhập số điểm uy tín thay đổi cho người bị tố cáo:")
-                    .setView(etPoints)
-                    .setPositiveButton("Xác nhận vi phạm", (dialog, which) -> {
+                    .setTitle("Đánh giá Fairplay")
+                    .setView(layout)
+                    .setPositiveButton("Xác nhận", (dialog, which) -> {
                         String input = etPoints.getText().toString();
                         int points = input.isEmpty() ? 0 : Integer.parseInt(input);
+                        if (rgType.getCheckedRadioButtonId() == rbMinus.getId()) {
+                            points = -Math.abs(points);
+                        } else {
+                            points = Math.abs(points);
+                        }
                         sendDecision(id, true, points, v);
                     })
                     .setNegativeButton("Hủy", null)
@@ -201,7 +286,9 @@ public class AdminAuditActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
                         Toast.makeText(v.getContext(), "Đã xử lý phán quyết", Toast.LENGTH_SHORT).show();
                         if (v.getContext() instanceof AdminAuditActivity) {
-                            ((AdminAuditActivity) v.getContext()).loadData(true);
+                            AdminAuditActivity activity = (AdminAuditActivity) v.getContext();
+                            boolean currentlyPending = activity.indicatorPending.getVisibility() == View.VISIBLE;
+                            activity.loadData(currentlyPending);
                         }
                     } else {
                         Toast.makeText(v.getContext(), "Lỗi: " + response.code(), Toast.LENGTH_SHORT).show();
@@ -223,7 +310,7 @@ public class AdminAuditActivity extends AppCompatActivity {
             ImageView ivIcon;
             MaterialCardView cvIcon;
             View vAccent;
-            View btnBlock, btnHide, btnIgnore;
+            View btnBlock, btnIgnore;
             ViewHolder(View v) {
                 super(v);
                 tvTitle = v.findViewById(R.id.tvAuditTitle);
@@ -233,10 +320,9 @@ public class AdminAuditActivity extends AppCompatActivity {
                 tvContent = v.findViewById(R.id.tvAuditContent);
                 tvReporter = v.findViewById(R.id.tvAuditReporter);
                 ivIcon = v.findViewById(R.id.ivAuditTypeIcon);
-                cvIcon = (MaterialCardView) v.findViewById(R.id.cvAuditIcon);
+                cvIcon = v.findViewById(R.id.cvAuditIcon);
                 vAccent = v.findViewById(R.id.vAuditAccent);
                 btnBlock = v.findViewById(R.id.btnBlock);
-                btnHide = v.findViewById(R.id.btnHide);
                 btnIgnore = v.findViewById(R.id.btnIgnore);
             }
         }

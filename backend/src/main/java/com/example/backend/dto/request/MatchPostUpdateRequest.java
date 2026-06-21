@@ -20,6 +20,7 @@ public class MatchPostUpdateRequest {
     private Boolean hasField;
     private String targetPositions;
     private String ageRange;
+    private String teamName;
 
 
     public Long getFieldId() {
@@ -132,5 +133,13 @@ public class MatchPostUpdateRequest {
 
     public void setAgeRange(String ageRange) {
         this.ageRange = ageRange;
+    }
+
+    public String getTeamName() {
+        return teamName;
+    }
+
+    public void setTeamName(String teamName) {
+        this.teamName = teamName;
     }
 }

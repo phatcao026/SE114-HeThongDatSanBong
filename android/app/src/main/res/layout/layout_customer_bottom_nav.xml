@@ -179,8 +179,8 @@
                     android:layout_width="@dimen/spacing_20"
                     android:layout_height="@dimen/spacing_20"
                     android:layout_gravity="center"
-                    android:contentDescription="@string/cd_notifications"
-                    android:src="@drawable/ic_bell" />
+                    android:contentDescription="@string/cd_nav_messages"
+                    android:src="@drawable/ic_message" />
             </FrameLayout>
 
             <TextView
@@ -189,7 +189,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_1"
                 android:fontFamily="@font/be_vietnam_pro"
-                android:text="@string/nav_notifications"
+                android:text="@string/nav_messages_label"
                 android:textColor="@color/text_on_primary"
                 android:textSize="@dimen/text_caption"
                 android:textStyle="bold" />

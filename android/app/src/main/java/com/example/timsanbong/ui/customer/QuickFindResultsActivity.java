@@ -16,8 +16,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.timsanbong.R;
+import com.example.timsanbong.data.model.ChatMessage;
 import com.example.timsanbong.data.model.Conversation;
 import com.example.timsanbong.data.model.MatchPost;
+import com.example.timsanbong.data.model.MessageRequest;
 import com.example.timsanbong.data.model.RecommendedMatch;
 import com.example.timsanbong.data.repository.ChatRepository;
 import com.example.timsanbong.utils.Constants;
@@ -87,22 +89,28 @@ public class QuickFindResultsActivity extends AppCompatActivity {
         String playstyle = getIntent().getStringExtra("playstyle");
         String teamName = getIntent().getStringExtra("teamName");
         String date = getIntent().getStringExtra("date");
-        String time = getIntent().getStringExtra("time");
+        String timeStart = getIntent().getStringExtra("time");
+        String timeEnd = getIntent().getStringExtra("timeEnd");
+        String postType = getIntent().getStringExtra("postType");
+        String skillLevel = getIntent().getStringExtra("skillLevel");
+        String ageRange = getIntent().getStringExtra("ageRange");
+        Boolean hasField = null;
+        if (getIntent().hasExtra("hasField")) {
+            hasField = getIntent().getBooleanExtra("hasField", false);
+        }
         
         // Clean up empty strings to null so they aren't used in search
         if (playstyle != null && playstyle.trim().isEmpty()) playstyle = null;
         if (teamName != null && teamName.trim().isEmpty()) teamName = null;
         if (date != null && date.trim().isEmpty()) date = null;
-        if (time != null && time.trim().isEmpty()) {
-            time = null;
-        } else if (time != null) {
-            time = time + ":00"; // Ensure standard time format
-        }
+        if (postType != null && postType.trim().isEmpty()) postType = null;
+        if (skillLevel != null && skillLevel.trim().isEmpty()) skillLevel = null;
+        if (ageRange != null && ageRange.trim().isEmpty()) ageRange = null;
 
         progressBar.setVisibility(View.VISIBLE);
         
         new com.example.timsanbong.data.repository.MatchRepository().getSmartRecommendations(
-                this, playstyle, teamName, date, time, null, null, null, null, null,
+                this, playstyle, teamName, date, timeStart, timeEnd, skillLevel, hasField, postType, ageRange,
                 new RepositoryCallback<List<RecommendedMatch>>() {
                     @Override
                     public void onSuccess(List<RecommendedMatch> data) {
@@ -131,39 +139,117 @@ public class QuickFindResultsActivity extends AppCompatActivity {
 
     private void acceptMatch(RecommendedMatch recommendation) {
         if (recommendation.getMatchPost() == null) return;
-        
+
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle("Xác nhận bắt kèo")
+                .setMessage("Bạn có muốn chuyển đến trang nhắn tin với chủ kèo không?")
+                .setPositiveButton("Có", (dialog, which) -> {
+                    executeAcceptMatch(recommendation, true);
+                })
+                .setNegativeButton("Không", (dialog, which) -> {
+                    executeAcceptMatch(recommendation, false);
+                })
+                .show();
+    }
+
+    private void executeAcceptMatch(RecommendedMatch recommendation, boolean shouldChat) {
         progressBar.setVisibility(View.VISIBLE);
         new com.example.timsanbong.data.repository.MatchRepository().createMatchRequest(
-                this, recommendation.getMatchId(), "Tôi muốn bắt kèo này!", 
+                this, recommendation.getMatchId(), "Tôi muốn bắt kèo này!",
                 new RepositoryCallback<com.example.timsanbong.data.model.MatchRequestResponse>() {
+                    @Override
+                    public void onSuccess(com.example.timsanbong.data.model.MatchRequestResponse data) {
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(QuickFindResultsActivity.this, "Đã gửi yêu cầu bắt kèo.", Toast.LENGTH_SHORT).show();
+                        if (shouldChat) {
+                            openDirectConversation(recommendation);
+                        }
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(QuickFindResultsActivity.this, message, Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void openDirectConversation(RecommendedMatch recommendation) {
+        if (recommendation.getMatchPost() == null || recommendation.getMatchPost().getUserId() <= 0) {
+            return;
+        }
+
+        MatchPost match = recommendation.getMatchPost();
+        String autoMessage = String.format("Tôi muốn bắt kèo của bạn: %s - %s - %s",
+                match.getTeam(), match.getDate(), match.getTime());
+
+        chatRepository.getConversations(this, new RepositoryCallback<List<Conversation>>() {
             @Override
-            public void onSuccess(com.example.timsanbong.data.model.MatchRequestResponse data) {
-                openDirectConversation(recommendation);
+            public void onSuccess(List<Conversation> data) {
+                Conversation existing = null;
+                for (Conversation c : data) {
+                    if (c.getOtherUser() != null && c.getOtherUser().getId() == match.getUserId()) {
+                        existing = c;
+                        break;
+                    }
+                }
+                if (existing != null) {
+                    navigateToChat(existing, autoMessage);
+                } else {
+                    createNewConversation(match.getUserId(), autoMessage);
+                }
             }
 
             @Override
             public void onError(String message) {
-                progressBar.setVisibility(View.GONE);
+                createNewConversation(match.getUserId(), autoMessage);
+            }
+        });
+    }
+
+    private void createNewConversation(long userId, String autoMessage) {
+        chatRepository.createDirectConversation(this, userId, new RepositoryCallback<Conversation>() {
+            @Override
+            public void onSuccess(Conversation data) {
+                navigateToChat(data, autoMessage);
+            }
+
+            @Override
+            public void onError(String message) {
                 Toast.makeText(QuickFindResultsActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void openDirectConversation(RecommendedMatch recommendation) {
-        if (recommendation.getMatchPost() == null) return;
-        
-        chatRepository.createDirectConversation(this, recommendation.getMatchPost().getUserId(), new RepositoryCallback<Conversation>() {
-            @Override
-            public void onSuccess(Conversation data) {
-                Intent intent = new Intent(QuickFindResultsActivity.this, ChatActivity.class);
-                intent.putExtra(Constants.EXTRA_CONVERSATION, data);
-                startActivity(intent);
-            }
+    private void navigateToChat(Conversation conversation, String autoMessage) {
+        long conversationId;
+        try {
+            conversationId = Long.parseLong(conversation.getId());
+        } catch (NumberFormatException e) {
+            conversationId = 0;
+        }
 
-            @Override
-            public void onError(String message) {
-                Toast.makeText(QuickFindResultsActivity.this, message, Toast.LENGTH_SHORT).show();
-            }
-        });
+        if (conversationId > 0) {
+            MessageRequest request = new MessageRequest(conversationId, autoMessage);
+            chatRepository.sendMessage(this, request, new RepositoryCallback<ChatMessage>() {
+                @Override
+                public void onSuccess(ChatMessage data) {
+                    startChatActivity(conversation);
+                }
+
+                @Override
+                public void onError(String message) {
+                    startChatActivity(conversation);
+                }
+            });
+        } else {
+            startChatActivity(conversation);
+        }
+    }
+
+    private void startChatActivity(Conversation conversation) {
+        Intent intent = new Intent(QuickFindResultsActivity.this, ChatActivity.class);
+        intent.putExtra(Constants.EXTRA_CONVERSATION, conversation);
+        startActivity(intent);
     }
 }

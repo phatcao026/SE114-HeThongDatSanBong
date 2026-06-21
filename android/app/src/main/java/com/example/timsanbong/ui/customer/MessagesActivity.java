@@ -17,6 +17,7 @@ import com.example.timsanbong.R;
 import com.example.timsanbong.data.model.Conversation;
 import com.example.timsanbong.utils.Constants;
 import com.example.timsanbong.utils.NavBarManager;
+import com.example.timsanbong.utils.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +100,20 @@ public class MessagesActivity extends AppCompatActivity {
     }
 
     private void showConversations(List<Conversation> conversations) {
+        String currentUserName = null;
+        try {
+            String json = new SessionManager(this).getUserJson();
+            if (json != null) {
+                currentUserName = new org.json.JSONObject(json).optString("fullName");
+            }
+        } catch (Exception ignored) {}
+
+        if (currentUserName != null) {
+            for (Conversation c : conversations) {
+                c.setCurrentUserName(currentUserName);
+            }
+        }
+
         conversationAdapter.updateConversations(conversations);
         tvEmptyMessages.setVisibility(conversations.isEmpty() ? View.VISIBLE : View.GONE);
         rvConversations.setVisibility(conversations.isEmpty() ? View.GONE : View.VISIBLE);

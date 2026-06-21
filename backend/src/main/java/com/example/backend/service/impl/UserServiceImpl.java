@@ -24,6 +24,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserResponse getUserById(Long id) {
         User user = findUser(id);
         return toResponse(user);
@@ -72,6 +73,26 @@ public class UserServiceImpl implements UserService {
         response.setPhone(user.getPhone());
         response.setRole(user.getRole() != null ? user.getRole().name() : null);
         response.setTrustScore(user.getTrustScore());
+        
+        // Calculate basic stats
+        int matches = user.getBookings() != null ? (int) user.getBookings().stream()
+                .filter(b -> b.getStatus() == com.example.backend.utils.Enums.BookingStatus.COMPLETED)
+                .count() : 0;
+        int noShows = user.getBookings() != null ? (int) user.getBookings().stream()
+                .filter(b -> b.getStatus() == com.example.backend.utils.Enums.BookingStatus.CANCELLED)
+                .count() : 0;
+        
+        response.setMatchesPlayed(matches);
+        response.setNoShows(noShows);
+        
+        // Calculate average rating from trust score:
+        // 100 -> 5.0
+        // 80  -> 4.0
+        // 60  -> 3.0
+        // 20  -> 1.0
+        double calculatedRating = (user.getTrustScore() != null ? user.getTrustScore() : 100) / 20.0;
+        response.setAverageRating(Math.round(calculatedRating * 10.0) / 10.0);
+
         response.setCreatedAt(user.getCreatedAt());
         response.setUpdatedAt(user.getUpdatedAt());
         return response;

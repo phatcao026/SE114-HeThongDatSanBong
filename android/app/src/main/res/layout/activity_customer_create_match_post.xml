@@ -307,14 +307,31 @@
                 android:textColor="@color/text_primary"
                 android:textSize="@dimen/text_body_medium" />
 
-            <!-- Location (Conditional) -->
+            <!-- Booking Selector (When hasField is ON) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilBookingSelect"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_3"
+                android:hint="Chọn lịch đặt sân của bạn"
+                android:visibility="gone"
+                app:boxStrokeColor="@color/border">
+                <AutoCompleteTextView
+                    android:id="@+id/actvBookingSelect"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Location (Conditional, for custom if not in booking list or manual entry) -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilLocation"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_3"
-                android:hint="Địa điểm"
+                android:hint="Địa điểm (Tên sân)"
                 app:startIconDrawable="@drawable/ic_map_pin"
                 app:boxCornerRadiusBottomEnd="@dimen/radius_small"
                 app:boxCornerRadiusBottomStart="@dimen/radius_small"
@@ -351,33 +368,33 @@
             <!-- Age Range -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilAgeRange"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_3"
-                android:hint="Độ tuổi (vd: 18-30 tuổi)"
+                android:hint="Độ tuổi"
                 app:boxStrokeColor="@color/border">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etAgeRange"
+                <AutoCompleteTextView
+                    android:id="@+id/actvAgeRange"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text" />
+                    android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Cost Sharing -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilCostSharing"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_3"
-                android:hint="Quy tắc chia tiền (vd: 50-50, Thua trả hết)"
+                android:hint="Quy tắc chia tiền"
                 app:boxStrokeColor="@color/border">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etCostSharing"
+                <AutoCompleteTextView
+                    android:id="@+id/actvCostSharing"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text" />
+                    android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Description (NOW AT THE BOTTOM) -->

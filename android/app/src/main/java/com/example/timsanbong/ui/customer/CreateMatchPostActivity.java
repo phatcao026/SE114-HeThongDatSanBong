@@ -31,10 +31,10 @@ public class CreateMatchPostActivity extends AppCompatActivity {
 
     private android.widget.ImageView btnBack;
     private TextView tabFindOpponent, tabFindMember;
-    private AutoCompleteTextView actvTeam;
+    private AutoCompleteTextView actvTeam, actvBookingSelect, actvAgeRange, actvCostSharing;
     private TextView chipBeginner, chipIntermediate, chipAdvanced;
-    private TextInputLayout tilLocation, tilNeededMembers, tilPositions, tilPlayDate, tilPlayTime, tilEndTime, tilBookingId;
-    private TextInputEditText etPlayDate, etPlayTime, etEndTime, etLocation, etDescription, etNeededMembers, etPositions, etAgeRange, etCostSharing, etBookingId;
+    private TextInputLayout tilLocation, tilNeededMembers, tilPositions, tilPlayDate, tilPlayTime, tilEndTime, tilBookingId, tilBookingSelect;
+    private TextInputEditText etPlayDate, etPlayTime, etEndTime, etLocation, etDescription, etNeededMembers, etPositions, etBookingId;
     private androidx.appcompat.widget.SwitchCompat swHasField;
     private MaterialButton btnSubmit;
 
@@ -42,9 +42,12 @@ public class CreateMatchPostActivity extends AppCompatActivity {
     private String selectedSkill = "INTERMEDIATE";
     private String selectedDateIso = "";
     private Long selectedTeamId;
+    private Long selectedBookingId;
     private final Map<String, Long> teamIdsByName = new HashMap<>();
+    private final Map<String, com.example.timsanbong.data.model.Booking> bookingsByDisplay = new HashMap<>();
     private MatchViewModel matchViewModel;
     private TeamViewModel teamViewModel;
+    private BookingViewModel bookingViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,17 +57,20 @@ public class CreateMatchPostActivity extends AppCompatActivity {
         initViews();
         matchViewModel = new ViewModelProvider(this).get(MatchViewModel.class);
         teamViewModel = new ViewModelProvider(this).get(TeamViewModel.class);
+        bookingViewModel = new ViewModelProvider(this).get(BookingViewModel.class);
 
         setupTabs();
         setupTeamDropdown();
         setupSkillChips();
         setupPickers();
+        setupStaticDropdowns();
         setupObservers();
 
         btnBack.setOnClickListener(v -> finish());
         btnSubmit.setOnClickListener(v -> validateAndSubmit());
 
         teamViewModel.loadMyTeams();
+        bookingViewModel.loadMyBookings();
     }
 
     private void initViews() {
@@ -83,6 +89,7 @@ public class CreateMatchPostActivity extends AppCompatActivity {
         tilNeededMembers = findViewById(R.id.tilNeededMembers);
         tilPositions = findViewById(R.id.tilPositions);
         tilBookingId = findViewById(R.id.tilBookingId);
+        tilBookingSelect = findViewById(R.id.tilBookingSelect);
 
         etPlayDate = findViewById(R.id.etPlayDate);
         etPlayTime = findViewById(R.id.etPlayTime);
@@ -91,8 +98,9 @@ public class CreateMatchPostActivity extends AppCompatActivity {
         etDescription = findViewById(R.id.etDescription);
         etNeededMembers = findViewById(R.id.etNeededMembers);
         etPositions = findViewById(R.id.etPositions);
-        etAgeRange = findViewById(R.id.etAgeRange);
-        etCostSharing = findViewById(R.id.etCostSharing);
+        actvAgeRange = findViewById(R.id.actvAgeRange);
+        actvCostSharing = findViewById(R.id.actvCostSharing);
+        actvBookingSelect = findViewById(R.id.actvBookingSelect);
         etBookingId = findViewById(R.id.etBookingId);
         swHasField = findViewById(R.id.swHasField);
         btnSubmit = findViewById(R.id.btnSubmit);
@@ -110,13 +118,13 @@ public class CreateMatchPostActivity extends AppCompatActivity {
         tilNeededMembers.setVisibility(isFindMember ? View.VISIBLE : View.GONE);
         tilPositions.setVisibility(isFindMember ? View.VISIBLE : View.GONE);
         
-        // Show date/time for BOTH types now as per request
+        // Show date/time for BOTH types now
         tilPlayDate.setVisibility(View.VISIBLE);
         tilPlayTime.setVisibility(View.VISIBLE);
-        tilEndTime.setVisibility(isFindMember ? View.VISIBLE : View.GONE);
+        tilEndTime.setVisibility(View.VISIBLE);
         
+        tilBookingSelect.setVisibility(hasField ? View.VISIBLE : View.GONE);
         tilLocation.setVisibility(hasField ? View.VISIBLE : View.GONE);
-        // BookingId remains hidden as requested "xoa cai booking id di"
         tilBookingId.setVisibility(View.GONE);
     }
 
@@ -204,6 +212,27 @@ public class CreateMatchPostActivity extends AppCompatActivity {
         });
     }
 
+    private void setupStaticDropdowns() {
+        String[] ageOptions = {"Dưới 18 tuổi", "18-25 tuổi", "25-35 tuổi", "Trên 35 tuổi", "Mọi lứa tuổi"};
+        actvAgeRange.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, ageOptions));
+
+        String[] costOptions = {"Chia đều (50-50)", "Thua trả hết", "Thắng trả ít", "Chủ kèo mời", "Tự thỏa thuận"};
+        actvCostSharing.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, costOptions));
+
+        actvBookingSelect.setOnItemClickListener((parent, view, position, id) -> {
+            String display = parent.getItemAtPosition(position).toString();
+            com.example.timsanbong.data.model.Booking b = bookingsByDisplay.get(display);
+            if (b != null) {
+                selectedBookingId = b.getId();
+                etLocation.setText(b.getFieldName());
+                selectedDateIso = b.getBookingDate();
+                etPlayDate.setText(b.getBookingDate());
+                etPlayTime.setText(b.getStartTime().substring(0, 5));
+                etEndTime.setText(b.getEndTime().substring(0, 5));
+            }
+        });
+    }
+
     private void setupObservers() {
         teamViewModel.teamsState.observe(this, resource -> {
             if (resource == null || resource.status != com.example.timsanbong.utils.Resource.Status.SUCCESS || resource.data == null) {
@@ -218,6 +247,21 @@ public class CreateMatchPostActivity extends AppCompatActivity {
             }
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, teamNames);
             actvTeam.setAdapter(adapter);
+        });
+
+        bookingViewModel.bookingsState.observe(this, resource -> {
+            if (resource == null || resource.status != com.example.timsanbong.utils.Resource.Status.SUCCESS || resource.data == null) {
+                return;
+            }
+            bookingsByDisplay.clear();
+            List<String> displays = new ArrayList<>();
+            for (com.example.timsanbong.data.model.Booking b : resource.data) {
+                if ("CANCELLED".equals(b.getStatus())) continue;
+                String d = String.format("%s (%s %s)", b.getFieldName(), b.getBookingDate(), b.getStartTime());
+                displays.add(d);
+                bookingsByDisplay.put(d, b);
+            }
+            actvBookingSelect.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, displays));
         });
 
         matchViewModel.createMatchState.observe(this, resource -> {
@@ -241,7 +285,7 @@ public class CreateMatchPostActivity extends AppCompatActivity {
     }
 
     private void validateAndSubmit() {
-        String teamName = actvTeam.getText().toString().trim();
+        String teamNameInput = actvTeam.getText().toString().trim();
         String timeStart = etPlayTime.getText() != null ? etPlayTime.getText().toString().trim() : "";
         String timeEnd = etEndTime.getText() != null ? etEndTime.getText().toString().trim() : "";
         String location = etLocation.getText() != null ? etLocation.getText().toString().trim() : "";
@@ -258,51 +302,50 @@ public class CreateMatchPostActivity extends AppCompatActivity {
             return;
         }
 
-        // Team ID resolution
-        if (teamIdsByName.containsKey(teamName)) {
-            selectedTeamId = teamIdsByName.get(teamName);
-        } else {
-            selectedTeamId = null;
-        }
-
         String description = etDescription.getText() != null ? etDescription.getText().toString().trim() : "";
 
         MatchPostRequest request = new MatchPostRequest();
         request.setPostType(selectedType);
         
-        // Use teamId if available, otherwise just use the typed teamName
-        if (teamIdsByName.containsKey(teamName)) {
-            request.setTeamId(teamIdsByName.get(teamName));
+        // Ensure team name is sent if not empty
+        if (!teamNameInput.isEmpty()) {
+            request.setTeamName(teamNameInput);
+            
+            // Also include teamId if a formal team was selected from the dropdown
+            if (teamIdsByName.containsKey(teamNameInput)) {
+                request.setTeamId(teamIdsByName.get(teamNameInput));
+            }
         } else {
-            request.setTeamName(teamName.isEmpty() ? null : teamName);
+            request.setTeamName(null);
+            request.setTeamId(null);
         }
 
         request.setSkillLevel(selectedSkill);
         request.setMessage(description);
         request.setHasField(hasField);
         request.setFieldName(location);
+        if (selectedBookingId != null) {
+            request.setBookingId(selectedBookingId);
+        }
         
-        // Essential match info for BOTH now (date, timeStart)
+        // Essential match info for BOTH now (date, timeStart, timeEnd)
         request.setDate(selectedDateIso);
         request.setTimeStart(timeStart + ":00");
+        String finalEndTime = timeEnd.isEmpty() ? buildEndTime(timeStart) : timeEnd;
+        request.setTimeEnd(finalEndTime + ":00");
 
         if (MatchPost.TYPE_FIND_MEMBER.equals(selectedType)) {
-            // FIND_MEMBER needs explicit timeEnd
-            String finalEndTime = timeEnd.isEmpty() ? buildEndTime(timeStart) : timeEnd;
-            request.setTimeEnd(finalEndTime + ":00");
-            
             String needed = etNeededMembers.getText() != null ? etNeededMembers.getText().toString().trim() : "";
             if (!needed.isEmpty()) request.setNeededMembers(Integer.parseInt(needed));
             
             if (etPositions.getText() != null) request.setTargetPositions(etPositions.getText().toString().trim());
-        } else {
-            // FIND_OPPONENT might not strictly need timeEnd in JSON but good to have if provided
-            if (!timeEnd.isEmpty()) request.setTimeEnd(timeEnd + ":00");
-            else request.setTimeEnd(buildEndTime(timeStart) + ":00");
         }
 
-        if (etAgeRange.getText() != null) request.setAgeRange(etAgeRange.getText().toString().trim());
-        if (etCostSharing.getText() != null) request.setCostSharing(etCostSharing.getText().toString().trim());
+        String age = actvAgeRange.getText().toString().trim();
+        if (!age.isEmpty()) request.setAgeRange(age);
+
+        String costSharing = actvCostSharing.getText().toString().trim();
+        if (!costSharing.isEmpty()) request.setCostSharing(costSharing);
 
         matchViewModel.createMatchPost(request);
     }

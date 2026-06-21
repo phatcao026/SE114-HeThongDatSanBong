@@ -101,6 +101,28 @@ public class FieldReviewServiceImpl implements FieldReviewService {
                 .toList();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<FieldReviewResponse> getAllFieldReviews() {
+        List<FieldReview> reviews = fieldReviewRepository.findAll();
+        if (reviews.isEmpty()) {
+            return List.of();
+        }
+
+        Set<Long> reviewerIds = reviews.stream()
+                .map(FieldReview::getReviewerId)
+                .collect(Collectors.toSet());
+
+        Map<Long, User> usersById = userRepository.findAllById(reviewerIds)
+                .stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
+
+        return reviews.stream()
+                .map(review -> toReviewResponse(review, usersById.get(review.getReviewerId())))
+                .sorted((r1, r2) -> r2.getCreatedAt().compareTo(r1.getCreatedAt()))
+                .toList();
+    }
+
     private FieldReviewResponse toReviewResponse(FieldReview review, User reviewer) {
         FieldReviewResponse response = new FieldReviewResponse();
         response.setId(review.getId());

@@ -47,9 +47,6 @@ public class MatchPostRequest {
 
     @SerializedName("teamName")
     private String teamName;
-    
-    @SerializedName("team")
-    private String team;
 
     @SerializedName("fieldName")
     private String fieldName;
@@ -58,7 +55,7 @@ public class MatchPostRequest {
 
     public void setPostType(String postType) { this.postType = postType; }
     public void setTeamId(Long teamId) { this.teamId = teamId; }
-    public void setTeamName(String teamName) { this.teamName = teamName; this.team = teamName; }
+    public void setTeamName(String teamName) { this.teamName = teamName; }
     public void setFieldId(Long fieldId) { this.fieldId = fieldId; }
     public void setFieldName(String fieldName) { this.fieldName = fieldName; }
     public void setBookingId(Long bookingId) { this.bookingId = bookingId; }

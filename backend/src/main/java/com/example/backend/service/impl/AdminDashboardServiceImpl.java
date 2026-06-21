@@ -22,6 +22,7 @@ import com.example.backend.repository.FieldRepository;
 import com.example.backend.repository.MatchPostRepository;
 import com.example.backend.repository.MatchRequestRepository;
 import com.example.backend.repository.MessageRepository;
+import com.example.backend.repository.OpponentReviewRepository;
 import com.example.backend.repository.PaymentRepository;
 import com.example.backend.repository.ReviewRepository;
 import com.example.backend.repository.TimeSlotRepository;
@@ -51,6 +52,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
     private final MatchPostRepository matchPostRepository;
     private final MatchRequestRepository matchRequestRepository;
     private final ReviewRepository reviewRepository;
+    private final OpponentReviewRepository opponentReviewRepository;
     private final ConversationRepository conversationRepository;
     private final MessageRepository messageRepository;
 
@@ -62,6 +64,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                                      MatchPostRepository matchPostRepository,
                                      MatchRequestRepository matchRequestRepository,
                                      ReviewRepository reviewRepository,
+                                     OpponentReviewRepository opponentReviewRepository,
                                      ConversationRepository conversationRepository,
                                      MessageRepository messageRepository) {
         this.userRepository = userRepository;
@@ -72,6 +75,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         this.matchPostRepository = matchPostRepository;
         this.matchRequestRepository = matchRequestRepository;
         this.reviewRepository = reviewRepository;
+        this.opponentReviewRepository = opponentReviewRepository;
         this.conversationRepository = conversationRepository;
         this.messageRepository = messageRepository;
     }
@@ -111,9 +115,9 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         response.setClosedMatchPosts(matchPostRepository.countByStatus(Enums.PostStatus.CLOSED));
         response.setExpiredMatchPosts(matchPostRepository.countByStatus(Enums.PostStatus.EXPIRED));
 
-        response.setTotalReviews(reviewRepository.count());
-        response.setPendingReviews(reviewRepository.countByStatus(Enums.ReviewStatus.PENDING_ADMIN_REVIEW));
-        response.setPenalizedReviews(reviewRepository.countByStatus(Enums.ReviewStatus.PENALIZED));
+        response.setTotalReviews(reviewRepository.count() + opponentReviewRepository.count());
+        response.setPendingReviews(opponentReviewRepository.countByStatus(Enums.FairplayStatus.PENDING));
+        response.setPenalizedReviews(opponentReviewRepository.countByStatus(Enums.FairplayStatus.RESOLVED));
         response.setTotalConversations(conversationRepository.count());
         response.setTotalMessages(messageRepository.count());
         response.setGeneratedAt(LocalDateTime.now());

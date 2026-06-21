@@ -92,7 +92,7 @@ public interface ApiService {
     @DELETE("match-posts/{id}")
     Call<Void> deleteMatchPost(@Path("id") long id);
 
-    @GET("match-posts/me")
+    @GET("match-posts/my")
     Call<List<MatchPost>> getMyMatchPosts();
 
     @GET("match-posts/recommendations")
@@ -171,6 +171,12 @@ public interface ApiService {
     @POST("fairplay/reviews")
     Call<Void> submitReview(@Body ReviewRequest request);
 
+    @GET("fairplay/my-submitted")
+    Call<List<Long>> getMySubmittedReviews();
+
+    @GET("fairplay/my-reviews")
+    Call<List<OpponentReviewResponse>> getMyFairplayReviews();
+
     @POST("reviews/field")
     Call<FieldReviewResponse> createFieldReview(@Body FieldReviewRequest request);
 
@@ -248,6 +254,9 @@ public interface ApiService {
     @GET("admin/reviews")
     Call<List<ReviewResponse>> getAdminReviews();
 
+    @GET("admin/field-reviews")
+    Call<List<FieldReviewResponse>> getAdminFieldReviews();
+
     @PUT("admin/users/{id}/lock")
     Call<Void> lockUser(@Path("id") long id);
 
@@ -256,6 +265,9 @@ public interface ApiService {
 
     @GET("admin/fairplay/pending")
     Call<List<OpponentReviewResponse>> getAdminFairplayPending();
+
+    @GET("admin/fairplay/processed")
+    Call<List<OpponentReviewResponse>> getAdminFairplayProcessed();
 
     @PUT("admin/fairplay/resolve/{id}")
     Call<Void> resolveFairplayReview(@Path("id") long id, @Body Map<String, Object> body);

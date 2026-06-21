@@ -24,14 +24,33 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         void onAccept(MatchPost match, int position);
         void onChat(MatchPost match);
         void onCardClick(MatchPost match);
+        default void onRate(MatchPost match) {}
     }
 
     private final List<MatchPost> matches;
     private final OnMatchActionListener listener;
+    private java.util.Map<Long, String> reviewStatuses = new java.util.HashMap<>();
+    private long currentUserId = -1;
+    private java.util.Set<Long> localAcceptedIds = new java.util.HashSet<>();
 
     public MatchAdapter(List<MatchPost> matches, OnMatchActionListener listener) {
         this.matches = matches;
         this.listener = listener;
+    }
+
+    public void setLocalAcceptedIds(java.util.Set<Long> acceptedIds) {
+        this.localAcceptedIds = acceptedIds;
+        notifyDataSetChanged();
+    }
+
+    public void setCurrentUserId(long userId) {
+        this.currentUserId = userId;
+        notifyDataSetChanged();
+    }
+
+    public void setReviewStatuses(java.util.Map<Long, String> statuses) {
+        this.reviewStatuses = statuses;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -61,7 +80,10 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         ((GradientDrawable) holder.tvTrustBadge.getBackground().mutate()).setColor(ContextCompat.getColor(ctx, trustColor));
 
         // Team name
-        String teamDisplay = match.getTeam();
+        String teamDisplay = match.getTeamName();
+        if (teamDisplay == null || teamDisplay.trim().isEmpty()) {
+            teamDisplay = match.getTeam();
+        }
         holder.tvTeamName.setText(teamDisplay);
 
         // LIVE badge
@@ -130,20 +152,70 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
 
         holder.btnAccept.setText(R.string.match_action_accept);
         holder.btnChatMatch.setText(R.string.match_action_chat);
-        if (match.isAccepted()) {
+        
+        boolean isHistoryView = "COMPLETED".equals(match.getStatus()) || 
+                               "EXPIRED".equals(match.getStatus()) ||
+                               "MATCHED".equals(match.getStatus()) ||
+                               "CLOSED".equals(match.getStatus());
+
+        String reviewStatus = reviewStatuses.get(match.getId());
+        boolean isOwner = currentUserId != -1 && match.getUserId() == currentUserId;
+        boolean isAcceptedByMe = localAcceptedIds.contains(match.getId());
+
+        if (isHistoryView) {
+            holder.btnAccept.setVisibility(View.GONE);
+            holder.btnChatMatch.setVisibility(View.GONE);
+            
+            if (reviewStatus != null) {
+                holder.btnRate.setVisibility(View.GONE);
+                holder.tvAccepted.setVisibility(View.VISIBLE);
+                if ("PENDING".equals(reviewStatus)) {
+                    holder.tvAccepted.setText("Đang chờ Admin xử lý");
+                    holder.tvAccepted.setTextColor(ContextCompat.getColor(ctx, R.color.accent_orange));
+                } else {
+                    holder.tvAccepted.setText("Đã xử lý (Xong)");
+                    holder.tvAccepted.setTextColor(ContextCompat.getColor(ctx, R.color.success));
+                }
+            } else {
+                holder.btnRate.setVisibility(View.VISIBLE);
+                holder.tvAccepted.setVisibility(View.GONE);
+            }
+        } else if (isOwner) {
+            holder.btnAccept.setVisibility(View.GONE);
+            holder.btnChatMatch.setVisibility(View.GONE);
+            holder.tvAccepted.setVisibility(View.GONE);
+            holder.btnRate.setVisibility(View.GONE);
+        } else if (isAcceptedByMe) {
+            holder.btnAccept.setVisibility(View.VISIBLE);
+            holder.btnAccept.setEnabled(false);
+            holder.btnAccept.setAlpha(0.5f);
+            holder.btnAccept.setText("Đã bắt kèo");
+            
+            holder.btnChatMatch.setVisibility(View.VISIBLE);
+            holder.tvAccepted.setVisibility(View.GONE);
+            holder.btnRate.setVisibility(View.GONE);
+        } else if (match.isAccepted()) {
+            // Match is accepted by SOMEONE ELSE on the server
             holder.btnAccept.setVisibility(View.GONE);
             holder.btnChatMatch.setVisibility(View.GONE);
             holder.tvAccepted.setVisibility(View.VISIBLE);
+            holder.btnRate.setVisibility(View.GONE);
         } else {
             holder.btnAccept.setVisibility(View.VISIBLE);
+            holder.btnAccept.setEnabled(true);
+            holder.btnAccept.setAlpha(1.0f);
+            holder.btnAccept.setText(R.string.match_action_accept);
+
             holder.btnChatMatch.setVisibility(View.VISIBLE);
             holder.tvAccepted.setVisibility(View.GONE);
+            holder.btnRate.setVisibility(View.GONE);
         }
 
         // Listeners
         holder.itemView.setOnClickListener(v -> listener.onCardClick(match));
         holder.btnAccept.setOnClickListener(v -> listener.onAccept(match, holder.getAdapterPosition()));
         holder.btnChatMatch.setOnClickListener(v -> listener.onChat(match));
+        holder.btnRate.setOnClickListener(v -> listener.onRate(match));
     }
 
     @Override
@@ -175,6 +247,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         final View layoutInfoGrid;
         final MaterialButton btnAccept;
         final MaterialButton btnChatMatch;
+        final MaterialButton btnRate;
         final TextView tvAccepted;
 
         ViewHolder(View view) {
@@ -196,6 +269,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
             layoutInfoGrid = view.findViewById(R.id.layoutInfoGrid);
             btnAccept = view.findViewById(R.id.btnAccept);
             btnChatMatch = view.findViewById(R.id.btnChatMatch);
+            btnRate = view.findViewById(R.id.btnRate);
             tvAccepted = view.findViewById(R.id.tvAccepted);
         }
     }

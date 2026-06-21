@@ -14,11 +14,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.timsanbong.R;
 import com.example.timsanbong.data.api.ApiClient;
-import com.example.timsanbong.data.model.ReviewResponse;
+import com.example.timsanbong.data.model.FieldReviewResponse;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -27,7 +30,7 @@ import retrofit2.Response;
 public class AdminReviewActivity extends AppCompatActivity {
 
     private AdminReviewAdapter adapter;
-    private final List<ReviewResponse> reviews = new ArrayList<>();
+    private final List<FieldReviewResponse> displayItems = new ArrayList<>();
     private TextView tvReviewCount;
 
     @Override
@@ -35,45 +38,49 @@ public class AdminReviewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_reviews);
 
-        tvReviewCount = findViewById(R.id.tvReviewCount);
-        RecyclerView rv = findViewById(R.id.rvAdminReviews);
-        rv.setLayoutManager(new LinearLayoutManager(this));
-        
-        adapter = new AdminReviewAdapter(reviews);
-        rv.setAdapter(adapter);
+        initViews();
+        fetchData();
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
-
-        fetchReviews();
 
         AdminNavBarManager navBarManager = new AdminNavBarManager(this, AdminNavBarManager.ITEM_AUDIT);
         navBarManager.setup();
     }
 
-    private void fetchReviews() {
-        ApiClient.getService(this).getAdminReviews().enqueue(new Callback<List<ReviewResponse>>() {
+    private void initViews() {
+        tvReviewCount = findViewById(R.id.tvReviewCount);
+        RecyclerView rv = findViewById(R.id.rvAdminReviews);
+        rv.setLayoutManager(new LinearLayoutManager(this));
+        
+        adapter = new AdminReviewAdapter(displayItems);
+        rv.setAdapter(adapter);
+    }
+
+    private void fetchData() {
+        ApiClient.getService(this).getAdminFieldReviews().enqueue(new Callback<>() {
             @Override
-            public void onResponse(@NonNull Call<List<ReviewResponse>> call, @NonNull Response<List<ReviewResponse>> response) {
+            public void onResponse(@NonNull Call<List<FieldReviewResponse>> call, @NonNull Response<List<FieldReviewResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    reviews.clear();
-                    reviews.addAll(response.body());
+                    displayItems.clear();
+                    displayItems.addAll(response.body());
                     adapter.notifyDataSetChanged();
-                    tvReviewCount.setText(String.format(Locale.getDefault(), "%d đánh giá", reviews.size()));
+                    tvReviewCount.setText(String.format(Locale.getDefault(), "%d đánh giá", displayItems.size()));
                 } else {
                     Toast.makeText(AdminReviewActivity.this, "Không thể tải danh sách đánh giá", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<List<ReviewResponse>> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<List<FieldReviewResponse>> call, @NonNull Throwable t) {
                 Toast.makeText(AdminReviewActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     static class AdminReviewAdapter extends RecyclerView.Adapter<AdminReviewAdapter.ViewHolder> {
-        private final List<ReviewResponse> reviews;
-        AdminReviewAdapter(List<ReviewResponse> reviews) { this.reviews = reviews; }
+        private final List<FieldReviewResponse> items;
+        
+        AdminReviewAdapter(List<FieldReviewResponse> items) { this.items = items; }
 
         @NonNull
         @Override
@@ -84,16 +91,44 @@ public class AdminReviewActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            ReviewResponse r = reviews.get(position);
+            FieldReviewResponse r = items.get(position);
             holder.tvReviewerName.setText(r.getReviewerName());
-            holder.tvRevieweeName.setText(String.format("Đánh giá: %s", r.getRevieweeName()));
-            holder.tvReviewReason.setText(r.getReason());
-            holder.tvReviewStatus.setText(r.getStatus());
-            holder.tvReviewDate.setText(r.getCreatedAt());
+            holder.tvRevieweeName.setText(String.format(Locale.getDefault(), "Sân ID: %d", r.getFieldId()));
+            
+            String comment = r.getComment();
+            if (comment != null && !comment.trim().isEmpty()) {
+                holder.tvReviewReason.setVisibility(View.VISIBLE);
+                holder.tvReviewReason.setText(comment);
+            } else {
+                holder.tvReviewReason.setVisibility(View.GONE);
+            }
+
+            holder.tvReviewStatus.setText(String.format(Locale.getDefault(), "%.1f ⭐", r.getRating() != null ? r.getRating().floatValue() : 0f));
+            holder.tvReviewDate.setText(formatDateTime(r.getCreatedAt()));
+        }
+
+        private String formatDateTime(String isoString) {
+            if (isoString == null || isoString.isEmpty()) return "";
+            try {
+                // Handle formats like 2026-06-21T10:06:27.916395
+                String cleanIso = isoString;
+                if (isoString.contains(".")) {
+                    int dotIndex = isoString.lastIndexOf(".");
+                    cleanIso = isoString.substring(0, dotIndex);
+                }
+                
+                SimpleDateFormat sdfInput = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+                Date date = sdfInput.parse(cleanIso);
+                
+                SimpleDateFormat sdfOutput = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+                return date != null ? sdfOutput.format(date) : isoString;
+            } catch (Exception e) {
+                return isoString;
+            }
         }
 
         @Override
-        public int getItemCount() { return reviews.size(); }
+        public int getItemCount() { return items.size(); }
 
         static class ViewHolder extends RecyclerView.ViewHolder {
             TextView tvReviewerName, tvRevieweeName, tvReviewReason, tvReviewStatus, tvReviewDate;

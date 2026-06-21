@@ -121,6 +121,14 @@
             android:exported="false"
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
         <activity
+            android:name=".ui.customer.MyMatchPostsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+        <activity
+            android:name=".ui.customer.MatchHistoryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimSanBong.NoActionBar" />
+        <activity
             android:name=".ui.customer.TeamManagementActivity"
             android:exported="false"
             android:theme="@style/Theme.TimSanBong.NoActionBar" />

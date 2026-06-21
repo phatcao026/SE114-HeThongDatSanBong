@@ -9,6 +9,8 @@ import java.util.List;
 public interface FairplayService {
     void submitReview(Long reviewerId, OpponentReviewCreateRequest request);
     List<OpponentReviewResponse> getPendingReviews();
+    List<OpponentReviewResponse> getProcessedReviews();
     void resolveReview(Long reviewId, FairplayDecisionRequest request);
     List<Long> getMySubmittedMatchIds(Long reviewerId);
+    List<OpponentReviewResponse> getMyReviews(Long reviewerId);
 }

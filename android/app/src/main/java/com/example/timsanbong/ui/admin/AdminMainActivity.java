@@ -13,9 +13,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.timsanbong.R;
 import com.example.timsanbong.data.api.ApiClient;
 import com.example.timsanbong.data.model.AdminDashboardOverviewResponse;
+import com.example.timsanbong.data.model.OpponentReviewResponse;
 import com.example.timsanbong.utils.PushNotificationManager;
 
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 
 import retrofit2.Call;
@@ -94,6 +96,21 @@ public class AdminMainActivity extends AppCompatActivity {
                 setupDefaultStats();
             }
         });
+
+        ApiClient.getService(this).getAdminFairplayPending().enqueue(new Callback<List<OpponentReviewResponse>>() {
+            @Override
+            public void onResponse(Call<List<OpponentReviewResponse>> call, Response<List<OpponentReviewResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    updateAuditCountUI(response.body().size());
+                }
+            }
+            @Override public void onFailure(Call<List<OpponentReviewResponse>> call, Throwable t) {}
+        });
+    }
+
+    private void updateAuditCountUI(int count) {
+        ((TextView) findViewById(R.id.tvAuditTitle)).setText(count + " báo cáo đang chờ");
+        setupHealthItem(findViewById(R.id.healthReviews), "Đánh giá cần duyệt", String.valueOf(count), "Alert");
     }
 
     private void updateUI(AdminDashboardOverviewResponse stats) {
@@ -138,7 +155,7 @@ public class AdminMainActivity extends AppCompatActivity {
         setupHealthItem(findViewById(R.id.healthConversations), "Cuộc trò chuyện", String.valueOf(stats.getTotalConversations()), "Realtime");
         setupHealthItem(findViewById(R.id.healthMessages), "Tin nhắn hệ thống", String.valueOf(stats.getTotalMessages()), "Live");
         setupHealthItem(findViewById(R.id.healthFields), "Sân đang hoạt động", stats.getAvailableFields() + "/" + stats.getTotalFields(), "Ok");
-        setupHealthItem(findViewById(R.id.healthReviews), "Đánh giá cần duyệt", String.valueOf(stats.getPendingReviews()), "Alert");
+        // healthReviews will be updated by getAdminFairplayPending call
     }
 
     private void setupHealthItem(View view, String label, String value, String trend) {

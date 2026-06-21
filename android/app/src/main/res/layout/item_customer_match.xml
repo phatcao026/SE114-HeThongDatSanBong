@@ -316,6 +316,18 @@
                 app:iconGravity="textStart"
                 app:cornerRadius="@dimen/radius_button" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRate"
+                style="@style/Widget.TimSanBong.Button.Flood"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height"
+                android:layout_weight="1"
+                android:text="Đánh giá"
+                app:icon="@drawable/ic_star"
+                app:iconGravity="textStart"
+                app:cornerRadius="@dimen/radius_button"
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/tvAccepted"
                 android:layout_width="match_parent"

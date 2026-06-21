@@ -12,8 +12,11 @@ import java.util.List;
 @Repository
 public interface OpponentReviewRepository extends JpaRepository<OpponentReview, Long> {
     List<OpponentReview> findByStatusOrderByCreatedAtDesc(Enums.FairplayStatus status);
+    List<OpponentReview> findByStatusInOrderByCreatedAtDesc(List<Enums.FairplayStatus> statuses);
     List<OpponentReview> findByRevieweeIdOrderByCreatedAtDesc(Long revieweeId);
+    List<OpponentReview> findByReviewerIdOrderByCreatedAtDesc(Long reviewerId);
     boolean existsByMatchIdAndReviewerId(Long matchId, Long reviewerId);
+    long countByStatus(Enums.FairplayStatus status);
 
     @Query("SELECT r.matchId FROM OpponentReview r WHERE r.reviewerId = :reviewerId")
     List<Long> findMatchIdsByReviewerId(@Param("reviewerId") Long reviewerId);

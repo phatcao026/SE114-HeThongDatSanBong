@@ -25,6 +25,20 @@ public class AdminFairplayController {
         return ResponseEntity.ok(fairplayService.getPendingReviews());
     }
 
+    @GetMapping("/processed")
+    public ResponseEntity<List<OpponentReviewResponse>> getProcessedReviews() {
+        return ResponseEntity.ok(fairplayService.getProcessedReviews());
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<OpponentReviewResponse>> getAllReviews(
+            @RequestParam(value = "status", required = false) String status) {
+        if ("PROCESSED".equalsIgnoreCase(status)) {
+            return ResponseEntity.ok(fairplayService.getProcessedReviews());
+        }
+        return ResponseEntity.ok(fairplayService.getPendingReviews());
+    }
+
     @PutMapping("/resolve/{id}")
     public ResponseEntity<Map<String, String>> resolveReview(
             @PathVariable("id") Long id,

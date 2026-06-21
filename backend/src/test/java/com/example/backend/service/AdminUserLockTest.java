@@ -38,6 +38,7 @@ public class AdminUserLockTest {
                 mock(com.example.backend.repository.MatchPostRepository.class),
                 mock(com.example.backend.repository.MatchRequestRepository.class),
                 mock(com.example.backend.repository.ReviewRepository.class),
+                mock(com.example.backend.repository.OpponentReviewRepository.class),
                 mock(com.example.backend.repository.ConversationRepository.class),
                 mock(com.example.backend.repository.MessageRepository.class)
         );

@@ -41,6 +41,7 @@ public class Conversation implements Serializable {
     private String timeAgo;
     private String subtitle;
     private boolean isOnline;
+    private String currentUserName;
 
     public Conversation() {}
 
@@ -85,17 +86,49 @@ public class Conversation implements Serializable {
     }
 
     public String getName() {
+        if (otherUser != null && otherUser.getFullName() != null && !otherUser.getFullName().isEmpty()) {
+            return otherUser.getFullName();
+        }
         if (localName != null) return localName;
-        if (apiName != null) return apiName;
-        if (otherUser != null) return otherUser.getName();
-        if (memberNames != null && !memberNames.isEmpty()) return memberNames.get(0);
-        return "Nguoi dung";
+        if (apiName != null && !apiName.trim().isEmpty()) return apiName;
+        
+        // For direct conversations without a set name, show the other member's name
+        if (memberNames != null && !memberNames.isEmpty()) {
+            if (currentUserName != null && !currentUserName.isEmpty()) {
+                for (String name : memberNames) {
+                    if (name != null && !name.equalsIgnoreCase(currentUserName)) {
+                        return name;
+                    }
+                }
+            }
+            // Fallback if currentUserName is not set or all members match currentUserName
+            return memberNames.get(memberNames.size() - 1); 
+        }
+        return "Người dùng";
+    }
+
+    public void setOtherUser(User otherUser) {
+        this.otherUser = otherUser;
+    }
+
+    public void setMemberNames(List<String> memberNames) {
+        this.memberNames = memberNames;
+    }
+
+    public void setCurrentUserName(String currentUserName) {
+        this.currentUserName = currentUserName;
     }
 
     public String getInitials() {
         if (initials != null) return initials;
         String displayName = getName();
-        return displayName.isEmpty() ? "U" : displayName.substring(0, 1).toUpperCase();
+        if (displayName == null || displayName.isEmpty() || displayName.equals("Người dùng")) return "U";
+        
+        String[] parts = displayName.trim().split("\\s+");
+        if (parts.length > 1) {
+            return (parts[0].substring(0, 1) + parts[parts.length - 1].substring(0, 1)).toUpperCase();
+        }
+        return displayName.substring(0, Math.min(displayName.length(), 2)).toUpperCase();
     }
 
     public String getTimeAgo() {

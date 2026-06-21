@@ -21,6 +21,15 @@ public class MatchPost implements Serializable {
     @SerializedName("trustScore")
     private Integer trustScore;
 
+    @SerializedName("matchesPlayed")
+    private Integer matchesPlayed;
+
+    @SerializedName("noShows")
+    private Integer noShows;
+
+    @SerializedName("averageRating")
+    private Double averageRating;
+
     @SerializedName("teamId")
     private long teamId;
 
@@ -132,6 +141,7 @@ public class MatchPost implements Serializable {
     public String getPlayTime() { return getTime(); }
     public String getLocation() { return fieldName; }
     public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
     public Boolean getHasField() { return hasField; }
     public Integer getNeededMembers() { return neededMembers; }
     public Integer getJoinedMembers() { return joinedMembers; }
@@ -145,6 +155,10 @@ public class MatchPost implements Serializable {
     public int getTrustScore() { return trustScore != null ? trustScore : 100; }
     public void setTrustScore(int trustScore) { this.trustScore = trustScore; }
 
+    public int getMatchesPlayed() { return matchesPlayed != null ? matchesPlayed : 0; }
+    public int getNoShows() { return noShows != null ? noShows : 0; }
+    public double getAverageRating() { return averageRating != null ? averageRating : 5.0; }
+
     public String getIdString() { return String.valueOf(id); }
     public String getType() { return postType != null ? postType : TYPE_FIND_OPPONENT; }
     public String getTypeLabel() {
@@ -152,8 +166,8 @@ public class MatchPost implements Serializable {
         return "Tìm đối thủ";
     }
     public String getTeam() {
-        if (teamName != null && !teamName.trim().isEmpty()) return teamName;
-        if (team != null && !team.trim().isEmpty()) return team;
+        if (teamName != null && !teamName.trim().isEmpty() && !teamName.startsWith("Đội của ")) return teamName;
+        if (userName != null && !userName.trim().isEmpty()) return "Đội của " + userName;
         return "Đội bóng";
     }
     public String getCaptain() { return userName != null ? userName : "Đội trưởng"; }

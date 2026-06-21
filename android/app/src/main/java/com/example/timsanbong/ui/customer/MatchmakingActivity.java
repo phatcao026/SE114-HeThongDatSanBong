@@ -12,9 +12,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.timsanbong.R;
+import com.example.timsanbong.data.model.ChatMessage;
 import com.example.timsanbong.data.model.Conversation;
 import com.example.timsanbong.data.model.MatchPost;
+import com.example.timsanbong.data.model.MessageRequest;
 import com.example.timsanbong.data.repository.ChatRepository;
+import com.example.timsanbong.data.repository.MatchRepository;
 import com.example.timsanbong.utils.Constants;
 import com.example.timsanbong.utils.NavBarManager;
 import com.example.timsanbong.utils.RepositoryCallback;
@@ -33,8 +36,10 @@ public class MatchmakingActivity extends AppCompatActivity {
 
     private MatchAdapter matchAdapter;
     private List<MatchPost> allMatches = new ArrayList<>();
+    private java.util.Set<Long> localAcceptedIds = new java.util.HashSet<>();
     private int currentTab = 0;
     private MatchViewModel matchViewModel;
+    private final MatchRepository matchRepository = new MatchRepository();
     private final ChatRepository chatRepository = new ChatRepository();
     private MatchPost pendingAcceptedMatch;
 
@@ -45,6 +50,15 @@ public class MatchmakingActivity extends AppCompatActivity {
         initViews();
         setupListeners();
         loadData();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (matchViewModel != null) {
+            localAcceptedIds = matchRepository.getAcceptedMatchIds(this);
+            matchViewModel.loadMatchPosts(0, 50, null);
+        }
     }
 
     private void initViews() {
@@ -69,8 +83,19 @@ public class MatchmakingActivity extends AppCompatActivity {
         matchAdapter = new MatchAdapter(new ArrayList<>(), new MatchAdapter.OnMatchActionListener() {
             @Override
             public void onAccept(MatchPost match, int position) {
-                pendingAcceptedMatch = match;
-                matchViewModel.createMatchRequest(match.getId(), "");
+                new com.google.android.material.dialog.MaterialAlertDialogBuilder(MatchmakingActivity.this)
+                        .setTitle("Xác nhận bắt kèo")
+                        .setMessage("Bạn có muốn chuyển đến trang nhắn tin với chủ kèo không?")
+                        .setPositiveButton("Có", (dialog, which) -> {
+                            pendingAcceptedMatch = match;
+                            matchViewModel.createMatchRequest(match.getId(), "");
+                            openDirectConversation(match);
+                        })
+                        .setNegativeButton("Không", (dialog, which) -> {
+                            pendingAcceptedMatch = match;
+                            matchViewModel.createMatchRequest(match.getId(), "");
+                        })
+                        .show();
             }
 
             @Override
@@ -103,7 +128,7 @@ public class MatchmakingActivity extends AppCompatActivity {
         tabSuggested.setOnClickListener(tabClick);
 
         findViewById(R.id.ivNotifications).setOnClickListener(v ->
-                startActivity(new Intent(this, NotificationsActivity.class)));
+                startActivity(new Intent(this, MessagesActivity.class)));
     }
 
     private void loadData() {
@@ -112,6 +137,7 @@ public class MatchmakingActivity extends AppCompatActivity {
         matchViewModel.matchPostsState.observe(this, resource -> {
             if (resource == null) return;
             if (resource.status == com.example.timsanbong.utils.Resource.Status.SUCCESS && resource.data != null) {
+                localAcceptedIds = matchRepository.getAcceptedMatchIds(this);
                 allMatches = resource.data;
                 selectTab(currentTab);
             } else if (resource.status == com.example.timsanbong.utils.Resource.Status.ERROR) {
@@ -125,6 +151,8 @@ public class MatchmakingActivity extends AppCompatActivity {
             if (resource.status == com.example.timsanbong.utils.Resource.Status.SUCCESS) {
                 if (pendingAcceptedMatch != null) {
                     pendingAcceptedMatch.setAccepted(true);
+                    matchRepository.saveAcceptedMatchId(this, pendingAcceptedMatch.getId());
+                    localAcceptedIds.add(pendingAcceptedMatch.getId());
                     pendingAcceptedMatch = null;
                 }
                 matchAdapter.updateMatches(getFilteredList(currentTab));
@@ -135,6 +163,7 @@ public class MatchmakingActivity extends AppCompatActivity {
             }
         });
 
+        localAcceptedIds = matchRepository.getAcceptedMatchIds(this);
         matchViewModel.loadMatchPosts(0, 50, null);
     }
 
@@ -156,7 +185,14 @@ public class MatchmakingActivity extends AppCompatActivity {
 
     private List<MatchPost> getFilteredList(int tab) {
         List<MatchPost> result = new ArrayList<>();
+        long currentUserId = new com.example.timsanbong.utils.SessionManager(this).getUserId();
         for (MatchPost match : allMatches) {
+            // Hide matches accepted by ME from the general boards
+            boolean acceptedByMe = (match.isAccepted() || localAcceptedIds.contains(match.getId())) 
+                    && match.getUserId() != currentUserId;
+
+            if (acceptedByMe) continue;
+
             if (tab == 0) result.add(match);
             else if (tab == 1 && MatchPost.TYPE_FIND_OPPONENT.equals(match.getType())) result.add(match);
             else if (tab == 2 && MatchPost.TYPE_FIND_MEMBER.equals(match.getType())) result.add(match);
@@ -171,12 +207,38 @@ public class MatchmakingActivity extends AppCompatActivity {
             return;
         }
 
-        chatRepository.createDirectConversation(this, match.getUserId(), new RepositoryCallback<Conversation>() {
+        String autoMessage = String.format("Tôi muốn bắt kèo của bạn: %s - %s - %s",
+                match.getTeam(), match.getDate(), match.getTime());
+
+        chatRepository.getConversations(this, new RepositoryCallback<List<Conversation>>() {
+            @Override
+            public void onSuccess(List<Conversation> data) {
+                Conversation existing = null;
+                for (Conversation c : data) {
+                    if (c.getOtherUser() != null && c.getOtherUser().getId() == match.getUserId()) {
+                        existing = c;
+                        break;
+                    }
+                }
+                if (existing != null) {
+                    navigateToChat(existing, autoMessage);
+                } else {
+                    createNewConversation(match.getUserId(), autoMessage);
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                createNewConversation(match.getUserId(), autoMessage);
+            }
+        });
+    }
+
+    private void createNewConversation(long userId, String autoMessage) {
+        chatRepository.createDirectConversation(this, userId, new RepositoryCallback<Conversation>() {
             @Override
             public void onSuccess(Conversation data) {
-                Intent intent = new Intent(MatchmakingActivity.this, ChatActivity.class);
-                intent.putExtra(Constants.EXTRA_CONVERSATION, data);
-                startActivity(intent);
+                navigateToChat(data, autoMessage);
             }
 
             @Override
@@ -184,5 +246,37 @@ public class MatchmakingActivity extends AppCompatActivity {
                 Toast.makeText(MatchmakingActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void navigateToChat(Conversation conversation, String autoMessage) {
+        long conversationId;
+        try {
+            conversationId = Long.parseLong(conversation.getId());
+        } catch (NumberFormatException e) {
+            conversationId = 0;
+        }
+
+        if (conversationId > 0) {
+            MessageRequest request = new MessageRequest(conversationId, autoMessage);
+            chatRepository.sendMessage(this, request, new RepositoryCallback<ChatMessage>() {
+                @Override
+                public void onSuccess(ChatMessage data) {
+                    startChatActivity(conversation);
+                }
+
+                @Override
+                public void onError(String message) {
+                    startChatActivity(conversation);
+                }
+            });
+        } else {
+            startChatActivity(conversation);
+        }
+    }
+
+    private void startChatActivity(Conversation conversation) {
+        Intent intent = new Intent(MatchmakingActivity.this, ChatActivity.class);
+        intent.putExtra(Constants.EXTRA_CONVERSATION, conversation);
+        startActivity(intent);
     }
 }

@@ -96,12 +96,12 @@
                 android:layout_marginEnd="@dimen/spacing_2" />
 
             <TextView
-                android:id="@+id/tabFindOpponent"
+                android:id="@+id/tabMyPosts"
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
                 android:gravity="center"
                 android:paddingHorizontal="@dimen/spacing_4"
-                android:text="@string/tab_find_opponent"
+                android:text="@string/tab_my_posts"
                 android:textSize="13sp"
                 android:fontFamily="@font/be_vietnam_pro"
                 android:background="@drawable/bg_chip_filter"
@@ -109,12 +109,12 @@
                 android:layout_marginEnd="@dimen/spacing_2" />
 
             <TextView
-                android:id="@+id/tabFindMember"
+                android:id="@+id/tabHistory"
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
                 android:gravity="center"
                 android:paddingHorizontal="@dimen/spacing_4"
-                android:text="@string/tab_find_member"
+                android:text="@string/tab_history"
                 android:textSize="13sp"
                 android:fontFamily="@font/be_vietnam_pro"
                 android:background="@drawable/bg_chip_filter"
@@ -122,6 +122,57 @@
                 android:layout_marginEnd="@dimen/spacing_2" />
         </LinearLayout>
     </HorizontalScrollView>
+
+    <!-- Sub-filters for Bảng chung -->
+    <LinearLayout
+        android:id="@+id/layoutSubFilters"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/spacing_4"
+        android:layout_marginTop="@dimen/spacing_3"
+        app:layout_constraintTop_toBottomOf="@id/layoutSegment"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/tabSubAll"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/spacing_3"
+            android:text="@string/tab_all"
+            android:textSize="12sp"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:background="@drawable/bg_chip_filter_selected"
+            android:textColor="@color/text_on_primary"
+            android:layout_marginEnd="@dimen/spacing_2" />
+
+        <TextView
+            android:id="@+id/tabFindOpponent"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/spacing_3"
+            android:text="@string/tab_find_opponent"
+            android:textSize="12sp"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:background="@drawable/bg_chip_filter"
+            android:textColor="@color/text_secondary"
+            android:layout_marginEnd="@dimen/spacing_2" />
+
+        <TextView
+            android:id="@+id/tabFindMember"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/spacing_3"
+            android:text="@string/tab_find_member"
+            android:textSize="12sp"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:background="@drawable/bg_chip_filter"
+            android:textColor="@color/text_secondary" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/layoutSummary"
@@ -131,7 +182,7 @@
         android:layout_marginHorizontal="@dimen/spacing_4"
         android:layout_marginTop="@dimen/spacing_4"
         android:gravity="center_vertical"
-        app:layout_constraintTop_toBottomOf="@id/layoutSegment"
+        app:layout_constraintTop_toBottomOf="@id/layoutSubFilters"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 

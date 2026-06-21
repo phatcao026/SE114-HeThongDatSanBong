@@ -75,6 +75,7 @@ public class MatchPostServiceImpl implements MatchPostService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MatchPostResponse> getMatchPosts(Enums.PostStatus status,
                                                  Enums.PostType postType,
                                                  Enums.TeamLevel skillLevel,
@@ -87,6 +88,7 @@ public class MatchPostServiceImpl implements MatchPostService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MatchPostResponse> getMyMatchPosts() {
         Long currentUserId = TokenUtils.getCurrentUserId();
         userRepository.findById(currentUserId)
@@ -96,6 +98,7 @@ public class MatchPostServiceImpl implements MatchPostService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public MatchPostResponse getMatchPostById(Long id) {
         return toResponse(findPost(id));
     }
@@ -148,6 +151,12 @@ public class MatchPostServiceImpl implements MatchPostService {
         }
         post.setJoinedMembers(0);
         post.setAgeRange(cleanOptional(request.getAgeRange()));
+        post.setTeamName(cleanOptional(request.getTeamName()));
+
+        // Essential match info for BOTH now (date, timeStart)
+        post.setDate(request.getDate());
+        post.setTimeStart(request.getTimeStart());
+        post.setTimeEnd(request.getTimeEnd());
 
         applyBookingOrManualSchedule(
                 post,
@@ -227,6 +236,10 @@ public class MatchPostServiceImpl implements MatchPostService {
 
         if (request.getAgeRange() != null) {
             post.setAgeRange(cleanOptional(request.getAgeRange()));
+        }
+
+        if (request.getTeamName() != null) {
+            post.setTeamName(cleanOptional(request.getTeamName()));
         }
 
         if (request.getSkillLevel() != null) {
@@ -470,6 +483,39 @@ public class MatchPostServiceImpl implements MatchPostService {
         response.setHasField(post.getHasField());
         response.setTargetPositions(post.getTargetPositions());
         response.setAgeRange(post.getAgeRange());
+        
+        // Final logic for team name
+        if (post.getTeamName() != null && !post.getTeamName().trim().isEmpty()) {
+            response.setTeamName(post.getTeamName());
+        } else if (users.containsKey(post.getUserId())) {
+            response.setTeamName("Đội của " + users.get(post.getUserId()).getFullName());
+        } else {
+            response.setTeamName("Đội bóng");
+        }
+        
+        if (post.getUser() != null) {
+            User u = post.getUser();
+            response.setTrustScore(u.getTrustScore() != null ? u.getTrustScore() : 100);
+            
+            // Re-calculate stats for response
+            int matches = u.getBookings() != null ? (int) u.getBookings().stream()
+                    .filter(b -> b.getStatus() == com.example.backend.utils.Enums.BookingStatus.COMPLETED)
+                    .count() : 0;
+            int noShows = u.getBookings() != null ? (int) u.getBookings().stream()
+                    .filter(b -> b.getStatus() == com.example.backend.utils.Enums.BookingStatus.CANCELLED)
+                    .count() : 0;
+            
+            response.setMatchesPlayed(matches);
+            response.setNoShows(noShows);
+            double calculatedRating = response.getTrustScore() / 20.0;
+            response.setAverageRating(Math.round(calculatedRating * 10.0) / 10.0);
+        } else {
+            response.setTrustScore(100);
+            response.setMatchesPlayed(0);
+            response.setNoShows(0);
+            response.setAverageRating(5.0);
+        }
+
         return response;
     }
 
@@ -523,15 +569,35 @@ public class MatchPostServiceImpl implements MatchPostService {
 
         Enums.PostType activePostType = postType != null ? postType : Enums.PostType.FIND_OPPONENT;
 
-        Pageable top20 = PageRequest.of(0, 20);
-        Page<MatchPost> rawMatchesPage = matchPostRepository.findPotentialMatches(currentUserId, activePostType, top20);
-        if (rawMatchesPage.isEmpty()) {
-            return List.of();
+            // Use a large page size to fetch more potential matches for AI to filter
+            Pageable top50 = PageRequest.of(0, 50);
+            Page<MatchPost> rawMatchesPage = matchPostRepository.findPotentialMatches(
+                    currentUserId,
+                    activePostType,
+                    date,
+                    skillLevel,
+                    hasField,
+                    top50
+            );
+
+            // LOG the parameters and result size for debugging
+            System.out.println("DEBUG: findPotentialMatches - userId: " + currentUserId + 
+                    ", type: " + activePostType + ", date: " + date + ", level: " + skillLevel + 
+                    ", hasField: " + hasField + " -> Found: " + rawMatchesPage.getTotalElements());
+
+            if (rawMatchesPage.isEmpty()) {
+            // If strict filtering found nothing, try a broader search (date only) if date was provided
+            if (date != null && (skillLevel != null || hasField != null)) {
+                rawMatchesPage = matchPostRepository.findPotentialMatches(
+                        currentUserId, activePostType, date, null, null, top50);
+            }
+            
+            if (rawMatchesPage.isEmpty()) return List.of();
         }
 
-        List<MatchPost> top20Matches = rawMatchesPage.getContent();
+        List<MatchPost> potentialMatches = rawMatchesPage.getContent();
 
-        List<AiOpponentDto> aiInputData = top20Matches.stream()
+        List<AiOpponentDto> aiInputData = potentialMatches.stream()
                 .map(m -> {
                     int opponentTrust = m.getUser() != null && m.getUser().getTrustScore() != null
                             ? m.getUser().getTrustScore()
@@ -566,8 +632,22 @@ public class MatchPostServiceImpl implements MatchPostService {
                 aiInputData
         );
 
+        // If AI returned no matches but database has potential matches, return database matches directly
+        if (aiResults.isEmpty() && !potentialMatches.isEmpty()) {
+            return potentialMatches.stream()
+                    .limit(5)
+                    .map(m -> {
+                        RecommendedMatchResponse res = new RecommendedMatchResponse();
+                        res.setMatchId(m.getId());
+                        res.setOpponentNote(m.getMessage());
+                        res.setAiExplanation("Dựa trên kết quả tìm kiếm từ database.");
+                        res.setMatchPost(toResponse(m));
+                        return res;
+                    }).toList();
+        }
+
         return aiResults.stream().map(aiRes -> {
-            MatchPost fullMatchInfo = top20Matches.stream()
+            MatchPost fullMatchInfo = potentialMatches.stream()
                     .filter(m -> m.getId().equals(aiRes.getMatchId()))
                     .findFirst()
                     .orElse(null);

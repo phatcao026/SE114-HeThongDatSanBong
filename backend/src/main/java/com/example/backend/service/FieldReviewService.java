@@ -8,4 +8,5 @@ import java.util.List;
 public interface FieldReviewService {
     FieldReviewResponse createReview(FieldReviewCreateRequest request);
     List<FieldReviewResponse> getReviewsForField(Long fieldId);
+    List<FieldReviewResponse> getAllFieldReviews();
 }

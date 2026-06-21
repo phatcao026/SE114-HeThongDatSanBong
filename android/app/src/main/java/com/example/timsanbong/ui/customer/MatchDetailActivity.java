@@ -12,14 +12,20 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.timsanbong.R;
+import com.example.timsanbong.data.model.ChatMessage;
 import com.example.timsanbong.data.model.Conversation;
 import com.example.timsanbong.data.model.MatchPost;
+import com.example.timsanbong.data.model.MessageRequest;
 import com.example.timsanbong.data.repository.ChatRepository;
+import com.example.timsanbong.data.repository.MatchRepository;
 import com.example.timsanbong.utils.Constants;
 import com.example.timsanbong.utils.RepositoryCallback;
 import com.example.timsanbong.utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class MatchDetailActivity extends AppCompatActivity {
@@ -47,6 +53,7 @@ public class MatchDetailActivity extends AppCompatActivity {
 
     private MatchPost match;
     private MatchViewModel matchViewModel;
+    private final MatchRepository matchRepository = new MatchRepository();
     private final ChatRepository chatRepository = new ChatRepository();
     private SessionManager sessionManager;
 
@@ -95,7 +102,17 @@ public class MatchDetailActivity extends AppCompatActivity {
     private void setupListeners() {
         btnDetailAccept.setOnClickListener(v -> {
             if (match != null && !match.isAccepted()) {
-                matchViewModel.createMatchRequest(match.getId(), "");
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle("Xác nhận bắt kèo")
+                        .setMessage("Bạn có muốn chuyển đến trang nhắn tin với chủ kèo không?")
+                        .setPositiveButton("Có", (dialog, which) -> {
+                            matchViewModel.createMatchRequest(match.getId(), "");
+                            openDirectConversation();
+                        })
+                        .setNegativeButton("Không", (dialog, which) -> {
+                            matchViewModel.createMatchRequest(match.getId(), "");
+                        })
+                        .show();
             }
         });
 
@@ -111,6 +128,7 @@ public class MatchDetailActivity extends AppCompatActivity {
             if (resource == null) return;
             if (resource.status == com.example.timsanbong.utils.Resource.Status.SUCCESS) {
                 match.setAccepted(true);
+                matchRepository.saveAcceptedMatchId(this, match.getId());
                 btnDetailAccept.setText(getString(R.string.match_cta_accepted));
                 btnDetailAccept.setEnabled(false);
                 Toast.makeText(this, "Đã gửi yêu cầu bắt kèo.", Toast.LENGTH_SHORT).show();
@@ -149,7 +167,11 @@ public class MatchDetailActivity extends AppCompatActivity {
         trustBg.setColor(ContextCompat.getColor(this, trustColor));
         tvDetailTrust.setText(String.valueOf(trust));
 
-        tvDetailTeam.setText(match.getTeam());
+        String teamDisplay = match.getTeamName();
+        if (teamDisplay == null || teamDisplay.trim().isEmpty()) {
+            teamDisplay = match.getTeam();
+        }
+        tvDetailTeam.setText(teamDisplay);
         
         String captainName = match.getCaptain();
         tvDetailCaptain.setText(getString(R.string.match_captain_role_format, captainName, getString(R.string.default_role)));
@@ -184,9 +206,9 @@ public class MatchDetailActivity extends AppCompatActivity {
         tvDetailCost.setText(match.getCost());
         tvDetailMessage.setText(match.getMessage());
 
-        tvTrustMatches.setText(String.valueOf(trust * 2));
-        tvTrustNoBail.setText(trust >= 80 ? "0" : "1");
-        tvTrustRating.setText(String.format(Locale.getDefault(), "%.1f", trust / 20.0));
+        tvTrustMatches.setText(String.valueOf(match.getMatchesPlayed()));
+        tvTrustNoBail.setText(String.valueOf(match.getNoShows()));
+        tvTrustRating.setText(String.format(Locale.getDefault(), "%.1f", match.getAverageRating()));
 
         if (match.isAccepted()) {
             btnDetailAccept.setText(getString(R.string.match_cta_accepted));
@@ -211,12 +233,38 @@ public class MatchDetailActivity extends AppCompatActivity {
             return;
         }
 
+        String autoMessage = String.format("Tôi muốn bắt kèo của bạn: %s - %s - %s",
+                match.getTeam(), match.getDate(), match.getTime());
+
+        chatRepository.getConversations(this, new RepositoryCallback<List<Conversation>>() {
+            @Override
+            public void onSuccess(List<Conversation> data) {
+                Conversation existing = null;
+                for (Conversation c : data) {
+                    if (c.getOtherUser() != null && c.getOtherUser().getId() == match.getUserId()) {
+                        existing = c;
+                        break;
+                    }
+                }
+                if (existing != null) {
+                    navigateToChat(existing, autoMessage);
+                } else {
+                    createNewConversation(autoMessage);
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                createNewConversation(autoMessage);
+            }
+        });
+    }
+
+    private void createNewConversation(String autoMessage) {
         chatRepository.createDirectConversation(this, match.getUserId(), new RepositoryCallback<Conversation>() {
             @Override
             public void onSuccess(Conversation data) {
-                Intent intent = new Intent(MatchDetailActivity.this, ChatActivity.class);
-                intent.putExtra(Constants.EXTRA_CONVERSATION, data);
-                startActivity(intent);
+                navigateToChat(data, autoMessage);
             }
 
             @Override
@@ -224,5 +272,37 @@ public class MatchDetailActivity extends AppCompatActivity {
                 Toast.makeText(MatchDetailActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void navigateToChat(Conversation conversation, String autoMessage) {
+        long conversationId;
+        try {
+            conversationId = Long.parseLong(conversation.getId());
+        } catch (NumberFormatException e) {
+            conversationId = 0;
+        }
+
+        if (conversationId > 0) {
+            MessageRequest request = new MessageRequest(conversationId, autoMessage);
+            chatRepository.sendMessage(this, request, new RepositoryCallback<ChatMessage>() {
+                @Override
+                public void onSuccess(ChatMessage data) {
+                    startChatActivity(conversation);
+                }
+
+                @Override
+                public void onError(String message) {
+                    startChatActivity(conversation);
+                }
+            });
+        } else {
+            startChatActivity(conversation);
+        }
+    }
+
+    private void startChatActivity(Conversation conversation) {
+        Intent intent = new Intent(MatchDetailActivity.this, ChatActivity.class);
+        intent.putExtra(Constants.EXTRA_CONVERSATION, conversation);
+        startActivity(intent);
     }
 }

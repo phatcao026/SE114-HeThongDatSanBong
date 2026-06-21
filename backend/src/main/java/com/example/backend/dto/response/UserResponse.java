@@ -10,6 +10,9 @@ public class UserResponse {
     private String role;
     private Integer trustScore;
     private Boolean isLocked;
+    private Integer matchesPlayed;
+    private Integer noShows;
+    private Double averageRating;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -59,6 +62,30 @@ public class UserResponse {
 
     public void setTrustScore(Integer trustScore) {
         this.trustScore = trustScore;
+    }
+
+    public Integer getMatchesPlayed() {
+        return matchesPlayed;
+    }
+
+    public void setMatchesPlayed(Integer matchesPlayed) {
+        this.matchesPlayed = matchesPlayed;
+    }
+
+    public Integer getNoShows() {
+        return noShows;
+    }
+
+    public void setNoShows(Integer noShows) {
+        this.noShows = noShows;
+    }
+
+    public Double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
     }
 
     public Boolean getIsLocked() {

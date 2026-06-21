@@ -49,5 +49,17 @@ public class ChatMessage {
     }
 
     public String getText() { return content; }
-    public String getTime() { return createdAt != null ? createdAt : ""; }
+    public String getTime() {
+        if (createdAt == null || createdAt.isEmpty()) return "";
+        try {
+            // ISO format: 2023-10-27T10:15:30
+            if (createdAt.contains("T")) {
+                String timePart = createdAt.split("T")[1];
+                return timePart.substring(0, 5); // HH:mm
+            }
+            return createdAt;
+        } catch (Exception e) {
+            return createdAt;
+        }
+    }
 }

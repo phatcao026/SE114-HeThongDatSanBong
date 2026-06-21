@@ -1,6 +1,6 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.request.OpponentReviewCreateRequest;
+import com.example.backend.dto.response.OpponentReviewResponse;
 import com.example.backend.service.FairplayService;
 import com.example.backend.utils.TokenUtils;
 import jakarta.validation.Valid;
@@ -21,7 +21,7 @@ public class FairplayController {
     }
 
     @PostMapping("/reviews")
-    public ResponseEntity<Map<String, String>> submitReview(@Valid @RequestBody OpponentReviewCreateRequest request) {
+    public ResponseEntity<Map<String, String>> submitReview(@Valid @RequestBody com.example.backend.dto.request.OpponentReviewCreateRequest request) {
         Long reviewerId = TokenUtils.getCurrentUserId();
         fairplayService.submitReview(reviewerId, request);
         return ResponseEntity.ok(Map.of("message", "Đã gửi đánh giá lên Tòa án Fairplay chờ xử lý!"));
@@ -31,5 +31,11 @@ public class FairplayController {
     public ResponseEntity<List<Long>> getMySubmittedReviews() {
         Long reviewerId = TokenUtils.getCurrentUserId();
         return ResponseEntity.ok(fairplayService.getMySubmittedMatchIds(reviewerId));
+    }
+
+    @GetMapping("/my-reviews")
+    public ResponseEntity<List<OpponentReviewResponse>> getMyReviews() {
+        Long reviewerId = TokenUtils.getCurrentUserId();
+        return ResponseEntity.ok(fairplayService.getMyReviews(reviewerId));
     }
 }

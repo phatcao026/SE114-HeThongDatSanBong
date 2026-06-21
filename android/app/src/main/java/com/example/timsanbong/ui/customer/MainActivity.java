@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupListeners() {
         btnNotifications.setOnClickListener(v ->
-                startActivity(new Intent(this, NotificationsActivity.class)));
+                startActivity(new Intent(this, MessagesActivity.class)));
         tvAvatar.setOnClickListener(v ->
                 startActivity(new Intent(this, ProfileActivity.class)));
         btnSearchNearby.setOnClickListener(v -> openFindPitch());
