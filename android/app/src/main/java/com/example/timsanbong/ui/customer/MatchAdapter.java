@@ -177,8 +177,8 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
             if (reviewStatus != null) {
                 holder.btnRate.setVisibility(View.GONE);
                 holder.tvAccepted.setVisibility(View.VISIBLE);
-                if ("PENDING".equals(reviewStatus)) {
-                    holder.tvAccepted.setText("Đang chờ Admin xử lý");
+                if ("PENDING".equals(reviewStatus) || "SUBMITTED".equals(reviewStatus)) {
+                    holder.tvAccepted.setText("Đã gửi đánh giá");
                     holder.tvAccepted.setTextColor(ContextCompat.getColor(ctx, R.color.accent_orange));
                 } else {
                     holder.tvAccepted.setText("Đã xử lý (Xong)");
@@ -223,7 +223,11 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         holder.itemView.setOnClickListener(v -> listener.onCardClick(match));
         holder.btnAccept.setOnClickListener(v -> listener.onAccept(match, holder.getAdapterPosition()));
         holder.btnChatMatch.setOnClickListener(v -> listener.onChat(match));
-        holder.btnRate.setOnClickListener(v -> listener.onRate(match));
+        holder.btnRate.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onRate(match);
+            }
+        });
     }
 
     @Override

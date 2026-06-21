@@ -83,15 +83,10 @@ public class QuickFindResultsActivity extends AppCompatActivity {
 
         matchViewModel = new ViewModelProvider(this).get(MatchViewModel.class);
         
-        // We need to add this LiveData to MatchViewModel if it doesn't exist
-        // For now, let's assume it exists or we will add it.
-        // Actually, let's check MatchViewModel again.
-        
         loadRecommendations();
     }
 
     private void loadRecommendations() {
-        String playstyle = getIntent().getStringExtra("playstyle");
         String teamName = getIntent().getStringExtra("teamName");
         String date = getIntent().getStringExtra("date");
         String timeStart = getIntent().getStringExtra("time");
@@ -105,7 +100,6 @@ public class QuickFindResultsActivity extends AppCompatActivity {
         }
         
         // Clean up empty strings to null so they aren't used in search
-        if (playstyle != null && playstyle.trim().isEmpty()) playstyle = null;
         if (teamName != null && teamName.trim().isEmpty()) teamName = null;
         if (date != null && date.trim().isEmpty()) date = null;
         if (postType != null && postType.trim().isEmpty()) postType = null;
@@ -117,7 +111,7 @@ public class QuickFindResultsActivity extends AppCompatActivity {
         java.util.Set<Long> acceptedIds = new com.example.timsanbong.data.repository.MatchRepository().getAcceptedMatchIds(this);
 
         new com.example.timsanbong.data.repository.MatchRepository().getSmartRecommendations(
-                this, playstyle, teamName, date, timeStart, timeEnd, skillLevel, hasField, postType, ageRange,
+                this, teamName, date, timeStart, timeEnd, skillLevel, hasField, postType, ageRange,
                 new RepositoryCallback<List<RecommendedMatch>>() {
                     @Override
                     public void onSuccess(List<RecommendedMatch> data) {

@@ -144,11 +144,11 @@ public class MatchRepository {
         });
     }
 
-    public void getSmartRecommendations(Context context, String playstyleNote, String teamName, String date,
+    public void getSmartRecommendations(Context context, String teamName, String date,
                                         String timeStart, String timeEnd, String skillLevel,
                                         Boolean hasField, String postType, String position,
                                         RepositoryCallback<List<RecommendedMatch>> callback) {
-        ApiClient.getService(context).getSmartRecommendations(playstyleNote, teamName, date, timeStart, timeEnd,
+        ApiClient.getService(context).getSmartRecommendations(teamName, date, timeStart, timeEnd,
                 skillLevel, hasField, postType, position).enqueue(new Callback<List<RecommendedMatch>>() {
             @Override
             public void onResponse(Call<List<RecommendedMatch>> call, Response<List<RecommendedMatch>> response) {
