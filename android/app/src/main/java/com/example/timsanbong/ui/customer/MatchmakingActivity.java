@@ -138,6 +138,7 @@ public class MatchmakingActivity extends AppCompatActivity {
             if (resource == null) return;
             if (resource.status == com.example.timsanbong.utils.Resource.Status.SUCCESS && resource.data != null) {
                 localAcceptedIds = matchRepository.getAcceptedMatchIds(this);
+                matchAdapter.setLocalAcceptedIds(localAcceptedIds);
                 allMatches = resource.data;
                 selectTab(currentTab);
             } else if (resource.status == com.example.timsanbong.utils.Resource.Status.ERROR) {
@@ -153,6 +154,7 @@ public class MatchmakingActivity extends AppCompatActivity {
                     pendingAcceptedMatch.setAccepted(true);
                     matchRepository.saveAcceptedMatchId(this, pendingAcceptedMatch.getId());
                     localAcceptedIds.add(pendingAcceptedMatch.getId());
+                    matchAdapter.setLocalAcceptedIds(localAcceptedIds);
                     pendingAcceptedMatch = null;
                 }
                 matchAdapter.updateMatches(getFilteredList(currentTab));
@@ -164,6 +166,7 @@ public class MatchmakingActivity extends AppCompatActivity {
         });
 
         localAcceptedIds = matchRepository.getAcceptedMatchIds(this);
+        matchAdapter.setLocalAcceptedIds(localAcceptedIds);
         matchViewModel.loadMatchPosts(0, 50, null);
     }
 
@@ -187,16 +190,25 @@ public class MatchmakingActivity extends AppCompatActivity {
         List<MatchPost> result = new ArrayList<>();
         long currentUserId = new com.example.timsanbong.utils.SessionManager(this).getUserId();
         for (MatchPost match : allMatches) {
-            // Hide matches accepted by ME from the general boards
             boolean acceptedByMe = (match.isAccepted() || localAcceptedIds.contains(match.getId())) 
                     && match.getUserId() != currentUserId;
 
-            if (acceptedByMe) continue;
-
-            if (tab == 0) result.add(match);
-            else if (tab == 1 && MatchPost.TYPE_FIND_OPPONENT.equals(match.getType())) result.add(match);
-            else if (tab == 2 && MatchPost.TYPE_FIND_MEMBER.equals(match.getType())) result.add(match);
-            else if (tab == 3 && match.getTrustScore() >= 90) result.add(match);
+            if (tab == 0) {
+                // All tab: show all but hide matches accepted by OTHERS if you want, 
+                // but user said "trang bang chung se giu tat ca cac keo co tren database"
+                // "khi minh chap nhan 1 keo thi no se bi dam mau chữ bắt kèo ko cho tương tác nữa"
+                // So we show it.
+                result.add(match);
+            } else if (tab == 1 && MatchPost.TYPE_FIND_OPPONENT.equals(match.getType())) {
+                result.add(match);
+            } else if (tab == 2 && MatchPost.TYPE_FIND_MEMBER.equals(match.getType())) {
+                result.add(match);
+            } else if (tab == 3) {
+                // History tab: only matches accepted by ME
+                if (acceptedByMe) {
+                    result.add(match);
+                }
+            }
         }
         return result;
     }

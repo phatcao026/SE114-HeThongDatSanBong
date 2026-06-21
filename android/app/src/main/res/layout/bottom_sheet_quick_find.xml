@@ -32,25 +32,6 @@
         android:textSize="@dimen/text_body_small" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilPlaystyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_4"
-        android:hint="@string/hint_playstyle"
-        app:boxStrokeColor="@color/primary"
-        app:hintTextColor="@color/primary"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etPlaystyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/be_vietnam_pro"
-            android:inputType="textMultiLine"
-            android:minLines="2" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilTeam"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

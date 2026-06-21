@@ -32,10 +32,16 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
     private java.util.Map<Long, String> reviewStatuses = new java.util.HashMap<>();
     private long currentUserId = -1;
     private java.util.Set<Long> localAcceptedIds = new java.util.HashSet<>();
+    private boolean isHistoryMode = false;
 
     public MatchAdapter(List<MatchPost> matches, OnMatchActionListener listener) {
         this.matches = matches;
         this.listener = listener;
+    }
+
+    public void setHistoryMode(boolean historyMode) {
+        this.isHistoryMode = historyMode;
+        notifyDataSetChanged();
     }
 
     public void setLocalAcceptedIds(java.util.Set<Long> acceptedIds) {
@@ -153,7 +159,8 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         holder.btnAccept.setText(R.string.match_action_accept);
         holder.btnChatMatch.setText(R.string.match_action_chat);
         
-        boolean isHistoryView = "COMPLETED".equals(match.getStatus()) || 
+        boolean isHistoryView = isHistoryMode ||
+                               "COMPLETED".equals(match.getStatus()) ||
                                "EXPIRED".equals(match.getStatus()) ||
                                "MATCHED".equals(match.getStatus()) ||
                                "CLOSED".equals(match.getStatus());
@@ -165,12 +172,13 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         if (isHistoryView) {
             holder.btnAccept.setVisibility(View.GONE);
             holder.btnChatMatch.setVisibility(View.GONE);
+            holder.tvAccepted.setVisibility(View.GONE); // Default
             
             if (reviewStatus != null) {
                 holder.btnRate.setVisibility(View.GONE);
                 holder.tvAccepted.setVisibility(View.VISIBLE);
-                if ("PENDING".equals(reviewStatus)) {
-                    holder.tvAccepted.setText("Đang chờ Admin xử lý");
+                if ("PENDING".equals(reviewStatus) || "SUBMITTED".equals(reviewStatus)) {
+                    holder.tvAccepted.setText("Đã gửi đánh giá");
                     holder.tvAccepted.setTextColor(ContextCompat.getColor(ctx, R.color.accent_orange));
                 } else {
                     holder.tvAccepted.setText("Đã xử lý (Xong)");
@@ -178,6 +186,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
                 }
             } else {
                 holder.btnRate.setVisibility(View.VISIBLE);
+                holder.btnRate.setText("Đánh giá ngay");
                 holder.tvAccepted.setVisibility(View.GONE);
             }
         } else if (isOwner) {
@@ -188,22 +197,21 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         } else if (isAcceptedByMe) {
             holder.btnAccept.setVisibility(View.VISIBLE);
             holder.btnAccept.setEnabled(false);
-            holder.btnAccept.setAlpha(0.5f);
+            holder.btnAccept.setAlpha(1.0f);
+            holder.btnAccept.setBackgroundTintList(android.content.res.ColorStateList.valueOf(ContextCompat.getColor(ctx, R.color.pitch_800)));
+            holder.btnAccept.setTextColor(ContextCompat.getColor(ctx, R.color.white));
             holder.btnAccept.setText("Đã bắt kèo");
             
             holder.btnChatMatch.setVisibility(View.VISIBLE);
             holder.tvAccepted.setVisibility(View.GONE);
             holder.btnRate.setVisibility(View.GONE);
-        } else if (match.isAccepted()) {
-            // Match is accepted by SOMEONE ELSE on the server
-            holder.btnAccept.setVisibility(View.GONE);
-            holder.btnChatMatch.setVisibility(View.GONE);
-            holder.tvAccepted.setVisibility(View.VISIBLE);
-            holder.btnRate.setVisibility(View.GONE);
         } else {
+            // Available or accepted by someone else
             holder.btnAccept.setVisibility(View.VISIBLE);
             holder.btnAccept.setEnabled(true);
             holder.btnAccept.setAlpha(1.0f);
+            holder.btnAccept.setBackgroundTintList(android.content.res.ColorStateList.valueOf(ContextCompat.getColor(ctx, R.color.accent_orange)));
+            holder.btnAccept.setTextColor(ContextCompat.getColor(ctx, R.color.white));
             holder.btnAccept.setText(R.string.match_action_accept);
 
             holder.btnChatMatch.setVisibility(View.VISIBLE);
@@ -215,7 +223,11 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         holder.itemView.setOnClickListener(v -> listener.onCardClick(match));
         holder.btnAccept.setOnClickListener(v -> listener.onAccept(match, holder.getAdapterPosition()));
         holder.btnChatMatch.setOnClickListener(v -> listener.onChat(match));
-        holder.btnRate.setOnClickListener(v -> listener.onRate(match));
+        holder.btnRate.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onRate(match);
+            }
+        });
     }
 
     @Override

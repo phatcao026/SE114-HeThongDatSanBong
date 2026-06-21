@@ -175,7 +175,7 @@ public class AdminAuditActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             OpponentReviewResponse report = reports.get(position);
             holder.tvTitle.setText(report.getRatingType());
-            holder.tvTime.setText(report.getCreatedAt());
+            holder.tvTime.setText(formatDateTime(report.getCreatedAt()));
             holder.tvPriority.setText(report.getStatus());
             holder.tvCategory.setText("Fairplay");
             holder.tvContent.setText(report.getComment());
@@ -221,6 +221,20 @@ public class AdminAuditActivity extends AppCompatActivity {
             holder.itemView.setOnClickListener(v -> {
                 // Show detail if needed
             });
+        }
+
+        private String formatDateTime(String isoString) {
+            if (isoString == null || isoString.isEmpty()) return "";
+            try {
+                // Handle format like 2026-06-21T20:41:18.269744 or 2026-06-21 20:41:18
+                String cleanDate = isoString.replace("T", " ").split("\\.")[0];
+                java.text.SimpleDateFormat inputSdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US);
+                java.text.SimpleDateFormat outputSdf = new java.text.SimpleDateFormat("HH:mm dd/MM/yyyy", java.util.Locale.US);
+                java.util.Date date = inputSdf.parse(cleanDate);
+                return outputSdf.format(date);
+            } catch (Exception e) {
+                return isoString; // Fallback to raw string if parsing fails
+            }
         }
 
         private void resolveReport(Long id, String action, View v) {

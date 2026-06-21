@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,20 +20,35 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.timsanbong.R;
+import com.example.timsanbong.data.model.ChatMessage;
 import com.example.timsanbong.data.model.Conversation;
 import com.example.timsanbong.data.model.MatchPost;
+import com.example.timsanbong.data.model.MessageRequest;
 import com.example.timsanbong.data.repository.ChatRepository;
+import com.example.timsanbong.data.repository.MatchRepository;
 import com.example.timsanbong.utils.Constants;
 import com.example.timsanbong.utils.RepositoryCallback;
 import com.example.timsanbong.utils.Resource;
+import com.example.timsanbong.utils.SessionManager;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class FindOpponentFragment extends Fragment {
 
-    private ImageView btnBack;
-    private TextView tabAll, tabFindOpponent, tabFindMember;
+    private static final String SCOPE_ALL = "SCOPE_ALL";
+    private static final String SCOPE_MY = "SCOPE_MY";
+    private static final String SCOPE_HISTORY = "SCOPE_HISTORY";
+
+    private static final String TYPE_ALL = "TYPE_ALL";
+    private static final String TYPE_OPPONENT = MatchPost.TYPE_FIND_OPPONENT;
+    private static final String TYPE_MEMBER = MatchPost.TYPE_FIND_MEMBER;
+
+    private TextView tabScopeAll, tabScopeMy, tabScopeHistory;
+    private TextView tabTypeAll, tabTypeOpponent, tabTypeMember;
     private RecyclerView rvMatches;
     private TextView tvEmptyMatches, tvMatchCount;
     private View btnCreatePost, btnQuickFind;
@@ -42,8 +56,13 @@ public class FindOpponentFragment extends Fragment {
     private MatchAdapter matchAdapter;
     private MatchViewModel matchViewModel;
     private List<MatchPost> allMatches = new ArrayList<>();
-    private String currentPostType = "ALL";
-    private ChatRepository chatRepository = new ChatRepository();
+    private String currentScope = SCOPE_ALL;
+    private String currentType = TYPE_ALL;
+    private final ChatRepository chatRepository = new ChatRepository();
+    private final MatchRepository matchRepository = new MatchRepository();
+    private Set<Long> localAcceptedIds = new HashSet<>();
+    private SessionManager sessionManager;
+    private long pendingAcceptMatchId = -1;
 
     private final ActivityResultLauncher<Intent> startForResult = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -64,17 +83,32 @@ public class FindOpponentFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        sessionManager = new SessionManager(requireContext());
+        localAcceptedIds = matchRepository.getAcceptedMatchIds(requireContext());
+
         initViews(view);
         setupListeners();
         setupViewModel();
-        selectTab("ALL");
+        updateTabsUI();
+        loadData();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshLocalAcceptedIds();
         loadData();
     }
 
     private void initViews(View view) {
-        tabAll = view.findViewById(R.id.tabAll);
-        tabFindOpponent = view.findViewById(R.id.tabFindOpponent);
-        tabFindMember = view.findViewById(R.id.tabFindMember);
+        tabScopeAll = view.findViewById(R.id.tabScopeAll);
+        tabScopeMy = view.findViewById(R.id.tabScopeMy);
+        tabScopeHistory = view.findViewById(R.id.tabScopeHistory);
+        
+        tabTypeAll = view.findViewById(R.id.tabTypeAll);
+        tabTypeOpponent = view.findViewById(R.id.tabTypeOpponent);
+        tabTypeMember = view.findViewById(R.id.tabTypeMember);
+
         rvMatches = view.findViewById(R.id.rvMatches);
         tvEmptyMatches = view.findViewById(R.id.tvEmptyMatches);
         tvMatchCount = view.findViewById(R.id.tvMatchCount);
@@ -85,12 +119,13 @@ public class FindOpponentFragment extends Fragment {
         matchAdapter = new MatchAdapter(new ArrayList<>(), new MatchAdapter.OnMatchActionListener() {
             @Override
             public void onAccept(MatchPost match, int position) {
+                pendingAcceptMatchId = match.getId();
                 matchViewModel.createMatchRequest(match.getId(), "Tôi muốn bắt kèo này!");
             }
 
             @Override
             public void onChat(MatchPost match) {
-                openDirectConversation(match);
+                openDirectConversation(match, false);
             }
 
             @Override
@@ -99,14 +134,28 @@ public class FindOpponentFragment extends Fragment {
                 intent.putExtra(Constants.EXTRA_MATCH_POST, match);
                 startForResult.launch(intent);
             }
+
+            @Override
+            public void onRate(MatchPost match) {
+                if (SCOPE_HISTORY.equals(currentScope)) {
+                    showReviewDialog(match);
+                }
+            }
         });
+        matchAdapter.setCurrentUserId(sessionManager.getUserId());
+        matchAdapter.setLocalAcceptedIds(localAcceptedIds);
         rvMatches.setAdapter(matchAdapter);
     }
 
     private void setupListeners() {
-        tabAll.setOnClickListener(v -> selectTab("ALL"));
-        tabFindOpponent.setOnClickListener(v -> selectTab(MatchPost.TYPE_FIND_OPPONENT));
-        tabFindMember.setOnClickListener(v -> selectTab(MatchPost.TYPE_FIND_MEMBER));
+        tabScopeAll.setOnClickListener(v -> selectScope(SCOPE_ALL));
+        tabScopeMy.setOnClickListener(v -> selectScope(SCOPE_MY));
+        tabScopeHistory.setOnClickListener(v -> selectScope(SCOPE_HISTORY));
+
+        tabTypeAll.setOnClickListener(v -> selectType(TYPE_ALL));
+        tabTypeOpponent.setOnClickListener(v -> selectType(TYPE_OPPONENT));
+        tabTypeMember.setOnClickListener(v -> selectType(TYPE_MEMBER));
+
         btnCreatePost.setOnClickListener(v ->
                 startForResult.launch(new Intent(requireContext(), CreateMatchPostActivity.class)));
         btnQuickFind.setOnClickListener(v -> {
@@ -120,6 +169,7 @@ public class FindOpponentFragment extends Fragment {
         matchViewModel.matchPostsState.observe(getViewLifecycleOwner(), resource -> {
             if (resource.status == Resource.Status.SUCCESS) {
                 allMatches = resource.data;
+                refreshLocalAcceptedIds();
                 filterAndDisplay();
             } else if (resource.status == Resource.Status.ERROR) {
                 Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show();
@@ -128,67 +178,304 @@ public class FindOpponentFragment extends Fragment {
 
         matchViewModel.matchRequestState.observe(getViewLifecycleOwner(), resource -> {
             if (resource.status == Resource.Status.SUCCESS) {
+                if (pendingAcceptMatchId != -1) {
+                    final long acceptedId = pendingAcceptMatchId;
+                    matchRepository.saveAcceptedMatchId(requireContext(), acceptedId);
+                    
+                    // Find the match in allMatches to show dialog
+                    MatchPost acceptedMatch = null;
+                    for (MatchPost m : allMatches) {
+                        if (m.getId() == acceptedId) {
+                            acceptedMatch = m;
+                            break;
+                        }
+                    }
+                    
+                    if (acceptedMatch != null) {
+                        final MatchPost finalMatch = acceptedMatch;
+                        new MaterialAlertDialogBuilder(requireContext())
+                                .setTitle("Xác nhận bắt kèo")
+                                .setMessage("Bạn có muốn chuyển đến trang nhắn tin với chủ kèo không?")
+                                .setPositiveButton("Có", (dialog, which) -> {
+                                    openDirectConversation(finalMatch, true);
+                                })
+                                .setNegativeButton("Không", null)
+                                .show();
+                    }
+
+                    pendingAcceptMatchId = -1;
+                }
                 Toast.makeText(requireContext(), "Gửi yêu cầu thành công!", Toast.LENGTH_SHORT).show();
+                refreshLocalAcceptedIds();
+                loadData();
             } else if (resource.status == Resource.Status.ERROR) {
                 Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show();
+                pendingAcceptMatchId = -1;
             }
         });
     }
 
+    private void refreshLocalAcceptedIds() {
+        localAcceptedIds = matchRepository.getAcceptedMatchIds(requireContext());
+        if (matchAdapter != null) {
+            matchAdapter.setLocalAcceptedIds(localAcceptedIds);
+            matchAdapter.setCurrentUserId(sessionManager.getUserId());
+        }
+    }
+
+    private java.util.Map<Long, String> reviewStatuses = new java.util.HashMap<>();
+
     private void loadData() {
+        refreshLocalAcceptedIds();
+        
+        // Fetch my submitted reviews to know which matches are already rated
+        com.example.timsanbong.data.api.ApiClient.getService(requireContext()).getMySubmittedReviews().enqueue(new retrofit2.Callback<List<Long>>() {
+            @Override
+            public void onResponse(retrofit2.Call<List<Long>> call, retrofit2.Response<List<Long>> response) {
+                reviewStatuses.clear();
+                if (response.isSuccessful() && response.body() != null) {
+                    for (Long matchId : response.body()) {
+                        reviewStatuses.put(matchId, "SUBMITTED");
+                    }
+                }
+                if (matchAdapter != null) {
+                    matchAdapter.setReviewStatuses(reviewStatuses);
+                }
+                fetchMatches();
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<List<Long>> call, Throwable t) {
+                fetchMatches();
+            }
+        });
+    }
+
+    private void fetchMatches() {
         matchViewModel.loadMatchPosts(0, 50, null);
     }
 
-    private void selectTab(String type) {
-        currentPostType = type;
-        
-        tabAll.setBackgroundResource(R.drawable.bg_chip_filter);
-        tabAll.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_secondary));
-        tabFindOpponent.setBackgroundResource(R.drawable.bg_chip_filter);
-        tabFindOpponent.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_secondary));
-        tabFindMember.setBackgroundResource(R.drawable.bg_chip_filter);
-        tabFindMember.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_secondary));
-
-        if ("ALL".equals(type)) {
-            tabAll.setBackgroundResource(R.drawable.bg_chip_filter_selected);
-            tabAll.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_on_primary));
-        } else if (MatchPost.TYPE_FIND_OPPONENT.equals(type)) {
-            tabFindOpponent.setBackgroundResource(R.drawable.bg_chip_filter_selected);
-            tabFindOpponent.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_on_primary));
-        } else if (MatchPost.TYPE_FIND_MEMBER.equals(type)) {
-            tabFindMember.setBackgroundResource(R.drawable.bg_chip_filter_selected);
-            tabFindMember.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_on_primary));
-        }
-        
+    private void selectScope(String scope) {
+        currentScope = scope;
+        matchAdapter.setHistoryMode(SCOPE_HISTORY.equals(scope));
+        updateTabsUI();
         filterAndDisplay();
+    }
+
+    private void selectType(String type) {
+        currentType = type;
+        updateTabsUI();
+        filterAndDisplay();
+    }
+
+    private void updateTabsUI() {
+        // Update Scope Row
+        TextView[] scopeTabs = {tabScopeAll, tabScopeMy, tabScopeHistory};
+        String[] scopeValues = {SCOPE_ALL, SCOPE_MY, SCOPE_HISTORY};
+        for (int i = 0; i < scopeTabs.length; i++) {
+            boolean active = currentScope.equals(scopeValues[i]);
+            scopeTabs[i].setBackgroundResource(active ? R.drawable.bg_chip_filter_selected : R.drawable.bg_chip_filter);
+            scopeTabs[i].setTextColor(ContextCompat.getColor(requireContext(), active ? R.color.text_on_primary : R.color.text_secondary));
+            scopeTabs[i].setTypeface(null, active ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL);
+        }
+
+        // Update Type Row
+        TextView[] typeTabs = {tabTypeAll, tabTypeOpponent, tabTypeMember};
+        String[] typeValues = {TYPE_ALL, TYPE_OPPONENT, TYPE_MEMBER};
+        for (int i = 0; i < typeTabs.length; i++) {
+            boolean active = currentType.equals(typeValues[i]);
+            typeTabs[i].setBackgroundResource(active ? R.drawable.bg_chip_filter_selected : R.drawable.bg_chip_filter);
+            typeTabs[i].setTextColor(ContextCompat.getColor(requireContext(), active ? R.color.text_on_primary : R.color.text_secondary));
+            typeTabs[i].setTypeface(null, active ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL);
+        }
+
+        if (matchAdapter != null) {
+            matchAdapter.setHistoryMode(SCOPE_HISTORY.equals(currentScope));
+        }
     }
 
     private void filterAndDisplay() {
         List<MatchPost> filtered = new ArrayList<>();
+        long currentUserId = sessionManager.getUserId();
+
         for (MatchPost match : allMatches) {
-            if ("ALL".equals(currentPostType)) {
-                filtered.add(match);
-            } else if (currentPostType.equals(match.getPostType())) {
-                filtered.add(match);
+            // Scope Filter
+            boolean passScope = false;
+            switch (currentScope) {
+                case SCOPE_ALL: passScope = true; break;
+                case SCOPE_MY: if (match.getUserId() == currentUserId) passScope = true; break;
+                case SCOPE_HISTORY: if (localAcceptedIds.contains(match.getId())) passScope = true; break;
             }
+            if (!passScope) continue;
+
+            // Type Filter
+            boolean passType = false;
+            switch (currentType) {
+                case TYPE_ALL: passType = true; break;
+                case TYPE_OPPONENT: if (MatchPost.TYPE_FIND_OPPONENT.equals(match.getPostType())) passType = true; break;
+                case TYPE_MEMBER: if (MatchPost.TYPE_FIND_MEMBER.equals(match.getPostType())) passType = true; break;
+            }
+            if (!passType) continue;
+
+            filtered.add(match);
         }
         matchAdapter.updateMatches(filtered);
         tvEmptyMatches.setVisibility(filtered.isEmpty() ? View.VISIBLE : View.GONE);
         tvMatchCount.setText(getString(R.string.match_count, filtered.size()));
     }
 
-    private void openDirectConversation(MatchPost match) {
-        chatRepository.createDirectConversation(requireContext(), match.getUserId(), new RepositoryCallback<Conversation>() {
+    private void openDirectConversation(MatchPost match, boolean sendAutoMessage) {
+        if (match.getUserId() <= 0) {
+            Toast.makeText(requireContext(), R.string.error_unknown, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        chatRepository.getConversations(requireContext(), new RepositoryCallback<List<Conversation>>() {
             @Override
-            public void onSuccess(Conversation data) {
-                Intent intent = new Intent(requireContext(), ChatActivity.class);
-                intent.putExtra(Constants.EXTRA_CONVERSATION, data);
-                startActivity(intent);
+            public void onSuccess(List<Conversation> data) {
+                Conversation existing = null;
+                for (Conversation c : data) {
+                    if (c.getOtherUser() != null && c.getOtherUser().getId() == match.getUserId()) {
+                        existing = c;
+                        break;
+                    }
+                }
+                if (existing != null) {
+                    handleConversationNavigation(existing, match, sendAutoMessage);
+                } else {
+                    createNewConversation(match, sendAutoMessage);
+                }
             }
 
             @Override
             public void onError(String message) {
-                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+                createNewConversation(match, sendAutoMessage);
+            }
+        });
+    }
+
+    private void createNewConversation(MatchPost match, boolean sendAutoMessage) {
+        chatRepository.createDirectConversation(requireContext(), match.getUserId(), new RepositoryCallback<Conversation>() {
+            @Override
+            public void onSuccess(Conversation data) {
+                handleConversationNavigation(data, match, sendAutoMessage);
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(FindOpponentFragment.this.requireContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void handleConversationNavigation(Conversation conversation, MatchPost match, boolean sendAutoMessage) {
+        if (sendAutoMessage) {
+            String autoMessage = String.format("Tôi muốn bắt kèo của bạn: %s - %s - %s",
+                    match.getTeam(), match.getDate(), match.getTime());
+            
+            long convId;
+            try {
+                convId = Long.parseLong(conversation.getId());
+            } catch (Exception e) {
+                convId = 0;
+            }
+
+            if (convId > 0) {
+                MessageRequest request = new MessageRequest(convId, autoMessage);
+                chatRepository.sendMessage(requireContext(), request, new RepositoryCallback<ChatMessage>() {
+                    @Override
+                    public void onSuccess(ChatMessage data) {
+                        startChatActivity(conversation);
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        startChatActivity(conversation);
+                    }
+                });
+                return;
+            }
+        }
+        startChatActivity(conversation);
+    }
+
+    private void startChatActivity(Conversation conversation) {
+        Intent intent = new Intent(requireContext(), ChatActivity.class);
+        intent.putExtra(Constants.EXTRA_CONVERSATION, conversation);
+        startActivity(intent);
+    }
+
+    private void showReviewDialog(MatchPost match) {
+        long myUserId = sessionManager.getUserId();
+        boolean isOwner = match.getUserId() == myUserId;
+        String title = isOwner ? "Đánh giá đối thủ/cầu thủ" : "Đánh giá chủ kèo";
+
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(requireContext());
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.setPadding(60, 40, 60, 20);
+
+        // Rating Type Selection (Spinner / Dropdown)
+        android.widget.TextView tvLabelType = new android.widget.TextView(requireContext());
+        tvLabelType.setText("Phân loại đánh giá:");
+        tvLabelType.setPadding(0, 0, 0, 10);
+        tvLabelType.setTextSize(16);
+        tvLabelType.setTypeface(null, android.graphics.Typeface.BOLD);
+        layout.addView(tvLabelType);
+
+        android.widget.Spinner spinnerType = new android.widget.Spinner(requireContext());
+        String[] displayTypes = {"Tích cực (Khen ngợi)", "Chơi xấu / Thô lỗ", "Không đến (No Show)", "Hủy kèo muộn", "Khác"};
+        String[] backendValues = {"GOOD", "BAD_BEHAVIOR", "NO_SHOW", "LATE_CANCEL", "OTHER"};
+
+        android.widget.ArrayAdapter<String> spinnerAdapter = new android.widget.ArrayAdapter<>(
+                requireContext(), android.R.layout.simple_spinner_dropdown_item, displayTypes);
+        spinnerType.setAdapter(spinnerAdapter);
+        layout.addView(spinnerType);
+
+        // Comment EditText
+        android.widget.TextView tvLabelComment = new android.widget.TextView(requireContext());
+        tvLabelComment.setText("Chi tiết lý do (Admin sẽ xem xét):");
+        tvLabelComment.setPadding(0, 40, 0, 10);
+        layout.addView(tvLabelComment);
+
+        android.widget.EditText etComment = new android.widget.EditText(requireContext());
+        etComment.setHint("Nhập lý do hoặc nhận xét của bạn...");
+        etComment.setMinLines(3);
+        etComment.setGravity(android.view.Gravity.TOP);
+        etComment.setBackgroundResource(android.R.drawable.edit_text);
+        layout.addView(etComment);
+
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle(title)
+                .setView(layout)
+                .setPositiveButton("Gửi đánh giá", (dialog, which) -> {
+                    String selectedType = backendValues[spinnerType.getSelectedItemPosition()];
+                    String comment = etComment.getText().toString().trim();
+                    if (comment.isEmpty()) comment = displayTypes[spinnerType.getSelectedItemPosition()];
+
+                    submitReview(match, selectedType, comment);
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    private void submitReview(MatchPost match, String ratingType, String comment) {
+        long currentUserId = sessionManager.getUserId();
+        long targetUserId = (match.getUserId() == currentUserId) ? 0 : match.getUserId();
+
+        com.example.timsanbong.data.model.ReviewRequest request = new com.example.timsanbong.data.model.ReviewRequest(targetUserId, match.getId(), ratingType, comment);
+        com.example.timsanbong.data.api.ApiClient.getService(requireContext()).submitReview(request).enqueue(new retrofit2.Callback<Void>() {
+            @Override
+            public void onResponse(retrofit2.Call<Void> call, retrofit2.Response<Void> response) {
+                if (response.isSuccessful()) {
+                    android.widget.Toast.makeText(requireContext(), "Cảm ơn bạn đã đánh giá!", android.widget.Toast.LENGTH_SHORT).show();
+                    loadData(); // Refresh to hide Rate button
+                } else {
+                    android.widget.Toast.makeText(requireContext(), "Lỗi khi gửi đánh giá", android.widget.Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(retrofit2.Call<Void> call, Throwable t) {
+                android.widget.Toast.makeText(requireContext(), "Lỗi kết nối", android.widget.Toast.LENGTH_SHORT).show();
             }
         });
     }

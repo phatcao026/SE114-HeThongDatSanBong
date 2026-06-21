@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingHorizontal="@dimen/spacing_4"
-        android:paddingTop="@dimen/spacing_3"
+        android:paddingTop="@dimen/spacing_2"
         android:paddingBottom="@dimen/spacing_2"
         app:layout_constraintTop_toBottomOf="@id/layoutAppBar"
         app:layout_constraintStart_toStartOf="parent"
@@ -65,78 +65,71 @@
             app:cornerRadius="@dimen/radius_button" />
     </LinearLayout>
 
-    <HorizontalScrollView
-        android:id="@+id/layoutSegment"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_2"
-        android:scrollbars="none"
-        app:layout_constraintTop_toBottomOf="@id/layoutActions"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingHorizontal="@dimen/spacing_4">
-
-            <TextView
-                android:id="@+id/tabAll"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:gravity="center"
-                android:paddingHorizontal="@dimen/spacing_4"
-                android:text="@string/tab_all"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:fontFamily="@font/be_vietnam_pro"
-                android:background="@drawable/bg_chip_filter_selected"
-                android:textColor="@color/text_on_primary"
-                android:layout_marginEnd="@dimen/spacing_2" />
-
-            <TextView
-                android:id="@+id/tabMyPosts"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:gravity="center"
-                android:paddingHorizontal="@dimen/spacing_4"
-                android:text="@string/tab_my_posts"
-                android:textSize="13sp"
-                android:fontFamily="@font/be_vietnam_pro"
-                android:background="@drawable/bg_chip_filter"
-                android:textColor="@color/text_secondary"
-                android:layout_marginEnd="@dimen/spacing_2" />
-
-            <TextView
-                android:id="@+id/tabHistory"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:gravity="center"
-                android:paddingHorizontal="@dimen/spacing_4"
-                android:text="@string/tab_history"
-                android:textSize="13sp"
-                android:fontFamily="@font/be_vietnam_pro"
-                android:background="@drawable/bg_chip_filter"
-                android:textColor="@color/text_secondary"
-                android:layout_marginEnd="@dimen/spacing_2" />
-        </LinearLayout>
-    </HorizontalScrollView>
-
-    <!-- Sub-filters for Bảng chung -->
+    <!-- Row 1: Scope Filters (All, My, History) -->
     <LinearLayout
-        android:id="@+id/layoutSubFilters"
+        android:id="@+id/layoutScopeFilters"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingHorizontal="@dimen/spacing_4"
-        android:layout_marginTop="@dimen/spacing_3"
-        app:layout_constraintTop_toBottomOf="@id/layoutSegment"
+        android:layout_marginTop="@dimen/spacing_2"
+        app:layout_constraintTop_toBottomOf="@id/layoutActions"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
-            android:id="@+id/tabSubAll"
+            android:id="@+id/tabScopeAll"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/spacing_4"
+            android:text="@string/tab_all"
+            android:textSize="12sp"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:background="@drawable/bg_chip_filter_selected"
+            android:textColor="@color/text_on_primary"
+            android:layout_marginEnd="@dimen/spacing_2" />
+
+        <TextView
+            android:id="@+id/tabScopeMy"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/spacing_4"
+            android:text="@string/tab_my_posts"
+            android:textSize="12sp"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:background="@drawable/bg_chip_filter"
+            android:textColor="@color/text_secondary"
+            android:layout_marginEnd="@dimen/spacing_2" />
+
+        <TextView
+            android:id="@+id/tabScopeHistory"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/spacing_4"
+            android:text="@string/tab_history"
+            android:textSize="12sp"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:background="@drawable/bg_chip_filter"
+            android:textColor="@color/text_secondary" />
+    </LinearLayout>
+
+    <!-- Row 2: Type Filters (All, Opponent, Member) -->
+    <LinearLayout
+        android:id="@+id/layoutTypeFilters"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/spacing_4"
+        android:layout_marginTop="@dimen/spacing_2"
+        app:layout_constraintTop_toBottomOf="@id/layoutScopeFilters"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/tabTypeAll"
             android:layout_width="wrap_content"
             android:layout_height="28dp"
             android:gravity="center"
@@ -149,7 +142,7 @@
             android:layout_marginEnd="@dimen/spacing_2" />
 
         <TextView
-            android:id="@+id/tabFindOpponent"
+            android:id="@+id/tabTypeOpponent"
             android:layout_width="wrap_content"
             android:layout_height="28dp"
             android:gravity="center"
@@ -162,7 +155,7 @@
             android:layout_marginEnd="@dimen/spacing_2" />
 
         <TextView
-            android:id="@+id/tabFindMember"
+            android:id="@+id/tabTypeMember"
             android:layout_width="wrap_content"
             android:layout_height="28dp"
             android:gravity="center"
@@ -180,9 +173,9 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginHorizontal="@dimen/spacing_4"
-        android:layout_marginTop="@dimen/spacing_4"
+        android:layout_marginTop="@dimen/spacing_3"
         android:gravity="center_vertical"
-        app:layout_constraintTop_toBottomOf="@id/layoutSubFilters"
+        app:layout_constraintTop_toBottomOf="@id/layoutTypeFilters"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 

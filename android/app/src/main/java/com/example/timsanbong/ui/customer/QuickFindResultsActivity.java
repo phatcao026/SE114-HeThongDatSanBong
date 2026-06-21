@@ -66,6 +66,11 @@ public class QuickFindResultsActivity extends AppCompatActivity {
             }
 
             @Override
+            public void onChat(RecommendedMatch recommendation) {
+                openDirectConversation(recommendation);
+            }
+
+            @Override
             public void onCardClick(RecommendedMatch recommendation) {
                 if (recommendation.getMatchPost() != null) {
                     Intent intent = new Intent(QuickFindResultsActivity.this, MatchDetailActivity.class);
@@ -78,15 +83,10 @@ public class QuickFindResultsActivity extends AppCompatActivity {
 
         matchViewModel = new ViewModelProvider(this).get(MatchViewModel.class);
         
-        // We need to add this LiveData to MatchViewModel if it doesn't exist
-        // For now, let's assume it exists or we will add it.
-        // Actually, let's check MatchViewModel again.
-        
         loadRecommendations();
     }
 
     private void loadRecommendations() {
-        String playstyle = getIntent().getStringExtra("playstyle");
         String teamName = getIntent().getStringExtra("teamName");
         String date = getIntent().getStringExtra("date");
         String timeStart = getIntent().getStringExtra("time");
@@ -100,7 +100,6 @@ public class QuickFindResultsActivity extends AppCompatActivity {
         }
         
         // Clean up empty strings to null so they aren't used in search
-        if (playstyle != null && playstyle.trim().isEmpty()) playstyle = null;
         if (teamName != null && teamName.trim().isEmpty()) teamName = null;
         if (date != null && date.trim().isEmpty()) date = null;
         if (postType != null && postType.trim().isEmpty()) postType = null;
@@ -109,12 +108,21 @@ public class QuickFindResultsActivity extends AppCompatActivity {
 
         progressBar.setVisibility(View.VISIBLE);
         
+        java.util.Set<Long> acceptedIds = new com.example.timsanbong.data.repository.MatchRepository().getAcceptedMatchIds(this);
+
         new com.example.timsanbong.data.repository.MatchRepository().getSmartRecommendations(
-                this, playstyle, teamName, date, timeStart, timeEnd, skillLevel, hasField, postType, ageRange,
+                this, teamName, date, timeStart, timeEnd, skillLevel, hasField, postType, ageRange,
                 new RepositoryCallback<List<RecommendedMatch>>() {
                     @Override
                     public void onSuccess(List<RecommendedMatch> data) {
                         progressBar.setVisibility(View.GONE);
+                        android.util.Log.d("QuickFind", "Loaded " + data.size() + " matches. Local accepted IDs: " + acceptedIds);
+                        for (RecommendedMatch rm : data) {
+                            if (rm.getMatchId() != null && acceptedIds.contains(rm.getMatchId())) {
+                                android.util.Log.d("QuickFind", "Marking match " + rm.getMatchId() + " as accepted");
+                                rm.setAccepted(true);
+                            }
+                        }
                         adapter.updateList(data);
                         if (tvTitle != null) {
                             if (data.isEmpty()) {
@@ -138,21 +146,8 @@ public class QuickFindResultsActivity extends AppCompatActivity {
     }
 
     private void acceptMatch(RecommendedMatch recommendation) {
-        if (recommendation.getMatchPost() == null) return;
+        if (recommendation.getMatchPost() == null || recommendation.isAccepted()) return;
 
-        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                .setTitle("Xác nhận bắt kèo")
-                .setMessage("Bạn có muốn chuyển đến trang nhắn tin với chủ kèo không?")
-                .setPositiveButton("Có", (dialog, which) -> {
-                    executeAcceptMatch(recommendation, true);
-                })
-                .setNegativeButton("Không", (dialog, which) -> {
-                    executeAcceptMatch(recommendation, false);
-                })
-                .show();
-    }
-
-    private void executeAcceptMatch(RecommendedMatch recommendation, boolean shouldChat) {
         progressBar.setVisibility(View.VISIBLE);
         new com.example.timsanbong.data.repository.MatchRepository().createMatchRequest(
                 this, recommendation.getMatchId(), "Tôi muốn bắt kèo này!",
@@ -161,9 +156,22 @@ public class QuickFindResultsActivity extends AppCompatActivity {
                     public void onSuccess(com.example.timsanbong.data.model.MatchRequestResponse data) {
                         progressBar.setVisibility(View.GONE);
                         Toast.makeText(QuickFindResultsActivity.this, "Đã gửi yêu cầu bắt kèo.", Toast.LENGTH_SHORT).show();
-                        if (shouldChat) {
-                            openDirectConversation(recommendation);
-                        }
+                        
+                        // Save local state
+                        android.util.Log.d("QuickFind", "Saving accepted match ID: " + recommendation.getMatchId());
+                        new com.example.timsanbong.data.repository.MatchRepository().saveAcceptedMatchId(QuickFindResultsActivity.this, recommendation.getMatchId());
+                        recommendation.setAccepted(true);
+                        adapter.notifyDataSetChanged();
+
+                        // Show dialog ONLY after successful acceptance
+                        new com.google.android.material.dialog.MaterialAlertDialogBuilder(QuickFindResultsActivity.this)
+                                .setTitle("Xác nhận bắt kèo")
+                                .setMessage("Bạn có muốn chuyển đến trang nhắn tin với chủ kèo không?")
+                                .setPositiveButton("Có", (dialog, which) -> {
+                                    openDirectConversation(recommendation);
+                                })
+                                .setNegativeButton("Không", null)
+                                .show();
                     }
 
                     @Override
@@ -174,7 +182,7 @@ public class QuickFindResultsActivity extends AppCompatActivity {
                 });
     }
 
-    private void openDirectConversation(RecommendedMatch recommendation) {
+    public void openDirectConversation(RecommendedMatch recommendation) {
         if (recommendation.getMatchPost() == null || recommendation.getMatchPost().getUserId() <= 0) {
             return;
         }

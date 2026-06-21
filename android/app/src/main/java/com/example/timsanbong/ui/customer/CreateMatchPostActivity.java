@@ -118,7 +118,7 @@ public class CreateMatchPostActivity extends AppCompatActivity {
         tilNeededMembers.setVisibility(isFindMember ? View.VISIBLE : View.GONE);
         tilPositions.setVisibility(isFindMember ? View.VISIBLE : View.GONE);
         
-        // Show date/time for BOTH types now
+        // Always show date/time for BOTH types
         tilPlayDate.setVisibility(View.VISIBLE);
         tilPlayTime.setVisibility(View.VISIBLE);
         tilEndTime.setVisibility(View.VISIBLE);

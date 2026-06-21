@@ -2,7 +2,6 @@ package com.example.backend.service;
 
 import com.example.backend.entity.Notification;
 import com.example.backend.entity.User;
-import com.example.backend.entity.UserFcmToken;
 import com.example.backend.repository.NotificationRepository;
 import com.example.backend.repository.UserFcmTokenRepository;
 import com.example.backend.repository.UserRepository;
@@ -60,34 +59,19 @@ public class NotificationServiceTest {
     @Test
     void testRegisterNewFcmToken() {
         String token = "sample-fcm-token-123";
-        when(userFcmTokenRepository.findByFcmToken(token)).thenReturn(Optional.empty());
 
         notificationService.registerFcmToken(token);
 
-        ArgumentCaptor<UserFcmToken> captor = ArgumentCaptor.forClass(UserFcmToken.class);
-        verify(userFcmTokenRepository, times(1)).save(captor.capture());
-
-        UserFcmToken savedToken = captor.getValue();
-        assertEquals(1L, savedToken.getUserId());
-        assertEquals(token, savedToken.getFcmToken());
-        assertNotNull(savedToken.getCreatedAt());
+        verify(userFcmTokenRepository, times(1)).upsert(eq(1L), eq(token), any(LocalDateTime.class));
     }
 
     @Test
     void testRegisterExistingFcmTokenDifferentUser() {
         String token = "sample-fcm-token-123";
-        UserFcmToken existing = new UserFcmToken();
-        existing.setId(10L);
-        existing.setUserId(2L); // previously user 2
-        existing.setFcmToken(token);
-        existing.setCreatedAt(LocalDateTime.now().minusDays(1));
-
-        when(userFcmTokenRepository.findByFcmToken(token)).thenReturn(Optional.of(existing));
 
         notificationService.registerFcmToken(token);
 
-        verify(userFcmTokenRepository, times(1)).save(existing);
-        assertEquals(1L, existing.getUserId()); // reassigned to user 1
+        verify(userFcmTokenRepository, times(1)).upsert(eq(1L), eq(token), any(LocalDateTime.class));
     }
 
     @Test

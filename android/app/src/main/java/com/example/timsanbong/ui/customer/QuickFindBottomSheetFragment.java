@@ -26,7 +26,7 @@ import java.util.Locale;
 
 public class QuickFindBottomSheetFragment extends BottomSheetDialogFragment {
 
-    private TextInputEditText etPlaystyle, etDate, etTime, etTimeEnd;
+    private TextInputEditText etDate, etTime, etTimeEnd;
     private AutoCompleteTextView etTeamName, actvPostType, actvSkillLevel, actvHasField, actvAgeRange;
     private String selectedDateIso = "";
     private String selectedTimeStart = "";
@@ -43,7 +43,6 @@ public class QuickFindBottomSheetFragment extends BottomSheetDialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        etPlaystyle = view.findViewById(R.id.etPlaystyle);
         etTeamName = view.findViewById(R.id.etTeamName);
         etDate = view.findViewById(R.id.etDate);
         etTime = view.findViewById(R.id.etTime);
@@ -62,7 +61,6 @@ public class QuickFindBottomSheetFragment extends BottomSheetDialogFragment {
         etTimeEnd.setOnClickListener(v -> showTimePicker(false));
 
         btnSearch.setOnClickListener(v -> {
-            String playstyle = etPlaystyle.getText() != null ? etPlaystyle.getText().toString().trim() : "";
             String teamName = etTeamName.getText() != null ? etTeamName.getText().toString().trim() : "";
             String ageRange = actvAgeRange.getText().toString().trim();
             if ("Tất cả".equals(ageRange)) ageRange = "";
@@ -84,7 +82,6 @@ public class QuickFindBottomSheetFragment extends BottomSheetDialogFragment {
             else if ("Không".equals(hasFieldStr)) hasField = false;
 
             Intent intent = new Intent(getContext(), QuickFindResultsActivity.class);
-            intent.putExtra("playstyle", playstyle);
             intent.putExtra("teamName", teamName);
             intent.putExtra("date", selectedDateIso);
             intent.putExtra("time", selectedTimeStart);

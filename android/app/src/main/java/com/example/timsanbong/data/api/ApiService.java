@@ -97,7 +97,6 @@ public interface ApiService {
 
     @GET("match-posts/recommendations")
     Call<List<RecommendedMatch>> getSmartRecommendations(
-            @Query("playstyleNote") String playstyleNote,
             @Query("teamName") String teamName,
             @Query("date") String date,
             @Query("timeStart") String timeStart,

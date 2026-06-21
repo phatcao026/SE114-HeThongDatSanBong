@@ -131,6 +131,7 @@ public class MatchDetailActivity extends AppCompatActivity {
                 matchRepository.saveAcceptedMatchId(this, match.getId());
                 btnDetailAccept.setText(getString(R.string.match_cta_accepted));
                 btnDetailAccept.setEnabled(false);
+                btnDetailAccept.setAlpha(0.5f);
                 Toast.makeText(this, "Đã gửi yêu cầu bắt kèo.", Toast.LENGTH_SHORT).show();
             } else if (resource.status == com.example.timsanbong.utils.Resource.Status.ERROR) {
                 Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
@@ -210,9 +211,10 @@ public class MatchDetailActivity extends AppCompatActivity {
         tvTrustNoBail.setText(String.valueOf(match.getNoShows()));
         tvTrustRating.setText(String.format(Locale.getDefault(), "%.1f", match.getAverageRating()));
 
-        if (match.isAccepted()) {
+        if (match.isAccepted() || matchRepository.getAcceptedMatchIds(this).contains(match.getId())) {
             btnDetailAccept.setText(getString(R.string.match_cta_accepted));
             btnDetailAccept.setEnabled(false);
+            btnDetailAccept.setAlpha(0.5f);
         }
 
         // Show delete button if current user is the poster
