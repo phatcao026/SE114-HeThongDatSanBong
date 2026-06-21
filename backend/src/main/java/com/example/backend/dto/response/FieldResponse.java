@@ -3,6 +3,7 @@ package com.example.backend.dto.response;
 import com.example.backend.utils.Enums;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class FieldResponse {
     private Long id;
@@ -16,6 +17,17 @@ public class FieldResponse {
 
     private Double averageRating;
     private Long reviewCount;
+
+    private List<TimeSlotResponse> timeSlots;
+
+    public List<TimeSlotResponse> getTimeSlots() {
+        return timeSlots;
+    }
+
+    public void setTimeSlots(List<TimeSlotResponse> timeSlots) {
+        this.timeSlots = timeSlots;
+    }
+
 
     public Long getId() {
         return id;

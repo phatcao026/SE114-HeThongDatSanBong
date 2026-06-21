@@ -1,16 +1,15 @@
 package com.example.timsanbong.ui.owner;
 
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -36,66 +35,59 @@ import com.example.timsanbong.data.model.FieldUpdateRequest;
 import com.example.timsanbong.data.model.TimeSlotCreateRequest;
 import com.example.timsanbong.data.model.TimeSlotResponse;
 import com.example.timsanbong.data.model.TimeSlotUpdateRequest;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-// 1. Kế thừa từ Fragment thay vì AppCompatActivity
 public class OwnerFieldsFragment extends Fragment {
     private OwnerFieldViewModel viewModel;
     private OwnerFieldAdapter fieldAdapter;
+    private OwnerTimeSlotAdapter timeSlotAdapter; 
+    private RecyclerView rvFields;
     private final List<Field> allFields = new ArrayList<>();
     private EditText etSearchFields;
-    private TextView tvEmptyFields;
-    private TextView tvAvailableCount;
-    private TextView tvMaintenanceCount;
-    private TextView tvClosedCount;
+    private LinearLayout llEmptyState;
+    private TextView tvAvailableCount, tvMaintenanceCount, tvClosedCount;
+    private TextView tvManagementLabel;
+    private View btnDateFieldFilter;
+    private String selectedDate; // Định dạng yyyy-MM-dd
+
     private ActivityResultLauncher<String> createFieldImagePickerLauncher;
     private Uri createFieldImageUri;
     private LinearLayout createFieldNoImageContainer;
     private FrameLayout createFieldImagePreviewContainer;
     private ImageView createFieldImagePreview;
-    private TextView createFieldNameError;
-    private String createFieldSelectedType = "FIVE_A_SIDE";
-    private String createFieldSelectedStatus = "AVAILABLE";
     private String searchQuery = "";
     private FilterMode filterMode = FilterMode.ALL;
 
     private enum FilterMode { ALL, AVAILABLE, MAINTENANCE, CLOSED }
 
-    // 2. Nạp giao diện fragment_owner_field_management vào container
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_owner_field_management, container, false);
     }
 
-    // 3. Thực hiện toàn bộ logic khởi tạo giao diện tại onViewCreated
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         viewModel = new ViewModelProvider(this).get(OwnerFieldViewModel.class);
+        
+        // Khởi tạo ngày mặc định là hôm nay
+        Calendar cal = Calendar.getInstance();
+        selectedDate = String.format(Locale.US, "%04d-%02d-%02d", 
+                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));
+
         createFieldImagePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
                 uri -> {
-                    if (uri == null) {
-                        return;
-                    }
+                    if (uri == null) return;
                     createFieldImageUri = uri;
-                    if (createFieldNoImageContainer != null) {
-                        createFieldNoImageContainer.setVisibility(View.GONE);
-                    }
-                    if (createFieldImagePreviewContainer != null) {
-                        createFieldImagePreviewContainer.setVisibility(View.VISIBLE);
-                    }
-                    if (createFieldImagePreview != null) {
-                        Glide.with(this).load(uri).into(createFieldImagePreview);
-                    }
+                    if (createFieldNoImageContainer != null) createFieldNoImageContainer.setVisibility(View.GONE);
+                    if (createFieldImagePreviewContainer != null) createFieldImagePreviewContainer.setVisibility(View.VISIBLE);
+                    if (createFieldImagePreview != null) Glide.with(this).load(uri).into(createFieldImagePreview);
                 });
 
         bindViews(view);
@@ -103,675 +95,249 @@ public class OwnerFieldsFragment extends Fragment {
         setupActions(view);
         setupObservers();
 
-        // Bỏ trình quản lý thanh điều hướng cũ vì đã gom về Activity tổng
-        // new OwnerNavBarManager(this, OwnerNavBarManager.ITEM_FIELDS).setup();
-
-        viewModel.loadFields();
+        // Tải dữ liệu ban đầu cho ngày hiện tại
+        viewModel.loadFields(selectedDate);
     }
 
-    // 4. Ánh xạ các thành phần View qua biến gốc 'view' của Fragment
     private void bindViews(View view) {
         etSearchFields = view.findViewById(R.id.etSearchFields);
-        tvEmptyFields = view.findViewById(R.id.tvOwnerEmptyFields);
+        llEmptyState = view.findViewById(R.id.llEmptyState);
         tvAvailableCount = view.findViewById(R.id.tvAvailableCount);
         tvMaintenanceCount = view.findViewById(R.id.tvMaintenanceCount);
         tvClosedCount = view.findViewById(R.id.tvClosedCount);
+        tvManagementLabel = view.findViewById(R.id.tvManagementLabel);
+        btnDateFieldFilter = view.findViewById(R.id.btnDateFieldFilter);
+        updateDateLabel();
+    }
+
+    private void updateDateLabel() {
+        if (tvManagementLabel != null) {
+            Calendar now = Calendar.getInstance();
+            String today = String.format(Locale.US, "%04d-%02d-%02d",
+                    now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1, now.get(Calendar.DAY_OF_MONTH));
+            
+            if (selectedDate.equals(today)) {
+                tvManagementLabel.setText("Tình trạng đặt sân hôm nay");
+            } else {
+                try {
+                    String[] parts = selectedDate.split("-");
+                    tvManagementLabel.setText("Tình trạng sân ngày " + parts[2] + "/" + parts[1]);
+                } catch (Exception e) {
+                    tvManagementLabel.setText("Tình trạng sân ngày " + selectedDate);
+                }
+            }
+        }
     }
 
     private void setupRecyclerView(View view) {
-        RecyclerView rvFields = view.findViewById(R.id.rvFieldList);
+        rvFields = view.findViewById(R.id.rvFieldList);
         fieldAdapter = new OwnerFieldAdapter(new OwnerFieldAdapter.Listener() {
-            @Override
-            public void onEditField(Field field) {
-                showFieldForm(field);
-            }
-
-            @Override
-            public void onDeleteField(Field field) {
-                confirmDeleteField(field);
-            }
-
-            @Override
-            public void onManageTimeSlots(Field field) {
-                showTimeSlotManager(field);
-            }
+            @Override public void onEditField(Field field) { showFieldForm(field); }
+            @Override public void onDeleteField(Field field) { confirmDeleteField(field); }
+            @Override public void onManageTimeSlots(Field field) { showTimeSlotManager(field); }
         });
-
-        // Thay 'this' bằng 'requireContext()'
         rvFields.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvFields.setAdapter(fieldAdapter);
     }
 
     private void setupActions(View view) {
         view.findViewById(R.id.fabAddField).setOnClickListener(v -> showFieldForm(null));
+        
+        if (btnDateFieldFilter != null) {
+            btnDateFieldFilter.setOnClickListener(v -> showDatePicker());
+        }
+
         etSearchFields.addTextChangedListener(new SimpleTextWatcher(value -> {
             searchQuery = value == null ? "" : value.trim();
             renderFields();
         }));
-        // Filter pills click handlers
-        if (tvAvailableCount != null) {
-            tvAvailableCount.setOnClickListener(v -> {
-                filterMode = filterMode == FilterMode.AVAILABLE ? FilterMode.ALL : FilterMode.AVAILABLE;
-                updateSummary();
-                renderFields();
-            });
-        }
-        if (tvMaintenanceCount != null) {
-            tvMaintenanceCount.setOnClickListener(v -> {
-                filterMode = filterMode == FilterMode.MAINTENANCE ? FilterMode.ALL : FilterMode.MAINTENANCE;
-                updateSummary();
-                renderFields();
-            });
-        }
-        if (tvClosedCount != null) {
-            tvClosedCount.setOnClickListener(v -> {
-                filterMode = filterMode == FilterMode.CLOSED ? FilterMode.ALL : FilterMode.CLOSED;
-                updateSummary();
-                renderFields();
-            });
-        }
+        
+        tvAvailableCount.setOnClickListener(v -> { filterMode = (filterMode == FilterMode.AVAILABLE) ? FilterMode.ALL : FilterMode.AVAILABLE; updateSummaryUI(); renderFields(); });
+        tvMaintenanceCount.setOnClickListener(v -> { filterMode = (filterMode == FilterMode.MAINTENANCE) ? FilterMode.ALL : FilterMode.MAINTENANCE; updateSummaryUI(); renderFields(); });
+        tvClosedCount.setOnClickListener(v -> { filterMode = (filterMode == FilterMode.CLOSED) ? FilterMode.ALL : FilterMode.CLOSED; updateSummaryUI(); renderFields(); });
     }
 
-    // 5. Sử dụng 'getViewLifecycleOwner()' để lắng nghe dữ liệu LiveData an toàn
+    private void showDatePicker() {
+        Calendar cal = Calendar.getInstance();
+        try {
+            String[] parts = selectedDate.split("-");
+            cal.set(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]) - 1, Integer.parseInt(parts[2]));
+        } catch (Exception e) {}
+
+        new DatePickerDialog(requireContext(), (view, year, month, dayOfMonth) -> {
+            selectedDate = String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, dayOfMonth);
+            updateDateLabel();
+            viewModel.loadFields(selectedDate);
+        }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
     private void setupObservers() {
+        viewModel.getLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            View loadingBar = getActivity() != null ? getActivity().findViewById(R.id.ownerLoadingBar) : null;
+            if (loadingBar != null) loadingBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+            if (getView() != null) getView().setAlpha(isLoading ? 0.5f : 1.0f);
+        });
+
         viewModel.getFields().observe(getViewLifecycleOwner(), fields -> {
             allFields.clear();
-            if (fields != null) {
-                allFields.addAll(fields);
-            }
-            updateSummary();
+            if (fields != null) allFields.addAll(fields);
+            updateSummaryUI();
             renderFields();
         });
-        viewModel.getMessage().observe(getViewLifecycleOwner(), message -> {
-            if (message != null && !message.trim().isEmpty() && getContext() != null) {
-                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+
+        viewModel.getCurrentFieldAvailability().observe(getViewLifecycleOwner(), slots -> {
+            if (slots != null && timeSlotAdapter != null) {
+                timeSlotAdapter.submitList(slots); 
             }
         });
+        
+        viewModel.getMessage().observe(getViewLifecycleOwner(), msg -> {
+            if (msg != null && !msg.isEmpty()) Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void updateSummaryUI() {
+        int available = 0, maintenance = 0, closed = 0;
+        for (Field field : allFields) {
+            if ("MAINTENANCE".equalsIgnoreCase(field.getStatus())) {
+                maintenance++;
+            } else {
+                boolean hasAnyAvailable = false;
+                if (field.getTimeSlots() != null) {
+                    for (TimeSlotResponse ts : field.getTimeSlots()) {
+                        if (ts.isAvailable()) { hasAnyAvailable = true; break; }
+                    }
+                }
+                if (hasAnyAvailable) available++;
+                else closed++;
+            }
+        }
+        
+        tvAvailableCount.setText(getString(R.string.owner_available_pill, available));
+        tvMaintenanceCount.setText(getString(R.string.owner_maintenance_pill, maintenance));
+        tvClosedCount.setText(getString(R.string.owner_closed_pill, closed));
+
+        tvAvailableCount.setAlpha(filterMode == FilterMode.AVAILABLE || filterMode == FilterMode.ALL ? 1f : 0.4f);
+        tvMaintenanceCount.setAlpha(filterMode == FilterMode.MAINTENANCE || filterMode == FilterMode.ALL ? 1f : 0.4f);
+        tvClosedCount.setAlpha(filterMode == FilterMode.CLOSED || filterMode == FilterMode.ALL ? 1f : 0.4f);
     }
 
     private void renderFields() {
         List<Field> filtered = new ArrayList<>();
         String query = searchQuery.toLowerCase(Locale.US);
         for (Field field : allFields) {
-            if (query.isEmpty() || matchesField(field, query)) {
-                filtered.add(field);
+            boolean matchesSearch = query.isEmpty() || field.getName().toLowerCase(Locale.US).contains(query);
+            if (!matchesSearch) continue;
+
+            boolean isMaintenance = "MAINTENANCE".equalsIgnoreCase(field.getStatus());
+            boolean hasAvailable = false;
+            if (field.getTimeSlots() != null) {
+                for (TimeSlotResponse ts : field.getTimeSlots()) {
+                    if (ts.isAvailable()) { hasAvailable = true; break; }
+                }
             }
+            boolean isClosed = !isMaintenance && !hasAvailable;
+
+            if (filterMode == FilterMode.AVAILABLE && !isMaintenance && hasAvailable) filtered.add(field);
+            else if (filterMode == FilterMode.MAINTENANCE && isMaintenance) filtered.add(field);
+            else if (filterMode == FilterMode.CLOSED && isClosed) filtered.add(field);
+            else if (filterMode == FilterMode.ALL) filtered.add(field);
         }
-        // Apply status filter (Available / Maintenance / Closed)
-        List<Field> statusFiltered = new ArrayList<>();
-        for (Field f : filtered) {
-            if (filterMode == FilterMode.AVAILABLE) {
-                if (!"MAINTENANCE".equalsIgnoreCase(f.getStatus()) && !isFieldClosed(f)) statusFiltered.add(f);
-            } else if (filterMode == FilterMode.MAINTENANCE) {
-                if ("MAINTENANCE".equalsIgnoreCase(f.getStatus())) statusFiltered.add(f);
-            } else if (filterMode == FilterMode.CLOSED) {
-                if (isFieldClosed(f)) statusFiltered.add(f);
-            } else {
-                statusFiltered.add(f);
-            }
-        }
-        fieldAdapter.submitList(statusFiltered);
-        if (tvEmptyFields != null) {
-            tvEmptyFields.setVisibility(statusFiltered.isEmpty() ? View.VISIBLE : View.GONE);
-        }
+        fieldAdapter.submitList(filtered);
+        llEmptyState.setVisibility(filtered.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
-    private boolean matchesField(Field field, String query) {
-        return safe(field.getName()).toLowerCase(Locale.US).contains(query)
-                || safe(field.getTypeLabel()).toLowerCase(Locale.US).contains(query)
-                || safe(field.getStatus()).toLowerCase(Locale.US).contains(query)
-                || safe(field.getAddress()).toLowerCase(Locale.US).contains(query)
-                || safe(field.getDescription()).toLowerCase(Locale.US).contains(query);
-    }
+    private void showTimeSlotManager(Field field) {
+        Dialog dialog = createDialog(R.layout.dialog_owner_time_slot_manager);
+        ((TextView) dialog.findViewById(R.id.tvOwnerTimeSlotManagerTitle)).setText(field.getName());
+        
+        RecyclerView rvSlots = dialog.findViewById(R.id.rvOwnerTimeSlots);
+        timeSlotAdapter = new OwnerTimeSlotAdapter(new OwnerTimeSlotAdapter.Listener() {
+            @Override public void onEditTimeSlot(TimeSlotResponse ts) { showTimeSlotForm(field, ts); dialog.dismiss(); }
+            @Override public void onDeleteTimeSlot(TimeSlotResponse ts) { confirmDeleteTimeSlot(field, ts); dialog.dismiss(); }
+        });
+        rvSlots.setLayoutManager(new LinearLayoutManager(requireContext()));
+        rvSlots.setAdapter(timeSlotAdapter);
+        
+        viewModel.loadFieldAvailability(field.getId(), selectedDate);
 
-    private void updateSummary() {
-        int available = 0;
-        int maintenance = 0;
-        int closed = 0;
-        for (Field field : allFields) {
-            if ("MAINTENANCE".equalsIgnoreCase(field.getStatus())) {
-                maintenance++;
-            } else if (isFieldClosed(field)) {
-                closed++;
-            } else {
-                available++;
-            }
-        }
-        if (getContext() != null) {
-            tvAvailableCount.setText(getString(R.string.owner_available_pill, available));
-            tvMaintenanceCount.setText(getString(R.string.owner_maintenance_pill, maintenance));
-            if (tvClosedCount != null) tvClosedCount.setText(getString(R.string.owner_closed_pill, closed));
-        }
-        tvEmptyFields.setVisibility(allFields.isEmpty() ? View.VISIBLE : View.GONE);
-        // Visual state for filter pills
-        if (tvAvailableCount != null && tvMaintenanceCount != null && tvClosedCount != null) {
-            // Reset all
-            tvAvailableCount.setAlpha(1f);
-            tvAvailableCount.setTypeface(null, android.graphics.Typeface.NORMAL);
-            tvMaintenanceCount.setAlpha(1f);
-            tvMaintenanceCount.setTypeface(null, android.graphics.Typeface.NORMAL);
-            tvClosedCount.setAlpha(1f);
-            tvClosedCount.setTypeface(null, android.graphics.Typeface.NORMAL);
-            switch (filterMode) {
-                case AVAILABLE:
-                    tvAvailableCount.setAlpha(1f);
-                    tvAvailableCount.setTypeface(null, android.graphics.Typeface.BOLD);
-                    tvMaintenanceCount.setAlpha(0.6f);
-                    tvClosedCount.setAlpha(0.6f);
-                    break;
-                case MAINTENANCE:
-                    tvMaintenanceCount.setAlpha(1f);
-                    tvMaintenanceCount.setTypeface(null, android.graphics.Typeface.BOLD);
-                    tvAvailableCount.setAlpha(0.6f);
-                    tvClosedCount.setAlpha(0.6f);
-                    break;
-                case CLOSED:
-                    tvClosedCount.setAlpha(1f);
-                    tvClosedCount.setTypeface(null, android.graphics.Typeface.BOLD);
-                    tvAvailableCount.setAlpha(0.6f);
-                    tvMaintenanceCount.setAlpha(0.6f);
-                    break;
-                default:
-                    // ALL
-                    break;
-            }
-        }
-    }
-
-    private boolean isFieldClosed(Field f) {
-        if (f == null) return false;
-        // If status is explicitly set to CLOSED, respect it
-        if ("CLOSED".equalsIgnoreCase(f.getStatus())) return true;
-        // Otherwise, determine closed if there are time slots and none are available
-        if (f.getTimeSlots() == null || f.getTimeSlots().isEmpty()) return false;
-        for (TimeSlotResponse slot : f.getTimeSlots()) {
-            if (slot == null) continue;
-            if (slot.isAvailable()) return false;
-        }
-        return true;
+        dialog.findViewById(R.id.btnAddOwnerTimeSlot).setOnClickListener(v -> { showTimeSlotForm(field, null); dialog.dismiss(); });
+        dialog.findViewById(R.id.btnCancel).setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
     }
 
     private void showFieldForm(Field field) {
-        if (field == null) {
-            showCreateFieldForm();
-            return;
-        }
-
-        // Use the dedicated edit bottom-sheet layout for editing
+        if (field == null) { showCreateFieldForm(); return; }
         Dialog dialog = createDialog(R.layout.dialog_owner_edit_field);
-
-        TextView tvEditingFieldName = dialog.findViewById(R.id.tvEditingFieldName);
-        View btnClose = dialog.findViewById(R.id.btnCloseEditField);
         EditText etName = dialog.findViewById(R.id.etEditFieldName);
-        LinearLayout chipSan5 = dialog.findViewById(R.id.chipEditTypeSan5);
-        LinearLayout chipSan7 = dialog.findViewById(R.id.chipEditTypeSan7);
-        EditText etCapacity = dialog.findViewById(R.id.etEditCapacity);
-        EditText etPrice = dialog.findViewById(R.id.etEditPricePerSlot);
-        EditText etDescription = dialog.findViewById(R.id.etEditDescription);
-        LinearLayout rbAvailable = dialog.findViewById(R.id.rbEditStatusAvailable);
-        LinearLayout rbMaintenance = dialog.findViewById(R.id.rbEditStatusMaintenance);
-        TextView ivCheckAvailable = dialog.findViewById(R.id.ivEditCheckAvailable);
-        TextView ivCheckMaintenance = dialog.findViewById(R.id.ivEditCheckMaintenance);
-        View btnCancel = dialog.findViewById(R.id.btnCancelEditField);
-        View btnSubmit = dialog.findViewById(R.id.btnSubmitEditField);
-        View btnDelete = dialog.findViewById(R.id.btnDeleteFieldFromEdit);
-        FrameLayout framePreview = dialog.findViewById(R.id.frameEditImagePreview);
-        ImageView ivPreview = dialog.findViewById(R.id.ivEditFieldImagePreview);
-        View btnChangePhoto = dialog.findViewById(R.id.btnChangePhoto);
-
-        tvEditingFieldName.setText(field.getName());
         etName.setText(field.getName());
-        etDescription.setText(field.getDescription());
-        etPrice.setText(field.getPricePerHour() > 0 ? String.valueOf((int) field.getPricePerHour()) : "");
-        etCapacity.setText("");
-
-        // Set type selection
-        String t = normalizeTypeLabel(field.getType());
-        boolean isSan5 = "FIVE_A_SIDE".equalsIgnoreCase(t);
-        chipSan5.setBackgroundResource(isSan5 ? R.drawable.bg_type_chip_active : R.drawable.bg_type_chip_inactive);
-        chipSan7.setBackgroundResource(!isSan5 ? R.drawable.bg_type_chip_active : R.drawable.bg_type_chip_inactive);
-        chipSan5.setTag(Boolean.valueOf(isSan5));
-        chipSan7.setTag(Boolean.valueOf(!isSan5));
-
-        // Set status selection
-        boolean isAvailable = !"MAINTENANCE".equalsIgnoreCase(field.getStatus());
-        rbAvailable.setBackgroundResource(isAvailable ? R.drawable.bg_status_radio_active : R.drawable.bg_status_radio_inactive);
-        rbMaintenance.setBackgroundResource(isAvailable ? R.drawable.bg_status_radio_inactive : R.drawable.bg_status_radio_active);
-        ivCheckAvailable.setVisibility(isAvailable ? View.VISIBLE : View.GONE);
-        ivCheckMaintenance.setVisibility(isAvailable ? View.GONE : View.VISIBLE);
-
-        // Image preview if available
-        if (field.getImageUrl() != null && !field.getImageUrl().trim().isEmpty()) {
-            ivPreview.setVisibility(View.VISIBLE);
-            Glide.with(this).load(field.getImageUrl()).into(ivPreview);
-            if (framePreview != null) framePreview.setVisibility(View.VISIBLE);
-        }
-
-        View.OnClickListener dismiss = v -> dialog.dismiss();
-        if (btnClose != null) btnClose.setOnClickListener(dismiss);
-        if (btnCancel != null) btnCancel.setOnClickListener(dismiss);
-
-        chipSan5.setOnClickListener(v -> {
-            chipSan5.setBackgroundResource(R.drawable.bg_type_chip_active);
-            chipSan7.setBackgroundResource(R.drawable.bg_type_chip_inactive);
-            chipSan5.setTag(Boolean.TRUE);
-            chipSan7.setTag(Boolean.FALSE);
+        
+        dialog.findViewById(R.id.btnSubmitEditField).setOnClickListener(v -> {
+            String name = etName.getText().toString().trim();
+            if (name.isEmpty()) return;
+            viewModel.updateField(field.getId(), new FieldUpdateRequest(name, field.getType(), field.getAddress(), field.getDescription(), field.getImageUrl(), field.getStatus()));
+            dialog.dismiss();
         });
-        chipSan7.setOnClickListener(v -> {
-            chipSan7.setBackgroundResource(R.drawable.bg_type_chip_active);
-            chipSan5.setBackgroundResource(R.drawable.bg_type_chip_inactive);
-            chipSan7.setTag(Boolean.TRUE);
-            chipSan5.setTag(Boolean.FALSE);
-        });
-
-        rbAvailable.setOnClickListener(v -> {
-            rbAvailable.setBackgroundResource(R.drawable.bg_status_radio_active);
-            rbMaintenance.setBackgroundResource(R.drawable.bg_status_radio_inactive);
-            ivCheckAvailable.setVisibility(View.VISIBLE);
-            ivCheckMaintenance.setVisibility(View.GONE);
-        });
-        rbMaintenance.setOnClickListener(v -> {
-            rbAvailable.setBackgroundResource(R.drawable.bg_status_radio_inactive);
-            rbMaintenance.setBackgroundResource(R.drawable.bg_status_radio_active);
-            ivCheckAvailable.setVisibility(View.GONE);
-            ivCheckMaintenance.setVisibility(View.VISIBLE);
-        });
-
-        if (btnChangePhoto != null && createFieldImagePickerLauncher != null) {
-            btnChangePhoto.setOnClickListener(v -> createFieldImagePickerLauncher.launch("image/*"));
-        }
-
-        if (btnSubmit != null) {
-            btnSubmit.setOnClickListener(v -> {
-                String name = readText(etName);
-                String type = isViewSelected(chipSan7) ? "SEVEN_A_SIDE" : "FIVE_A_SIDE";
-                String description = readText(etDescription);
-                String status = ivCheckAvailable.getVisibility() == View.VISIBLE ? "AVAILABLE" : "MAINTENANCE";
-                String cover = ivPreview.getVisibility() == View.VISIBLE && field.getImageUrl() != null ? field.getImageUrl() : "";
-                if (name.isEmpty()) {
-                    Toast.makeText(requireContext(), "Vui lòng nhập tên sân.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                viewModel.updateField(field.getId(), new FieldUpdateRequest(
-                        name,
-                        type,
-                        field.getAddress() == null ? "" : field.getAddress(),
-                        description,
-                        cover,
-                        status));
-                dialog.dismiss();
-            });
-        }
-
-        if (btnDelete != null) {
-            btnDelete.setOnClickListener(v -> {
-                new AlertDialog.Builder(requireContext())
-                        .setTitle("Xóa sân bóng")
-                        .setMessage("Bạn có chắc chắn muốn xóa sân \"" + field.getName() + "\"?")
-                        .setNegativeButton("Hủy", null)
-                        .setPositiveButton("Xóa", (d, which) -> viewModel.deleteField(field.getId()))
-                        .show();
-            });
-        }
-
+        dialog.findViewById(R.id.btnCloseEditField).setOnClickListener(v -> dialog.dismiss());
         dialog.show();
     }
 
     private void showCreateFieldForm() {
         Dialog dialog = createDialog(R.layout.dialog_owner_create_field);
-        createFieldImageUri = null;
-
-        View closeButton = dialog.findViewById(R.id.btnCloseCreateField);
-        View cancelButton = dialog.findViewById(R.id.btnCancelCreateField);
-        View submitButton = dialog.findViewById(R.id.btnSubmitCreateField);
-        View imagePickerContainer = dialog.findViewById(R.id.containerImagePicker);
-        createFieldNoImageContainer = dialog.findViewById(R.id.llNoImage);
-        createFieldImagePreviewContainer = dialog.findViewById(R.id.frameImagePreview);
-        createFieldImagePreview = dialog.findViewById(R.id.ivFieldImagePreview);
-        createFieldNameError = dialog.findViewById(R.id.tvFieldNameError);
-
-        EditText etFieldName = dialog.findViewById(R.id.etFieldName);
-        EditText etDescription = dialog.findViewById(R.id.etDescription);
-        LinearLayout chipTypeSan5 = dialog.findViewById(R.id.chipTypeSan5);
-        LinearLayout chipTypeSan7 = dialog.findViewById(R.id.chipTypeSan7);
-        LinearLayout rbStatusAvailable = dialog.findViewById(R.id.rbStatusAvailable);
-        LinearLayout rbStatusMaintenance = dialog.findViewById(R.id.rbStatusMaintenance);
-        TextView ivCheckAvailable = dialog.findViewById(R.id.ivCheckAvailable);
-        TextView ivCheckMaintenance = dialog.findViewById(R.id.ivCheckMaintenance);
-
-        View.OnClickListener pickImage = v -> {
-            if (createFieldImagePickerLauncher != null) {
-                createFieldImagePickerLauncher.launch("image/*");
-            }
-        };
-
-        if (imagePickerContainer != null) {
-            imagePickerContainer.setOnClickListener(pickImage);
-        }
-        if (createFieldNoImageContainer != null) {
-            createFieldNoImageContainer.setOnClickListener(pickImage);
-        }
-        if (createFieldImagePreviewContainer != null) {
-            createFieldImagePreviewContainer.setOnClickListener(pickImage);
-        }
-
-        updateCreateFieldTypeSelection("FIVE_A_SIDE", chipTypeSan5, chipTypeSan7);
-        updateCreateFieldStatusSelection("AVAILABLE", rbStatusAvailable, rbStatusMaintenance, ivCheckAvailable, ivCheckMaintenance);
-
-        if (chipTypeSan5 != null) {
-            chipTypeSan5.setOnClickListener(v -> updateCreateFieldTypeSelection("FIVE_A_SIDE", chipTypeSan5, chipTypeSan7));
-        }
-        if (chipTypeSan7 != null) {
-            chipTypeSan7.setOnClickListener(v -> updateCreateFieldTypeSelection("SEVEN_A_SIDE", chipTypeSan5, chipTypeSan7));
-        }
-
-        if (rbStatusAvailable != null) {
-            rbStatusAvailable.setOnClickListener(v -> updateCreateFieldStatusSelection("AVAILABLE", rbStatusAvailable, rbStatusMaintenance, ivCheckAvailable, ivCheckMaintenance));
-        }
-        if (rbStatusMaintenance != null) {
-            rbStatusMaintenance.setOnClickListener(v -> updateCreateFieldStatusSelection("MAINTENANCE", rbStatusAvailable, rbStatusMaintenance, ivCheckAvailable, ivCheckMaintenance));
-        }
-
-        View.OnClickListener dismissListener = v -> dialog.dismiss();
-        if (closeButton != null) {
-            closeButton.setOnClickListener(dismissListener);
-        }
-        if (cancelButton != null) {
-            cancelButton.setOnClickListener(dismissListener);
-        }
-        if (submitButton != null) {
-            submitButton.setOnClickListener(v -> {
-                if (createFieldNameError != null) {
-                    createFieldNameError.setVisibility(View.GONE);
-                }
-
-                String name = readText(etFieldName);
-                if (name.isEmpty()) {
-                    if (createFieldNameError != null) {
-                        createFieldNameError.setVisibility(View.VISIBLE);
-                    }
-                    Toast.makeText(requireContext(), "Vui lòng nhập tên sân.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                String description = readText(etDescription);
-
-                String coverImage = createFieldImageUri == null ? "" : createFieldImageUri.toString();
-                viewModel.createField(new FieldCreateRequest(
-                        name,
-                        createFieldSelectedType,
-                        "",
-                        description,
-                        coverImage,
-                        createFieldSelectedStatus));
-                dialog.dismiss();
-            });
-        }
-
-        dialog.setOnDismissListener(d -> clearCreateFieldDialogState());
+        EditText etName = dialog.findViewById(R.id.etFieldName);
+        dialog.findViewById(R.id.btnSubmitCreateField).setOnClickListener(v -> {
+            String name = etName.getText().toString().trim();
+            if (name.isEmpty()) return;
+            viewModel.createField(new FieldCreateRequest(name, "FIVE_A_SIDE", "", "", "", "AVAILABLE"));
+            dialog.dismiss();
+        });
+        dialog.findViewById(R.id.btnCancelCreateField).setOnClickListener(v -> dialog.dismiss());
         dialog.show();
     }
 
-    private void updateCreateFieldTypeSelection(String type, LinearLayout chipTypeSan5, LinearLayout chipTypeSan7) {
-        createFieldSelectedType = type;
-        if (chipTypeSan5 == null || chipTypeSan7 == null) {
-            return;
+    private void showTimeSlotForm(Field field, TimeSlotResponse ts) {
+        Dialog dialog = createDialog(R.layout.dialog_owner_time_slot_form);
+        EditText etStart = dialog.findViewById(R.id.etOwnerSlotStartTime);
+        EditText etEnd = dialog.findViewById(R.id.etOwnerSlotEndTime);
+        EditText etPrice = dialog.findViewById(R.id.etOwnerSlotPrice);
+        if (ts != null) { 
+            etStart.setText(ts.getStartTime()); 
+            etEnd.setText(ts.getEndTime()); 
+            etPrice.setText(String.valueOf(ts.getPrice().intValue())); 
         }
-
-        boolean isSan5 = "FIVE_A_SIDE".equals(type);
-        boolean isSan7 = "SEVEN_A_SIDE".equals(type);
-
-        chipTypeSan5.setBackgroundResource(isSan5 ? R.drawable.bg_type_chip_active : R.drawable.bg_type_chip_inactive);
-        chipTypeSan7.setBackgroundResource(isSan7 ? R.drawable.bg_type_chip_active : R.drawable.bg_type_chip_inactive);
-
-        updateTypeChipTexts(chipTypeSan5, isSan5);
-        updateTypeChipTexts(chipTypeSan7, isSan7);
-    }
-
-    private void updateTypeChipTexts(LinearLayout chip, boolean selected) {
-        if (chip == null) {
-            return;
-        }
-        TextView titleView = (TextView) chip.getChildAt(0);
-        TextView subtitleView = (TextView) chip.getChildAt(1);
-        if (titleView != null) {
-            titleView.setTextColor(getResources().getColor(selected ? android.R.color.white : R.color.slate_600, null));
-        }
-        if (subtitleView != null) {
-            subtitleView.setTextColor(getResources().getColor(selected ? android.R.color.white : R.color.slate_400, null));
-        }
-    }
-
-    private void updateCreateFieldStatusSelection(String status,
-                                                  LinearLayout rbStatusAvailable,
-                                                  LinearLayout rbStatusMaintenance,
-                                                  TextView ivCheckAvailable,
-                                                  TextView ivCheckMaintenance) {
-        createFieldSelectedStatus = status;
-        if (rbStatusAvailable == null || rbStatusMaintenance == null || ivCheckAvailable == null || ivCheckMaintenance == null) {
-            return;
-        }
-
-        boolean availableSelected = "AVAILABLE".equals(status);
-        rbStatusAvailable.setBackgroundResource(availableSelected ? R.drawable.bg_status_radio_active : R.drawable.bg_status_radio_inactive);
-        rbStatusMaintenance.setBackgroundResource(availableSelected ? R.drawable.bg_status_radio_inactive : R.drawable.bg_status_radio_active);
-        ivCheckAvailable.setVisibility(availableSelected ? View.VISIBLE : View.GONE);
-        ivCheckMaintenance.setVisibility(availableSelected ? View.GONE : View.VISIBLE);
-    }
-
-    private String buildCreateFieldSupplementalInfo(String capacity, String price) {
-        List<String> infoLines = new ArrayList<>();
-        if (!capacity.isEmpty()) {
-            infoLines.add("Sức chứa tối đa: " + capacity + " người");
-        }
-        if (!price.isEmpty()) {
-            infoLines.add("Giá thuê / giờ: " + price + " ₫");
-        }
-        return TextUtils.join("\n", infoLines);
-    }
-
-    private Integer parseInteger(String value) {
-        try {
-            return Integer.parseInt(value.trim());
-        } catch (Exception exception) {
-            return null;
-        }
-    }
-
-    private void clearCreateFieldDialogState() {
-        createFieldImageUri = null;
-        createFieldNoImageContainer = null;
-        createFieldImagePreviewContainer = null;
-        createFieldImagePreview = null;
-        createFieldNameError = null;
-        createFieldSelectedType = "FIVE_A_SIDE";
-        createFieldSelectedStatus = "AVAILABLE";
-    }
-
-    private boolean isViewSelected(View v) {
-        if (v == null) return false;
-        Object tag = v.getTag();
-        return tag instanceof Boolean && (Boolean) tag;
+        dialog.findViewById(R.id.btnSave).setOnClickListener(v -> {
+            try {
+                double p = Double.parseDouble(etPrice.getText().toString());
+                if (ts != null) viewModel.updateTimeSlot(field.getId(), ts.getId(), new TimeSlotUpdateRequest(etStart.getText().toString(), etEnd.getText().toString(), p, "AVAILABLE"));
+                else viewModel.createTimeSlot(field.getId(), new TimeSlotCreateRequest(etStart.getText().toString(), etEnd.getText().toString(), p, "AVAILABLE"));
+                dialog.dismiss();
+            } catch (Exception e) {}
+        });
+        dialog.findViewById(R.id.btnCancel).setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
     }
 
     private void confirmDeleteField(Field field) {
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Xóa sân bóng")
-                .setMessage("Bạn có chắc chắn muốn xóa sân \"" + field.getName() + "\"?")
-                .setNegativeButton("Hủy", null)
-                .setPositiveButton("Xóa", (dialog, which) -> viewModel.deleteField(field.getId()))
-                .show();
+        new AlertDialog.Builder(requireContext()).setTitle("Xóa sân").setMessage("Xóa \"" + field.getName() + "\"?").setPositiveButton("Xóa", (d, w) -> viewModel.deleteField(field.getId())).setNegativeButton("Hủy", null).show();
     }
 
-    private void showTimeSlotManager(Field field) {
-        Dialog dialog = createDialog(R.layout.dialog_owner_time_slot_manager);
-        TextView tvTitle = dialog.findViewById(R.id.tvOwnerTimeSlotManagerTitle);
-        TextView tvSubtitle = dialog.findViewById(R.id.tvOwnerTimeSlotManagerSubtitle);
-        TextView tvEmpty = dialog.findViewById(R.id.tvOwnerTimeSlotEmpty);
-        RecyclerView rvSlots = dialog.findViewById(R.id.rvOwnerTimeSlots);
-        MaterialButton btnAdd = dialog.findViewById(R.id.btnAddOwnerTimeSlot);
-
-        tvTitle.setText(field.getName());
-        tvSubtitle.setText(getString(R.string.owner_field_type_status_format, field.getTypeLabel(), safe(field.getStatus())));
-
-        OwnerTimeSlotAdapter adapter = new OwnerTimeSlotAdapter(new OwnerTimeSlotAdapter.Listener() {
-            @Override
-            public void onEditTimeSlot(TimeSlotResponse timeSlot) {
-                showTimeSlotForm(field, timeSlot);
-                dialog.dismiss();
-            }
-
-            @Override
-            public void onDeleteTimeSlot(TimeSlotResponse timeSlot) {
-                confirmDeleteTimeSlot(field, timeSlot);
-                dialog.dismiss();
-            }
-        });
-
-        rvSlots.setLayoutManager(new LinearLayoutManager(requireContext()));
-        rvSlots.setAdapter(adapter);
-        adapter.submitList(field.getTimeSlots());
-        tvEmpty.setVisibility(field.getTimeSlots() == null || field.getTimeSlots().isEmpty()
-                ? View.VISIBLE : View.GONE);
-
-        btnAdd.setOnClickListener(v -> {
-            showTimeSlotForm(field, null);
-            dialog.dismiss();
-        });
-
-        dialog.show();
+    private void confirmDeleteTimeSlot(Field field, TimeSlotResponse ts) {
+        new AlertDialog.Builder(requireContext()).setTitle("Xóa khung giờ").setMessage("Xóa " + ts.getStartTime() + "?").setPositiveButton("Xóa", (d, w) -> viewModel.deleteTimeSlot(field.getId(), ts.getId())).setNegativeButton("Hủy", null).show();
     }
 
-    private void showTimeSlotForm(Field field, TimeSlotResponse timeSlot) {
-        Dialog dialog = createDialog(R.layout.dialog_owner_time_slot_form);
-        TextView tvTitle = dialog.findViewById(R.id.tv_dialog_title);
-        TextInputEditText etStartTime = dialog.findViewById(R.id.etOwnerSlotStartTime);
-        TextInputEditText etEndTime = dialog.findViewById(R.id.etOwnerSlotEndTime);
-        TextInputEditText etPrice = dialog.findViewById(R.id.etOwnerSlotPrice);
-        AutoCompleteTextView etStatus = dialog.findViewById(R.id.etOwnerSlotStatus);
-        MaterialButton btnCancel = dialog.findViewById(R.id.btnCancel);
-        MaterialButton btnSave = dialog.findViewById(R.id.btnSave);
-
-        String[] statuses = {"AVAILABLE", "PENDING", "BOOKED"};
-        etStatus.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, statuses));
-
-        boolean editing = timeSlot != null;
-        tvTitle.setText(editing ? "Chỉnh sửa khung giờ" : "Thêm khung giờ");
-        btnSave.setText(editing ? "Lưu khung giờ" : "Thêm khung giờ");
-
-        if (editing) {
-            etStartTime.setText(timeSlot.getStartTime());
-            etEndTime.setText(timeSlot.getEndTime());
-            etPrice.setText(timeSlot.getPrice() == null ? "" : String.valueOf(timeSlot.getPrice()));
-            String selectedStatus = timeSlot.isAvailable() ? "AVAILABLE" : safe(timeSlot.getStatus());
-            etStatus.setText(selectedStatus, false);
-        } else {
-            String defaultStatus = "AVAILABLE";
-            etStatus.setText(defaultStatus, false);
-        }
-
-        btnCancel.setOnClickListener(v -> dialog.dismiss());
-        btnSave.setOnClickListener(v -> {
-            String start = readText(etStartTime);
-            String end = readText(etEndTime);
-            BigDecimal price = parsePrice(readText(etPrice));
-            if (start.isEmpty() || end.isEmpty() || price == null) {
-                Toast.makeText(requireContext(), "Vui lòng nhập đủ giờ bắt đầu, giờ kết thúc và giá.", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (editing) {
-                viewModel.updateTimeSlot(
-                        field.getId(),
-                        timeSlot.getId(),
-                        new TimeSlotUpdateRequest(start, end, price.doubleValue(), readText(etStatus)));
-            } else {
-                viewModel.createTimeSlot(
-                        field.getId(),
-                        new TimeSlotCreateRequest(start, end, price.doubleValue(), readText(etStatus)));
-            }
-            dialog.dismiss();
-        });
-
-        dialog.show();
+    private Dialog createDialog(int resId) {
+        Dialog d = new Dialog(requireContext(), R.style.Theme_TimSanBong);
+        d.setContentView(resId);
+        d.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        return d;
     }
 
-    private void confirmDeleteTimeSlot(Field field, TimeSlotResponse timeSlot) {
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Xóa khung giờ")
-                .setMessage("Bạn có chắc chắn muốn xóa khung giờ " + safe(timeSlot.getStartTime()) + " - " + safe(timeSlot.getEndTime()) + "?")
-                .setNegativeButton("Hủy", null)
-                .setPositiveButton("Xóa", (dialog, which) -> viewModel.deleteTimeSlot(field.getId(), timeSlot.getId()))
-                .show();
-    }
-
-    // 6. Cập nhật hàm tạo Custom Dialog bằng requireContext()
-    private Dialog createDialog(int layoutResId) {
-        Dialog dialog = new Dialog(requireContext(), R.style.Theme_TimSanBong);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(layoutResId);
-        Window window = dialog.getWindow();
-        if (window != null) {
-            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-            window.setBackgroundDrawableResource(android.R.color.transparent);
-        }
-        return dialog;
-    }
-
-    private String readText(TextView textView) {
-        return textView.getText() == null ? "" : textView.getText().toString().trim();
-    }
-
-    private String safe(String value) {
-        return value == null ? "" : value;
-    }
-
-    private BigDecimal parsePrice(String value) {
-        try {
-            return new BigDecimal(value);
-        } catch (Exception exception) {
-            return null;
-        }
-    }
-
-    private String normalizeTypeLabel(String type) {
-        if (type == null) {
-            return "FIVE_A_SIDE";
-        }
-        String normalized = type.toUpperCase(Locale.US);
-        if (normalized.contains("11")) {
-            return "ELEVEN_A_SIDE";
-        }
-        if (normalized.contains("7")) {
-            return "SEVEN_A_SIDE";
-        }
-        return "FIVE_A_SIDE";
-    }
-
-    private String normalizeStatus(String status) {
-        if (status == null || status.trim().isEmpty()) {
-            return "AVAILABLE";
-        }
-        return status.toUpperCase(Locale.US);
-    }
-
-    private static class SimpleTextWatcher implements android.text.TextWatcher {
-        private final java.util.function.Consumer<String> consumer;
-
-        SimpleTextWatcher(java.util.function.Consumer<String> consumer) {
-            this.consumer = consumer;
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            consumer.accept(s == null ? "" : s.toString());
-        }
-
-        @Override
-        public void afterTextChanged(android.text.Editable s) {
-        }
+    private static class SimpleTextWatcher implements TextWatcher {
+        private final java.util.function.Consumer<String> c;
+        SimpleTextWatcher(java.util.function.Consumer<String> c) { this.c = c; }
+        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        @Override public void onTextChanged(CharSequence s, int start, int before, int count) { c.accept(s.toString()); }
+        @Override public void afterTextChanged(Editable s) {}
     }
 }

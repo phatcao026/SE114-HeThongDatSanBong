@@ -1,37 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    item_field_card.xml  ─  FieldCardAdapter.ViewHolder
-    Used in: fragment_field_management.xml → rvFieldList
-
-    Sections:
-      1. Accent colour bar (6dp, set background colour = field.accentColor in Java)
-      2. Field name (21sp bold) + type badge + capacity + rating
-      3. Status toggle button (AVAILABLE ↔ MAINTENANCE)
-      4. 2-column info grid: price box · booked-today box + progress bar
-      5. Time slots section: header label + chip FlexboxLayout container
-         → Add chip TextViews programmatically from field.getSlots()
-         → Each chip: bg_slot_chip_free.xml (green) or bg_slot_chip_booked.xml (red)
-         → If slots.size() > 4: add expand chip using bg_slot_chip_expand.xml
-      6. Horizontal divider
-      7. Action row: [Edit btn] [Delete btn] [Manage Slots btn]
-
-    Java wiring (FieldCardAdapter.java):
-      viewAccentBar         → setBackgroundColor(field.accentColor)
-      tvFieldName           → field.getName()
-      tvFieldTypeBadge      → field.getType()  + set background:
-                               Sân 5  → bg_type_badge_san5  textColor=#6D28D9
-                               Sân 7  → bg_type_badge_san7  textColor=#1D4ED8
-      tvFieldCapacity       → field.getCapacity() + " người"
-      tvFieldRating         → field.getRating()
-      btnStatusToggle       → field.getStatus() → set text + background
-      tvFieldPrice          → field.getPricePerSlot()
-      tvBookedToday         → field.getBookedToday() + "/" + field.getTotalSlots()
-      progressSlotUtil      → setProgress(field.getUtilizationPercent())
-      flSlotChips           → clear() + add chips programmatically
-      btnEditField          → listener.onEdit(field, position)
-      btnDeleteField        → listener.onDelete(field, position)
-      btnManageSlots        → listener.onManageSlots(field, position)
--->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -50,29 +17,27 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- ══ 1. ACCENT COLOUR BAR ══════════════════════ -->
+        <!-- Thanh màu đầu card -->
         <View
             android:id="@+id/viewAccentBar"
             android:layout_width="match_parent"
             android:layout_height="6dp"
             android:background="@color/emerald_500" />
-        <!-- In Java: viewAccentBar.setBackgroundColor(field.getAccentColor()) -->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="10dp">
+            android:padding="16dp">
 
-            <!-- ══ 2. FIELD NAME + META ROW ══════════════ -->
+            <!-- Tên sân và Trạng thái -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="start"
-                android:layout_marginBottom="10dp">
+                android:gravity="top"
+                android:layout_marginBottom="16dp">
 
-                <!-- Left: Name + badges row -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -85,19 +50,16 @@
                         android:layout_height="wrap_content"
                         android:text="@string/sample_field_name"
                         android:textColor="@color/slate_900"
-                        android:textSize="21sp"
-                        android:textStyle="bold"
-                        android:lineSpacingExtra="-2dp" />
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
 
-                    <!-- Badges row: Type badge · Capacity · Rating -->
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:layout_marginTop="6dp">
+                        android:layout_marginTop="4dp">
 
-                        <!-- Field type pill -->
                         <TextView
                             android:id="@+id/tvFieldTypeBadge"
                             android:layout_width="wrap_content"
@@ -107,44 +69,25 @@
                             android:textSize="11sp"
                             android:textStyle="bold"
                             android:background="@drawable/bg_type_badge_san5"
-                            android:paddingStart="10dp"
-                            android:paddingEnd="10dp"
-                            android:paddingTop="3dp"
-                            android:paddingBottom="3dp"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="2dp"
                             android:layout_marginEnd="8dp" />
 
-                        <!-- Capacity with user icon -->
-                        <LinearLayout
+                        <TextView
+                            android:id="@+id/tvFieldCapacity"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginEnd="8dp">
+                            android:text="@string/sample_capacity"
+                            android:textColor="@color/slate_500"
+                            android:textSize="11sp" />
 
-                            <ImageView
-                                android:layout_width="11dp"
-                                android:layout_height="11dp"
-                                android:src="@android:drawable/ic_menu_myplaces"
-                                app:tint="@color/slate_400"
-                                android:layout_marginEnd="3dp" />
-
-                            <TextView
-                                android:id="@+id/tvFieldCapacity"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/sample_capacity"
-                                android:textColor="@color/slate_500"
-                                android:textSize="11sp" />
-
-                        </LinearLayout>
-
-                        <!-- Rating with star icon -->
                         <LinearLayout
                             android:id="@+id/llFieldRating"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:gravity="center_vertical">
+                            android:gravity="center_vertical"
+                            android:layout_marginStart="8dp">
 
                             <ImageView
                                 android:layout_width="11dp"
@@ -157,18 +100,14 @@
                                 android:id="@+id/tvFieldRating"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/sample_rating"
+                                android:text="0.0"
                                 android:textColor="@color/amber_700"
                                 android:textSize="11sp"
                                 android:textStyle="bold" />
-
                         </LinearLayout>
-
                     </LinearLayout>
-
                 </LinearLayout>
 
-                <!-- Right: Status toggle button -->
                 <LinearLayout
                     android:id="@+id/btnStatusToggle"
                     android:layout_width="wrap_content"
@@ -176,303 +115,82 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:background="@drawable/bg_status_available"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp">
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="6dp">
 
-                    <!-- Status dot -->
                     <View
                         android:id="@+id/viewStatusDot"
-                        android:layout_width="7dp"
-                        android:layout_height="7dp"
+                        android:layout_width="6dp"
+                        android:layout_height="6dp"
                         android:background="@drawable/bg_badge_green"
-                        android:layout_marginEnd="5dp" />
+                        android:layout_marginEnd="6dp" />
 
                     <TextView
                         android:id="@+id/tvStatusLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/status_available"
+                        android:text="AVAILABLE"
                         android:textColor="@color/emerald_700"
                         android:textSize="10sp"
-                        android:textStyle="bold"
-                        android:letterSpacing="0.04" />
-
+                        android:textStyle="bold" />
                 </LinearLayout>
-                <!--
-                  In Java: when status == "Maintenance":
-                    btnStatusToggle.setBackground(ContextCompat.getDrawable(ctx, R.drawable.bg_status_maintenance))
-                    viewStatusDot  .setBackground(ContextCompat.getDrawable(ctx, R.drawable.bg_badge_orange))
-                    tvStatusLabel  .setText("MAINTENANCE")
-                    tvStatusLabel  .setTextColor(ContextCompat.getColor(ctx, R.color.orange_700))
-                -->
-
             </LinearLayout>
 
-            <!-- ══ 3. INFO GRID: Price · Booked Today ════ -->
+            <!-- Hành động -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="10dp">
+                android:gravity="center_vertical">
 
-                <!-- Price box -->
-                <LinearLayout
-                    android:id="@+id/llPriceBox"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_info_green"
-                    android:padding="10dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/price_per_slot_label"
-                        android:textColor="@color/slate_500"
-                        android:textSize="10sp"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:id="@+id/tvFieldPrice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/sample_price"
-                        android:textColor="@color/emerald_600"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <!-- Booked today box + progress bar -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_info_gray"
-                    android:padding="10dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/booked_today"
-                        android:textColor="@color/slate_500"
-                        android:textSize="10sp"
-                        android:layout_marginBottom="4dp" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="">
-
-                        <TextView
-                            android:id="@+id/tvBookedToday"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/sample_booked_today"
-                            android:textColor="@color/slate_900"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvTotalSlotsLabel"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/sample_total_slots"
-                            android:textColor="@color/slate_400"
-                            android:textSize="11sp" />
-
-                    </LinearLayout>
-
-                    <!-- Utilisation progress bar -->
-                    <ProgressBar
-                        android:id="@+id/progressSlotUtil"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="4dp"
-                        android:layout_marginTop="6dp"
-                        android:progressDrawable="@drawable/progress_slot_util"
-                        android:max="100"
-                        android:progress="42" />
-                    <!--
-                      In Java: set progress color based on utilization:
-                        > 70% → emerald_500
-                        > 40% → amber_500
-                        ≤ 40% → slate_300
-                      Use LayerDrawable to update color programmatically.
-                    -->
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <!-- ══ 4. TIME SLOTS SECTION ═════════════════ -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="1dp">
-
-                <!-- Section header -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="8dp">
-
-                    <ImageView
-                        android:layout_width="13dp"
-                        android:layout_height="13dp"
-                        android:src="@android:drawable/ic_menu_recent_history"
-                        app:tint="@color/slate_500"
-                        android:layout_marginEnd="5dp" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/timeslot_label"
-                        android:textColor="@color/slate_700"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                    <!-- Free / booked summary -->
-                    <TextView
-                        android:id="@+id/tvSlotSummary"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/sample_slot_summary"
-                        android:textColor="@color/emerald_600"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <!--
-                    TIME SLOT CHIPS CONTAINER
-                    Use com.google.android.flexbox.FlexboxLayout from the Flexbox library:
-                      implementation 'com.google.android.flexbox:flexbox:3.0.0'
-
-                    FlexboxLayout wraps chips to multiple lines automatically.
-                    In FieldCardAdapter.java:
-                      1. flSlotChips.removeAllViews()
-                      2. For each TimeSlot in field.getSlots() (show first 4, hide rest):
-                           TextView chip = inflater.inflate(R.layout.item_slot_chip, flSlotChips, false)
-                           chip.setText(slot.getTimeRange())
-                           chip.setBackground(slot.isBooked()
-                               ? bg_slot_chip_booked : bg_slot_chip_free)
-                           chip.setTextColor(slot.isBooked() ? #B91C1C : #15803D)
-                           flSlotChips.addView(chip)
-                      3. If slots.size() > 4: add "expand" chip with bg_slot_chip_expand
-                         clicking it removes itself and adds remaining chips
-                -->
-                <com.google.android.flexbox.FlexboxLayout
-                    android:id="@+id/flSlotChips"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:flexWrap="wrap"
-                    app:flexDirection="row"
-                    app:alignItems="flex_start"
-                    app:justifyContent="flex_start" />
-
-                <!--
-                    FALLBACK if Flexbox not available:
-                    Use a LinearLayout inside HorizontalScrollView for a single-row view.
-                    The item XML for each chip is item_slot_chip.xml (see below).
-
-                    <HorizontalScrollView android:scrollbars="none">
-                        <LinearLayout android:id="@+id/llSlotChipsRow"
-                            android:orientation="horizontal" />
-                    </HorizontalScrollView>
-                -->
-
-            </LinearLayout>
-
-            <!-- ══ 5. DIVIDER ════════════════════════════ -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/slate_100"
-                android:layout_marginBottom="4dp" />
-
-            <!-- ══ 6. ACTION ROW ═════════════════════════ -->
-            <LinearLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="4dp">
-
-                <!-- NÚT CHÍNH: Chiếm phần lớn không gian, thu hút sự chú ý -->
-                    <com.google.android.material.button.MaterialButton
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnManageSlots"
                     android:layout_width="0dp"
-                    android:layout_height="40dp"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
-                        android:layout_marginEnd="12dp"
-                        android:text="@string/manage_slots"
+                    android:layout_marginEnd="12dp"
+                    android:text="@string/manage_slots"
                     android:textColor="@color/white"
-                    android:textSize="15sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
+                    android:textAllCaps="false"
                     app:icon="@android:drawable/ic_menu_manage"
-                    app:iconGravity="textStart"
-                    app:iconPadding="8dp"
-                    app:iconSize="18dp"
-                    app:iconTint="@color/white"
+                    app:iconSize="24dp"
                     app:backgroundTint="@color/emerald_500"
-                    app:cornerRadius="10dp" />
+                    app:cornerRadius="12dp" />
 
-                <!-- NÚT PHỤ 1: Sửa (Màu trung tính, dạng Outline) -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEditField"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_marginEnd="8dp"
                     android:padding="0dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
                     app:icon="@android:drawable/ic_menu_edit"
                     app:iconGravity="textStart"
                     app:iconPadding="0dp"
-                    app:iconSize="20dp"
-                    app:iconTint="@color/slate_500"
-                    app:backgroundTint="@android:color/transparent"
+                    app:iconSize="24dp"
+                    app:iconTint="@color/slate_600"
                     app:strokeColor="@color/slate_200"
                     app:strokeWidth="1dp"
-                    app:cornerRadius="10dp" />
+                    app:cornerRadius="12dp" />
 
-                <!-- NÚT PHỤ 2: Xóa (Dạng cảnh báo nhẹ, nền đỏ nhạt) -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnDeleteField"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:padding="0dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
                     app:icon="@android:drawable/ic_menu_delete"
                     app:iconGravity="textStart"
                     app:iconPadding="0dp"
-                    app:iconSize="20dp"
                     app:iconTint="@color/red_500"
+                    app:iconSize="24dp"
                     app:backgroundTint="@color/red_50"
-                    app:strokeColor="@color/red_100"
-                    app:strokeWidth="1dp"
-                    app:cornerRadius="10dp" />
-
-            </LinearLayout>
-
+                    app:cornerRadius="12dp"
+                    app:rippleColor="@color/red_100" />
             </LinearLayout>
 
         </LinearLayout>
-
+    </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

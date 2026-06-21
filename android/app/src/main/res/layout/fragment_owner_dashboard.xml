@@ -1,15 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    fragment_dashboard.xml  ─  DashboardFragment
-    Screens: Welcome header · Revenue hero card · 3 stat mini-cards ·
-             Quick Actions · Recent Bookings RecyclerView
-    Java wiring:
-      - rvRecentBookings  → LinearLayoutManager + RecentBookingAdapter
-      - btnNewField       → navigate to FieldManagementFragment
-      - btnCalendar       → navigate to BookingManagementFragment
-      - btnSeeAll         → navigate to BookingManagementFragment
-      - tvOwnerName       → set from SharedPreferences / ViewModel
--->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -51,7 +40,6 @@
                 android:textStyle="bold"
                 android:gravity="center" />
 
-            <!-- Online dot -->
             <View
                 android:layout_width="12dp"
                 android:layout_height="12dp"
@@ -88,7 +76,6 @@
 
         </LinearLayout>
 
-        <!-- Notification Bell + red badge -->
         <FrameLayout
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -128,9 +115,10 @@
                 android:textSize="10sp"
                 android:textAlignment="center"
                 android:textStyle="bold"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
         </FrameLayout>
+
         <LinearLayout
             android:id="@+id/btnLogout"
             android:layout_width="40dp"
@@ -141,19 +129,15 @@
             android:focusable="true"
             android:gravity="center">
 
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="3dp"
-            android:src="@drawable/ic_admin_logout"
-            app:tint="@color/slate_700" />
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_admin_logout"
+                app:tint="@color/slate_700" />
 
-    </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 
-    <!-- ══════════════════════════════════════════════════
-         SCROLLABLE BODY
-         ══════════════════════════════════════════════════ -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -167,143 +151,57 @@
             <!-- ─────────────────────────────────────────
                  REVENUE HERO CARD
                  ───────────────────────────────────────── -->
-            <FrameLayout
+            <LinearLayout
+                android:id="@+id/cardRevenue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_gradient_green_primary"
+                android:padding="20dp"
+                android:elevation="4dp"
                 android:layout_marginBottom="12dp">
 
-                <LinearLayout
-                    android:id="@+id/cardRevenue"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_gradient_green_primary"
-                    android:padding="20dp"
-                    android:elevation="4dp">
+                    android:text="@string/greeting_subtitle"
+                    android:textColor="@color/emerald_200"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.06" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/tvRevenueValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 ₫"
+                    android:textColor="@color/white"
+                    android:textSize="36sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="4dp" />
+
+                <LinearLayout
+                    android:id="@+id/containerRevenueChange"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvRevenueChange"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-
-                        <!-- Left: labels + value -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/greeting_subtitle"
-                                android:textColor="@color/emerald_200"
-                                android:textSize="11sp"
-                                android:textStyle="bold"
-                                android:letterSpacing="0.06" />
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:gravity="bottom"
-                                android:layout_marginTop="4dp">
-
-                                <TextView
-                                    android:id="@+id/tvRevenueValue"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="12.4M"
-                                    android:textColor="@color/white"
-                                    android:textSize="40sp"
-                                    android:textStyle="bold"
-                                    android:lineSpacingExtra="-4dp" />
-
-                                <!--TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text=" ₫"
-                                    android:textColor="@color/emerald_200"
-                                    android:textSize="14sp"
-                                    android:layout_marginBottom="5dp" /-->
-
-                            </LinearLayout>
-
-                            <!-- +18% badge -->
-                            <LinearLayout
-                                android:id="@+id/containerRevenueChange"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal"
-                                android:paddingStart="8dp"
-                                android:paddingTop="3dp"
-                                android:paddingEnd="8dp"
-                                android:paddingBottom="3dp">
-
-                                <!-- ↑ up arrow indicator -->
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="↑"
-                                    android:textColor="@color/white"
-                                    android:textSize="13sp"
-                                    android:textStyle="bold" />
-
-                                <TextView
-                                    android:id="@+id/tvRevenueChange"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="3dp"
-                                    android:text="@string/stat_revenue_change"
-                                    android:textColor="@color/white"
-                                    android:textSize="13sp" />
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <!-- Right: trend icon box -->
-                        <LinearLayout
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:background="#33FFFFFF"
-                            android:gravity="center">
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@android:drawable/stat_sys_upload"
-                                app:tint="@color/white" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <!-- Mini bar-chart sparkline — rendered via canvas in Java/custom view.
-                         Replace this placeholder View with a custom BarChartView in code. -->
-                    <!--View
-                        android:id="@+id/viewRevenueMiniChart"
-                        android:layout_width="match_parent"
-                        android:layout_height="36dp"
-                        android:layout_marginTop="16dp"
-                        android:background="#22FFFFFF"
-                        android:contentDescription="Revenue mini chart" /-->
-                    <!--
-                        In Java, override onDraw() on a custom View to replicate the
-                        12-bar sparkline: bars at heights [40,65,45,80,55,90,70,100,75,88,60,95]%
-                        Last bar is fully white, others at 30% white alpha.
-                    -->
+                        android:text="0 thành công · 0 cần xử lý"
+                        android:textColor="@color/white"
+                        android:textSize="13sp" />
 
                 </LinearLayout>
 
-            </FrameLayout>
+            </LinearLayout>
 
             <!-- ─────────────────────────────────────────
-                 3 STAT MINI-CARDS  (Pending · Fields · Completed)
-                 Arranged in a 3-column LinearLayout
+                 2 STAT MINI-CARDS (Icon + Value on same row)
                  ───────────────────────────────────────── -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -311,41 +209,45 @@
                 android:orientation="horizontal"
                 android:layout_marginBottom="20dp">
 
-                <!-- CARD: Pending Orders (amber) -->
+                <!-- CARD: Pending Orders -->
                 <LinearLayout
                     android:id="@+id/cardStatPending"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginEnd="5dp"
+                    android:layout_marginEnd="6dp"
                     android:orientation="vertical"
                     android:background="@drawable/bg_status_pending"
                     android:padding="12dp">
 
-                    <!-- Icon box -->
                     <LinearLayout
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/bg_info_amber"
-                        android:gravity="center"
-                        android:layout_marginBottom="8dp">
-
-                        <ImageView
-                            android:layout_width="15dp"
-                            android:layout_height="15dp"
-                            android:src="@android:drawable/ic_menu_recent_history"
-                            app:tint="@color/amber_600" />
-
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/tvStatPendingValue"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="8"
-                        android:textColor="@color/slate_900"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <LinearLayout
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:background="@drawable/bg_info_amber"
+                            android:gravity="center">
+                            <ImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:src="@android:drawable/ic_menu_recent_history"
+                                app:tint="@color/amber_600" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvStatPendingValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="0"
+                            android:textColor="@color/slate_900"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -353,60 +255,48 @@
                         android:text="@string/stat_pending_label"
                         android:textColor="@color/amber_800"
                         android:textSize="10sp"
-                        android:layout_marginTop="2dp" />
-
-                    <!-- "Needs action" badge -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/stat_pending_badge"
-                        android:textColor="@color/white"
-                        android:textSize="9sp"
-                        android:textStyle="bold"
-                        android:background="@drawable/bg_badge_orange"
-                        android:paddingStart="6dp"
-                        android:paddingEnd="6dp"
-                        android:paddingTop="2dp"
-                        android:paddingBottom="2dp"
-                        android:layout_marginTop="6dp" />
-
+                        android:layout_marginTop="4dp" />
                 </LinearLayout>
 
-                <!-- CARD: Total Fields (emerald) -->
+                <!-- CARD: Total Fields -->
                 <LinearLayout
                     android:id="@+id/cardStatFields"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="6dp"
                     android:orientation="vertical"
                     android:background="@drawable/bg_status_completed"
                     android:padding="12dp">
 
                     <LinearLayout
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@color/emerald_100"
-                        android:gravity="center"
-                        android:layout_marginBottom="8dp">
-
-                        <ImageView
-                            android:layout_width="15dp"
-                            android:layout_height="15dp"
-                            android:src="@drawable/ic_nav_fields"
-                            app:tint="@color/emerald_600" />
-
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/tvStatFieldsValue"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="6"
-                        android:textColor="@color/slate_900"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <LinearLayout
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:background="@color/emerald_100"
+                            android:gravity="center">
+                            <ImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:src="@drawable/ic_nav_fields"
+                                app:tint="@color/emerald_600" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvStatFieldsValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="0"
+                            android:textColor="@color/slate_900"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -414,96 +304,8 @@
                         android:text="@string/stat_fields_label"
                         android:textColor="@color/emerald_700"
                         android:textSize="10sp"
-                        android:layout_marginTop="2dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/stat_fields_badge"
-                        android:textColor="@color/white"
-                        android:textSize="9sp"
-                        android:textStyle="bold"
-                        android:background="@drawable/bg_badge_green"
-                        android:paddingStart="6dp"
-                        android:paddingEnd="6dp"
-                        android:paddingTop="2dp"
-                        android:paddingBottom="2dp"
-                        android:layout_marginTop="6dp" />
-
+                        android:layout_marginTop="4dp" />
                 </LinearLayout>
-
-                <!-- CARD: Completed Bookings (blue) -->
-                <LinearLayout
-                    android:id="@+id/cardStatCompleted"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="5dp"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_status_confirmed"
-                    android:padding="12dp">
-
-                    <LinearLayout
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@color/blue_100"
-                        android:gravity="center"
-                        android:layout_marginBottom="8dp">
-
-                        <ImageView
-                            android:layout_width="15dp"
-                            android:layout_height="15dp"
-                            android:src="@android:drawable/checkbox_on_background"
-                            app:tint="@color/blue_600" />
-
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/tvStatCompletedValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="143"
-                        android:textColor="@color/slate_900"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/stat_completed_label"
-                        android:textColor="@color/blue_700"
-                        android:textSize="10sp"
-                        android:layout_marginTop="2dp" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginTop="6dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="↑"
-                            android:textColor="@color/blue_600"
-                            android:textSize="9sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvStatCompletedChange"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/stat_completed_change"
-                            android:textColor="@color/blue_600"
-                            android:textSize="9sp"
-                            android:textStyle="bold"
-                            android:layout_marginStart="2dp" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
             </LinearLayout>
 
             <!-- ─────────────────────────────────────────
@@ -524,7 +326,6 @@
                 android:orientation="horizontal"
                 android:layout_marginBottom="20dp">
 
-                <!-- + New Field -->
                 <LinearLayout
                     android:id="@+id/btnNewField"
                     android:layout_width="0dp"
@@ -536,18 +337,16 @@
                     android:background="@drawable/bg_btn_primary_green"
                     android:elevation="3dp">
 
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/btn_new_field"
                         android:textColor="@color/white"
-                        android:textSize="13sp"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
 
-                <!-- 📅 Booking Calendar -->
                 <LinearLayout
                     android:id="@+id/btnCalendar"
                     android:layout_width="0dp"
@@ -559,8 +358,8 @@
                     android:elevation="1dp">
 
                     <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:src="@drawable/ic_nav_bookings"
                         app:tint="@color/emerald_600"
                         android:layout_marginEnd="6dp" />
@@ -569,44 +368,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/btn_calendar"
-                        android:textColor="@color/slate_900"
-                        android:textSize="13sp"
+                        android:textColor="@color/emerald_600"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/btnMessages"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:background="@drawable/bg_quick_action_calendar"
-                    android:elevation="1dp">
-
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/ic_message"
-                        app:tint="@color/emerald_600"
-                        android:layout_marginEnd="6dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tin nhắn"
-                        android:textColor="@color/slate_900"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-
                 </LinearLayout>
 
             </LinearLayout>
 
             <!-- ─────────────────────────────────────────
-                 RECENT BOOKINGS SECTION HEADER
+                 RECENT BOOKINGS HEADER
                  ───────────────────────────────────────── -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -639,7 +409,6 @@
 
                 </LinearLayout>
 
-                <!-- "See all" pill button -->
                 <LinearLayout
                     android:id="@+id/btnSeeAllBookings"
                     android:layout_width="wrap_content"
@@ -650,6 +419,8 @@
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
                     android:paddingTop="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:paddingBottom="4dp">
 
                     <TextView
@@ -660,29 +431,18 @@
                         android:textSize="11sp"
                         android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=" ›"
-                        android:textColor="@color/emerald_600"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-
                 </LinearLayout>
 
             </LinearLayout>
 
-            <!-- ─────────────────────────────────────────
-                 RECENT BOOKINGS RECYCLERVIEW (max 5 items)
-                 Adapter: RecentBookingAdapter
-                 Layout: item_recent_booking.xml
-                 ───────────────────────────────────────── -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvRecentBookings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
-                android:clipToPadding="false" />
+                android:clipToPadding="false"
+                android:clickable="true"
+                android:focusable="true" />
 
             <TextView
                 android:id="@+id/tvOwnerEmptyRecentBookings"
@@ -694,7 +454,6 @@
                 android:textSize="12sp"
                 android:visibility="gone" />
 
-            <!-- Bottom spacer -->
             <Space android:layout_width="match_parent" android:layout_height="16dp" />
 
         </LinearLayout>

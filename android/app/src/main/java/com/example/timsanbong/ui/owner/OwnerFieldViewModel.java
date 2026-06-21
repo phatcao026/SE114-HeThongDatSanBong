@@ -12,18 +12,23 @@ import com.example.timsanbong.data.model.FieldCreateRequest;
 import com.example.timsanbong.data.model.FieldUpdateRequest;
 import com.example.timsanbong.data.model.TimeSlot;
 import com.example.timsanbong.data.model.TimeSlotCreateRequest;
+import com.example.timsanbong.data.model.TimeSlotResponse;
 import com.example.timsanbong.data.model.TimeSlotUpdateRequest;
 import com.example.timsanbong.data.repository.OwnerFieldRepository;
 import com.example.timsanbong.utils.RepositoryCallback;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public class OwnerFieldViewModel extends AndroidViewModel {
     private final OwnerFieldRepository repository = new OwnerFieldRepository();
     private final MutableLiveData<List<Field>> fields = new MutableLiveData<>(Collections.emptyList());
     private final MutableLiveData<Boolean> loading = new MutableLiveData<>(false);
     private final MutableLiveData<String> message = new MutableLiveData<>();
+    private final MutableLiveData<List<TimeSlotResponse>> currentFieldAvailability = new MutableLiveData<>();
+    private String lastLoadedDate;
 
     public OwnerFieldViewModel(@NonNull Application application) {
         super(application);
@@ -41,13 +46,43 @@ public class OwnerFieldViewModel extends AndroidViewModel {
         return message;
     }
 
+    public LiveData<List<TimeSlotResponse>> getCurrentFieldAvailability() {
+        return currentFieldAvailability;
+    }
+
     public void loadFields() {
+        Calendar cal = Calendar.getInstance();
+        String today = String.format(Locale.US, "%04d-%02d-%02d",
+                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));
+        loadFields(today);
+    }
+
+    public void loadFields(String date) {
+        this.lastLoadedDate = date;
         loading.setValue(true);
-        repository.getOwnerFields(getApplication(), new RepositoryCallback<>() {
+        repository.getOwnerFields(getApplication(), date, new RepositoryCallback<>() {
             @Override
             public void onSuccess(List<Field> data) {
                 loading.setValue(false);
                 fields.setValue(data == null ? Collections.emptyList() : data);
+            }
+
+            @Override
+            public void onError(String error) {
+                loading.setValue(false);
+                message.setValue(error);
+            }
+        });
+    }
+
+    public void loadFieldAvailability(long fieldId, String date) {
+        currentFieldAvailability.setValue(null);
+        loading.setValue(true);
+        repository.getFieldAvailability(getApplication(), fieldId, date, new RepositoryCallback<>() {
+            @Override
+            public void onSuccess(List<TimeSlotResponse> data) {
+                loading.setValue(false);
+                currentFieldAvailability.setValue(data);
             }
 
             @Override
@@ -93,8 +128,8 @@ public class OwnerFieldViewModel extends AndroidViewModel {
             @Override
             public void onSuccess(Field data) {
                 loading.setValue(false);
-                message.setValue("Tạo hoặc cập nhật sân thành công.");
-                loadFields();
+                message.setValue("Thành công.");
+                loadFields(lastLoadedDate);
             }
 
             @Override
@@ -110,8 +145,8 @@ public class OwnerFieldViewModel extends AndroidViewModel {
             @Override
             public void onSuccess(TimeSlot data) {
                 loading.setValue(false);
-                message.setValue("Tạo hoặc cập nhật khung giờ thành công.");
-                loadFields();
+                message.setValue("Thành công.");
+                loadFields(lastLoadedDate);
             }
 
             @Override

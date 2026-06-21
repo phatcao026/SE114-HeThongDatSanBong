@@ -25,6 +25,8 @@ import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -80,7 +82,13 @@ public class OwnerDashboardFragment extends Fragment {
         */
 
         bindSessionUser();
-        fieldViewModel.loadFields();
+        
+        // Logic lấy ngày hôm nay đúng chuẩn để tải dữ liệu sân
+        Calendar cal = Calendar.getInstance();
+        String today = String.format(Locale.US, "%04d-%02d-%02d",
+                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));
+        fieldViewModel.loadFields(today);
+
         bookingViewModel.loadBookings();
     }
 
@@ -93,9 +101,7 @@ public class OwnerDashboardFragment extends Fragment {
         tvRevenueChange = view.findViewById(R.id.tvRevenueChange);
         tvStatPendingValue = view.findViewById(R.id.tvStatPendingValue);
         tvStatFieldsValue = view.findViewById(R.id.tvStatFieldsValue);
-        tvStatCompletedValue = view.findViewById(R.id.tvStatCompletedValue);
-        tvStatCompletedChange = view.findViewById(R.id.tvStatCompletedChange);
-        tvNotificationBadge = view.findViewById(R.id.tvNotificationBadge);
+       tvNotificationBadge = view.findViewById(R.id.tvNotificationBadge);
         recentBookingsEmptyState = view.findViewById(R.id.tvOwnerEmptyRecentBookings);
     }
 
@@ -118,16 +124,6 @@ public class OwnerDashboardFragment extends Fragment {
         view.findViewById(R.id.btnSeeAllBookings).setOnClickListener(v -> {
             if (getActivity() instanceof OwnerMainActivity) {
                 ((OwnerMainActivity) getActivity()).switchToBookingsTab();
-            }
-        });
-
-        // 3. Các nút tính năng phụ (Tin nhắn / Thông báo) nếu chưa làm Fragment thì có thể giữ nguyên hoặc cập nhật sau
-        view.findViewById(R.id.btnMessages).setOnClickListener(v -> {
-            // Open MessagesActivity if exists (customer.messages used as shared activity)
-            try {
-                startActivity(new Intent(requireContext(), com.example.timsanbong.ui.customer.MessagesActivity.class));
-            } catch (Exception ex) {
-                showMessage("Chức năng tin nhắn đang tạm thời không khả dụng");
             }
         });
 
@@ -162,8 +158,9 @@ public class OwnerDashboardFragment extends Fragment {
         bookingAdapter = new RecentBookingAdapter(new RecentBookingAdapter.Listener() {
             @Override
             public void onItemClick(Booking booking) {
-                // For now show a short message; you can replace this with navigation to booking details
-                showMessage("Đơn #" + booking.getId());
+                if (getActivity() instanceof OwnerMainActivity) {
+                    ((OwnerMainActivity) getActivity()).switchToBookingsTab();
+                }
             }
         });
 
@@ -174,6 +171,24 @@ public class OwnerDashboardFragment extends Fragment {
 
     // 6. Đổi Observers sử dụng 'getViewLifecycleOwner()' thay vì 'this' để tối ưu quản lý bộ nhớ của Fragment
     private void setupObservers() {
+        View loadingBar = getActivity() != null ? getActivity().findViewById(R.id.ownerLoadingBar) : null;
+        View fragmentRootView = getView();
+
+        androidx.lifecycle.Observer<Boolean> loadingObserver = isLoading -> {
+            boolean isFieldLoading = fieldViewModel.getLoading().getValue() != null && fieldViewModel.getLoading().getValue();
+            boolean isBookingLoading = bookingViewModel.getLoading().getValue() != null && bookingViewModel.getLoading().getValue();
+            boolean loading = isFieldLoading || isBookingLoading;
+
+            if (loadingBar != null) loadingBar.setVisibility(loading ? View.VISIBLE : View.GONE);
+            if (fragmentRootView != null) {
+                fragmentRootView.setAlpha(loading ? 0.4f : 1.0f);
+                fragmentRootView.setEnabled(!loading);
+            }
+        };
+
+        fieldViewModel.getLoading().observe(getViewLifecycleOwner(), loadingObserver);
+        bookingViewModel.getLoading().observe(getViewLifecycleOwner(), loadingObserver);
+
         fieldViewModel.getFields().observe(getViewLifecycleOwner(), fields -> {
             currentFields.clear();
             if (fields != null) {
@@ -196,9 +211,9 @@ public class OwnerDashboardFragment extends Fragment {
         bookingViewModel.getMessage().observe(getViewLifecycleOwner(), this::showMessage);
     }
 
+    // Trong file OwnerDashboardFragment.java, cập nhật hàm renderStats:
     private void renderStats() {
         int totalFields = currentFields.size();
-        int totalSlots = 0;
         int waitingDeposit = 0;
         int needAction = 0;
         int completed = 0;
@@ -208,10 +223,7 @@ public class OwnerDashboardFragment extends Fragment {
             String status = safeStatus(booking.getStatus());
             if ("PENDING".equals(status)) {
                 waitingDeposit++;
-            } else if ("DEPOSIT_PAID".equals(status)) {
-                needAction++;
-                collectedDeposit = collectedDeposit.add(BigDecimal.valueOf(booking.getDepositAmount()));
-            } else if ("CONFIRMED".equals(status)) {
+            } else if ("DEPOSIT_PAID".equals(status) || "CONFIRMED".equals(status)) {
                 needAction++;
                 collectedDeposit = collectedDeposit.add(BigDecimal.valueOf(booking.getDepositAmount()));
             } else if ("COMPLETED".equals(status)) {
@@ -219,22 +231,25 @@ public class OwnerDashboardFragment extends Fragment {
                 collectedDeposit = collectedDeposit.add(BigDecimal.valueOf(booking.getDepositAmount()));
             }
         }
-        for (Field field : currentFields) {
-            List<TimeSlotResponse> slots = field.getTimeSlots();
-            totalSlots += slots == null ? 0 : slots.size();
-        }
 
         tvOwnerName.setText(resolveOwnerName());
         tvOwnerAvatar.setText(resolveAvatar());
         tvGreeting.setText(resolveGreeting());
+
+        // Hiển thị tổng tiền cọc
         tvRevenueValue.setText(formatMoney(collectedDeposit));
-        tvRevenueChange.setText(totalSlots + " khung giờ · " + needAction + " cần xử lý");
+
+        // GỘP THÔNG TIN: Thành công và Cần xử lý
+        tvRevenueChange.setText(completed + " thành công · " + needAction + " cần xử lý");
+
+        // Cập nhật 2 card còn lại
         tvStatPendingValue.setText(String.valueOf(waitingDeposit));
         tvStatFieldsValue.setText(String.valueOf(totalFields));
-        tvStatCompletedValue.setText(String.valueOf(completed));
-        tvStatCompletedChange.setText(needAction + " cần xử lý");
+
+        // Ẩn badge thông báo nếu không dùng
         tvNotificationBadge.setVisibility(View.GONE);
     }
+
 
     private List<Booking> getRecentBookings(List<Booking> bookings, int limit) {
         List<Booking> recent = new ArrayList<>(bookings);

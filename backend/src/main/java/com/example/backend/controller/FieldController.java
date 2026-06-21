@@ -37,6 +37,11 @@ public class FieldController {
         this.fieldService = fieldService;
     }
 
+    @GetMapping("/mine")
+    public ResponseEntity<List<FieldResponse>> getOwnerFields() {
+        return ResponseEntity.ok(fieldService.getOwnerFields());
+    }
+
     @GetMapping
     public ResponseEntity<List<FieldResponse>> getFields(
             @RequestParam(required = false) Enums.FieldType type,

@@ -317,7 +317,7 @@
     <string name="recent_bookings_title">Đơn đặt sân gần đây</string>
     <string name="recent_bookings_sub">Cập nhật theo thời gian thực</string>
     <string name="owner_name"> Name </string>
-    <string name="greeting_subtitle">Theo dõi sân, lịch đặt và doanh thu trong ngày.</string>
+    <string name="greeting_subtitle">Theo dõi doanh thu, sân và lịch đặt.</string>
     <string name="btn_create_field">Tạo sân mới</string>
     <string name="btn_view_bookings">Xem lịch đặt</string>
     <string name="stat_total_fields">Tổng sân</string>

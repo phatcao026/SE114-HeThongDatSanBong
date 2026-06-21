@@ -97,6 +97,11 @@ public class OwnerMainActivity extends AppCompatActivity {
     private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.setCustomAnimations(
+                R.anim.slide_in_right,
+                R.anim.slide_out_left,
+                R.anim.slide_in_left,
+                R.anim.slide_out_right);
         transaction.replace(R.id.ownerFragmentContainer, fragment);
         transaction.commit();
     }
@@ -152,14 +157,14 @@ public class OwnerMainActivity extends AppCompatActivity {
         }
     }
     public void switchToFieldsTab() {
-        if (tvFields != null) {
-            tvFields.performClick(); // Kích hoạt sự kiện bấm vào tab Sân Bóng giống như người dùng tự ấn
+        if (navFields != null) {
+            navFields.performClick(); // Gọi lệnh bấm vào LinearLayout điều hướng
         }
     }
 
     public void switchToBookingsTab() {
-        if (tvBookings != null) {
-            tvBookings.performClick(); // Kích hoạt sự kiện bấm vào tab Đơn Đặt
+        if (navBookings != null) {
+            navBookings.performClick(); // Gọi lệnh bấm vào LinearLayout điều hướng
         }
     }
 }

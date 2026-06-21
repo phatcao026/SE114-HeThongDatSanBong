@@ -29,7 +29,7 @@ public class TimeSlotResponse {
     public String getStatus() { return status; }
 
     public boolean isAvailable() {
-        if (available != null) return available;
-        return "AVAILABLE".equals(status);
+        if(available != null) return available;
+        return status != null && status.equalsIgnoreCase("AVAILABLE");
     }
 }

@@ -14,6 +14,7 @@ import com.example.timsanbong.data.model.Booking;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections; // Cần thêm import này
 import java.util.List;
 import java.util.Locale;
 
@@ -38,8 +39,31 @@ public class BookingCardAdapter extends RecyclerView.Adapter<BookingCardAdapter.
 
     public void submitList(List<Booking> newList) {
         bookings.clear();
-        if (newList != null) bookings.addAll(newList);
+        if (newList != null) {
+            List<Booking> sortedList = new ArrayList<>(newList);
+            // Sắp xếp: Ưu tiên trạng thái hoạt động lên đầu, sau đó theo ID mới nhất
+            Collections.sort(sortedList, (b1, b2) -> {
+                int p1 = getStatusPriority(b1.getStatus());
+                int p2 = getStatusPriority(b2.getStatus());
+                if (p1 != p2) return Integer.compare(p1, p2);
+                return Long.compare(b2.getId(), b1.getId());
+            });
+            bookings.addAll(sortedList);
+        }
         notifyDataSetChanged();
+    }
+
+    // Hàm phụ để định nghĩa độ ưu tiên hiển thị
+    private int getStatusPriority(String status) {
+        if (status == null) return 5;
+        switch (status.toUpperCase(Locale.US)) {
+            case "DEPOSIT_PAID": return 0; // Cần check-in ngay
+            case "CONFIRMED": return 1;    // Đang đá, chuẩn bị thu tiền
+            case "PENDING": return 2;      // Chờ khách cọc
+            case "COMPLETED": return 3;    // Đã xong
+            case "CANCELLED": return 4;    // Đã hủy
+            default: return 5;
+        }
     }
 
     public void setActionState(boolean inProgress, long bookingId) {
@@ -103,12 +127,30 @@ public class BookingCardAdapter extends RecyclerView.Adapter<BookingCardAdapter.
             tvBookingFieldType.setText(booking.getField() != null ? booking.getField().getTypeLabel() : "");
             tvBookingTimeSlot.setText(formatTimeRange(booking.getStartTime(), booking.getEndTime()));
             tvBookingDate.setText(booking.getBookingDate());
-            tvBookingPrice.setText(formatMoney(booking.getTotalAmount()));
 
+            double total = booking.getTotalAmount();
+            double deposit = booking.getDepositAmount();
             String status = booking.getStatus() == null ? "" : booking.getStatus().toUpperCase(Locale.US);
+
+            // Xử lý độ mờ cho đơn đã kết thúc
+            if ("COMPLETED".equals(status) || "CANCELLED".equals(status)) {
+                itemView.setAlpha(0.6f);
+            } else {
+                itemView.setAlpha(1.0f);
+            }
+
+            // Hiển thị tiền theo trạng thái CONFIRMED (70%) hoặc các loại khác (100%)
+            if ("CONFIRMED".equals(status)) {
+                double remaining = total - deposit;
+                tvBookingPrice.setText("Còn lại: " + formatMoney(remaining));
+                tvBookingPrice.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.blue_600));
+            } else {
+                tvBookingPrice.setText(formatMoney(total));
+                tvBookingPrice.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.emerald_600));
+            }
+
             styleStatus(status);
 
-            // Default hide all action groups
             llActionsPending.setVisibility(View.GONE);
             llActionConfirmed.setVisibility(View.GONE);
             llStatusFooter.setVisibility(View.GONE);
@@ -117,7 +159,6 @@ public class BookingCardAdapter extends RecyclerView.Adapter<BookingCardAdapter.
 
             switch (status) {
                 case "PENDING":
-                    // Show Confirm / Cancel (owner can confirm or cancel a pending booking)
                     llActionsPending.setVisibility(View.VISIBLE);
                     setPrimaryButton(btnConfirmBooking, "Xác nhận", v -> {
                         if (listener != null) listener.onConfirm(booking);
@@ -127,7 +168,6 @@ public class BookingCardAdapter extends RecyclerView.Adapter<BookingCardAdapter.
                     }, isBusy);
                     break;
                 case "DEPOSIT_PAID":
-                    // Show Check-in and No-show
                     llActionsPending.setVisibility(View.VISIBLE);
                     setPrimaryButton(btnConfirmBooking, "Check-in", v -> {
                         if (listener != null) listener.onCheckIn(booking);
@@ -137,9 +177,8 @@ public class BookingCardAdapter extends RecyclerView.Adapter<BookingCardAdapter.
                     }, isBusy);
                     break;
                 case "CONFIRMED":
-                    // Show Check-out / Complete action
                     llActionConfirmed.setVisibility(View.VISIBLE);
-                    btnCompleteBooking.setText("Check-out");
+                    btnCompleteBooking.setText("Check-out (Thu nốt tiền)");
                     btnCompleteBooking.setOnClickListener(v -> {
                         if (listener != null) listener.onCollectRest(booking);
                     });
@@ -154,7 +193,6 @@ public class BookingCardAdapter extends RecyclerView.Adapter<BookingCardAdapter.
                     if (tvStatusFooterMsg != null) tvStatusFooterMsg.setText("Đã hủy");
                     break;
                 default:
-                    // Unknown status: show footer with raw status
                     llStatusFooter.setVisibility(View.VISIBLE);
                     if (tvStatusFooterMsg != null) tvStatusFooterMsg.setText(status.isEmpty() ? "—" : status);
                     break;
@@ -163,7 +201,6 @@ public class BookingCardAdapter extends RecyclerView.Adapter<BookingCardAdapter.
 
         private void setPrimaryButton(View btnView, String text, View.OnClickListener listenerClick, boolean disabled) {
             if (btnView == null) return;
-            // Try to find a TextView child inside btnView to set the label
             TextView label = findFirstTextView(btnView);
             if (label != null) label.setText(text);
             btnView.setOnClickListener(listenerClick);
@@ -216,6 +253,3 @@ public class BookingCardAdapter extends RecyclerView.Adapter<BookingCardAdapter.
         }
     }
 }
-
-
-

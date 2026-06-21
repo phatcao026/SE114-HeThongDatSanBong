@@ -184,11 +184,34 @@ public interface ApiService {
     Call<List<FieldReviewResponse>> getFieldReviews(@Path("fieldId") long fieldId);
 
     // Owner fields
+    @GET("fields/mine")
+    Call<List<Field>> getOwnerFields(@Query("date") String date);
+
     @GET("fields")
     Call<List<Field>> getFields(
             @Query("type") String type,
             @Query("minPrice") BigDecimal minPrice,
             @Query("maxPrice") BigDecimal maxPrice);
+
+    // GET /api/fields/page
+//    @GET("fields/page")
+//    Call<Page<Field>> getFieldsPage(
+//            @Query("type") String type,
+//            @Query("name") String name,
+//            @Query("page") int page,
+//            @Query("size") int size
+//    );
+
+    // GET /api/fields/{id}
+    @GET("fields/{id}")
+    Call<Field> getFieldById(@Path("id") String id);
+
+    // GET /api/fields/{id}/availability
+    @GET("fields/{id}/availability")
+    Call<List<TimeSlotResponse>> getFieldAvailability(
+            @Path("id") String id,
+            @Query("date") String date // Format: "yyyy-MM-dd"
+    );
 
     @POST("fields")
     Call<Field> createOwnerField(@Body FieldCreateRequest request);

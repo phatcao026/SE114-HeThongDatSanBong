@@ -58,6 +58,16 @@ public class FieldServiceImpl implements FieldService {
     }
 
     @Override
+    public List<FieldResponse> getOwnerFields() {
+        ensureOwnerOrAdminRole();
+        Long ownerId = TokenUtils.getCurrentUserId();
+        return fieldRepository.findByOwnerIdOrderByCreatedAtDesc(ownerId)
+                .stream()
+                .map(this::toFieldResponse)
+                .toList();
+    }
+
+    @Override
     public FieldDetailResponse getFieldById(Long id) {
         Field field = findFieldWithTimeSlots(id);
         return toFieldDetailResponse(field);
@@ -268,11 +278,19 @@ public class FieldServiceImpl implements FieldService {
         response.setUpdatedAt(field.getUpdatedAt());
         response.setAverageRating(fieldReviewRepository.getAverageRatingForField(field.getId()));
         response.setReviewCount(fieldReviewRepository.getReviewCountForField(field.getId()));
+        // Include timeslots so clients (e.g. Owner dashboard) can show slot utilisation
+        if (field.getTimeSlots() != null) {
+            response.setTimeSlots(field.getTimeSlots()
+                    .stream()
+                    .map(this::toTimeSlotResponse)
+                    .toList());
+        }
         return response;
     }
 
     private FieldDetailResponse toFieldDetailResponse(Field field) {
         FieldDetailResponse response = new FieldDetailResponse();
+        // reuse common mapping
         response.setId(field.getId());
         response.setName(field.getName());
         response.setDescription(field.getDescription());
@@ -283,10 +301,12 @@ public class FieldServiceImpl implements FieldService {
         response.setUpdatedAt(field.getUpdatedAt());
         response.setAverageRating(fieldReviewRepository.getAverageRatingForField(field.getId()));
         response.setReviewCount(fieldReviewRepository.getReviewCountForField(field.getId()));
-        response.setTimeSlots(field.getTimeSlots()
-                .stream()
-                .map(this::toTimeSlotResponse)
-                .toList());
+        if (field.getTimeSlots() != null) {
+            response.setTimeSlots(field.getTimeSlots()
+                    .stream()
+                    .map(this::toTimeSlotResponse)
+                    .toList());
+        }
         return response;
     }
 
