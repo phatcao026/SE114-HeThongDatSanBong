@@ -131,7 +131,9 @@ Tạo file `.env` từ file `.env.example`:
 ```bash
 cp .env.example .env
 ```
-*(Cập nhật lại các biến môi trường như thông tin Database, JWT, Stripe,... nếu cần)*
+> ⚠️ **Lưu ý quan trọng về API Keys & Cấu hình:**
+> - **Biến môi trường (.env):** File `.env.example` chỉ chứa các giá trị mẫu và không kèm theo key thật để bảo mật. Bạn cần cập nhật các thông số thực tế của bạn (như Database, JWT Secret, Stripe API Key, Supabase Key, Groq API Key,...) vào file `.env` vừa tạo để chạy các tính năng tương ứng.
+> - **Cấu hình Firebase:** File cấu hình Firebase Admin SDK (`firebase-service-account.json`) đã được bỏ qua trong `.gitignore` để tránh rò rỉ bảo mật. Để chạy dự án, bạn cần tải file này từ **Firebase Console** (Cài đặt dự án -> Tài khoản dịch vụ -> Tạo khóa riêng tư mới), đổi tên thành `firebase-service-account.json` và lưu vào thư mục [backend/src/main/resources/](file:///d:/UIT/NhapMon_UngDungDiDong/SE114-HeThongDatSanBong/backend/src/main/resources/).
 
 **Bước 2: Khởi chạy Database và Caching bằng Docker**
 Dự án sử dụng Docker Compose để khởi tạo PostgreSQL và Redis:
