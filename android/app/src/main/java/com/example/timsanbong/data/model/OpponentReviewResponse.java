@@ -36,5 +36,6 @@ public class OpponentReviewResponse implements Serializable {
     public String getComment() { return comment; }
     public String getRatingType() { return ratingType; }
     public String getStatus() { return status; }
+    public Integer getPointsApplied() { return pointsApplied; }
     public String getCreatedAt() { return createdAt; }
 }

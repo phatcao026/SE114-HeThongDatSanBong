@@ -58,7 +58,7 @@ public class AdminUserActivity extends AppCompatActivity {
         fetchUsers();
         setupFilters();
 
-        findViewById(R.id.cvAdminAvatar).setOnClickListener(v -> {
+        findViewById(R.id.cvAdminTopAvatar).setOnClickListener(v -> {
             android.content.Intent intent = new android.content.Intent(this, AdminProfileActivity.class);
             startActivity(intent);
         });
@@ -71,6 +71,25 @@ public class AdminUserActivity extends AppCompatActivity {
 
         AdminNavBarManager navBarManager = new AdminNavBarManager(this, AdminNavBarManager.ITEM_USERS);
         navBarManager.setup();
+        loadAdminProfile();
+    }
+
+    private void loadAdminProfile() {
+        com.example.timsanbong.utils.SessionManager session = new com.example.timsanbong.utils.SessionManager(this);
+        String fullName = "Admin";
+        String json = session.getUserJson();
+        if (json != null) {
+            try {
+                org.json.JSONObject obj = new org.json.JSONObject(json);
+                fullName = obj.optString("fullName", "Admin");
+            } catch (org.json.JSONException ignored) {}
+        }
+
+        TextView tvTopInitial = findViewById(R.id.tvAdminTopInitial);
+        if (tvTopInitial != null && fullName != null && !fullName.isEmpty()) {
+            String initial = fullName.substring(0, 1).toUpperCase();
+            tvTopInitial.setText(initial);
+        }
     }
 
     @Override
@@ -121,10 +140,7 @@ public class AdminUserActivity extends AppCompatActivity {
         MaterialButton btnPlayer = findViewById(R.id.btnFilterPlayer);
         MaterialButton btnOwner = findViewById(R.id.btnFilterOwner);
         MaterialButton btnLocked = findViewById(R.id.btnFilterLocked);
-        MaterialButton btnLowTrust = new MaterialButton(this, null, com.google.android.material.R.attr.materialButtonStyle);
-        btnLowTrust.setText("Uy tín thấp");
-        btnLowTrust.setAllCaps(false);
-        ((ViewGroup) btnAll.getParent()).addView(btnLowTrust);
+        MaterialButton btnLowTrust = findViewById(R.id.btnFilterLowTrust);
 
         btnAll.setOnClickListener(v -> {
             updateFilterButtons(btnAll, btnPlayer, btnOwner, btnLocked, btnLowTrust);

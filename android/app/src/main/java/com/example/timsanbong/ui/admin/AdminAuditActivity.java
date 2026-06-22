@@ -45,14 +45,33 @@ public class AdminAuditActivity extends AppCompatActivity {
         initViews();
         setupTabs();
         loadData(true);
+        loadAdminProfile();
 
-        findViewById(R.id.cvAdminAvatar).setOnClickListener(v -> {
+        findViewById(R.id.cvAdminTopAvatar).setOnClickListener(v -> {
             android.content.Intent intent = new android.content.Intent(this, AdminProfileActivity.class);
             startActivity(intent);
         });
 
         AdminNavBarManager navBarManager = new AdminNavBarManager(this, AdminNavBarManager.ITEM_AUDIT);
         navBarManager.setup();
+    }
+
+    private void loadAdminProfile() {
+        com.example.timsanbong.utils.SessionManager session = new com.example.timsanbong.utils.SessionManager(this);
+        String fullName = "Admin";
+        String json = session.getUserJson();
+        if (json != null) {
+            try {
+                org.json.JSONObject obj = new org.json.JSONObject(json);
+                fullName = obj.optString("fullName", "Admin");
+            } catch (org.json.JSONException ignored) {}
+        }
+
+        TextView tvTopInitial = findViewById(R.id.tvAdminTopInitial);
+        if (tvTopInitial != null) {
+            String initial = fullName.substring(0, 1).toUpperCase();
+            tvTopInitial.setText(initial);
+        }
     }
 
     private void initViews() {
@@ -197,8 +216,13 @@ public class AdminAuditActivity extends AppCompatActivity {
                     colorInt = Color.parseColor("#DD6B20"); // Orange
                     bgColorInt = Color.parseColor("#FFFAF0");
                     break;
+                case "LATE_CANCEL":
+                    title = "Hủy kèo muộn";
+                    colorInt = Color.parseColor("#E53E3E");
+                    bgColorInt = Color.parseColor("#FFF5F5");
+                    break;
                 default:
-                    title = "Đánh giá Fairplay";
+                    title = "Đánh giá Fairplay (" + ratingType + ")";
                     colorInt = Color.parseColor("#D69E2E"); // Amber
                     bgColorInt = Color.parseColor("#FFFFF0");
                     break;
@@ -206,7 +230,16 @@ public class AdminAuditActivity extends AppCompatActivity {
 
             holder.tvTitle.setText(title);
             holder.tvTime.setText(formatDateTime(report.getCreatedAt()));
-            holder.tvPriority.setText(report.getStatus());
+            
+            String status = report.getStatus();
+            if ("APPROVED".equals(status)) {
+                int points = report.getPointsApplied() != null ? report.getPointsApplied() : 0;
+                holder.tvPriority.setText(String.format(java.util.Locale.getDefault(), "Đã duyệt: %s%d", points > 0 ? "+" : "", points));
+            } else if ("DISMISSED".equals(status)) {
+                holder.tvPriority.setText("Đã bỏ qua");
+            } else {
+                holder.tvPriority.setText(status);
+            }
             holder.tvCategory.setText("Fairplay");
             holder.tvContent.setText(report.getComment() != null && !report.getComment().isEmpty()
                     ? report.getComment() : "(Không có nội dung nhận xét)");
@@ -250,16 +283,43 @@ public class AdminAuditActivity extends AppCompatActivity {
 
         private void resolveReport(Long id, String action, View v) {
             if (action.equals("APPROVED")) {
-                showDecisionDialog(id, v);
+                int index = -1;
+                for (int i = 0; i < reports.size(); i++) {
+                    if (reports.get(i).getId().equals(id)) {
+                        index = i;
+                        break;
+                    }
+                }
+                String type = (index != -1) ? reports.get(index).getRatingType() : "OTHER";
+                showDecisionDialog(id, type, v);
             } else {
                 sendDecision(id, false, 0, v);
             }
         }
 
-        private void showDecisionDialog(Long id, View v) {
+        private int calculateSuggestedPoints(String ratingType) {
+            if (ratingType == null) return -5;
+            switch (ratingType) {
+                case "GOOD": return 5;
+                case "NO_SHOW": return -20;
+                case "BAD_BEHAVIOR": return -15;
+                case "LATE_CANCEL": return -10;
+                default: return -5;
+            }
+        }
+
+        private void showDecisionDialog(Long id, String ratingType, View v) {
             android.widget.LinearLayout layout = new android.widget.LinearLayout(v.getContext());
             layout.setOrientation(android.widget.LinearLayout.VERTICAL);
-            layout.setPadding(50, 40, 50, 10);
+            layout.setPadding(60, 40, 60, 10);
+
+            int suggestedPoints = calculateSuggestedPoints(ratingType);
+
+            android.widget.TextView tvHint = new android.widget.TextView(v.getContext());
+            tvHint.setText("Gợi ý cho " + ratingType + ": " + (suggestedPoints > 0 ? "+" : "") + suggestedPoints + " điểm");
+            tvHint.setPadding(0, 0, 0, 20);
+            tvHint.setTypeface(null, android.graphics.Typeface.ITALIC);
+            layout.addView(tvHint);
 
             android.widget.RadioGroup rgType = new android.widget.RadioGroup(v.getContext());
             rgType.setOrientation(android.widget.RadioGroup.HORIZONTAL);
@@ -267,11 +327,16 @@ public class AdminAuditActivity extends AppCompatActivity {
             android.widget.RadioButton rbMinus = new android.widget.RadioButton(v.getContext());
             rbMinus.setText("Trừ điểm");
             rbMinus.setId(View.generateViewId());
-            rbMinus.setChecked(true);
 
             android.widget.RadioButton rbPlus = new android.widget.RadioButton(v.getContext());
             rbPlus.setText("Cộng điểm");
             rbPlus.setId(View.generateViewId());
+
+            if (suggestedPoints >= 0) {
+                rbPlus.setChecked(true);
+            } else {
+                rbMinus.setChecked(true);
+            }
 
             rgType.addView(rbMinus);
             rgType.addView(rbPlus);
@@ -279,12 +344,14 @@ public class AdminAuditActivity extends AppCompatActivity {
             android.widget.EditText etPoints = new android.widget.EditText(v.getContext());
             etPoints.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
             etPoints.setHint("Số điểm (ví dụ: 10)");
+            etPoints.setText(String.valueOf(Math.abs(suggestedPoints)));
 
             layout.addView(rgType);
             layout.addView(etPoints);
 
             new androidx.appcompat.app.AlertDialog.Builder(v.getContext())
-                    .setTitle("Đánh giá Fairplay")
+                    .setTitle("Phán quyết Fairplay")
+                    .setMessage("Xác nhận hình phạt cho hành vi này")
                     .setView(layout)
                     .setPositiveButton("Xác nhận", (dialog, which) -> {
                         String input = etPoints.getText().toString();

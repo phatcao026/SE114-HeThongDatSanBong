@@ -34,10 +34,11 @@ public class AdminMainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_admin_main);
         PushNotificationManager.prepareForAuthenticatedUser(this);
         
+        loadAdminProfile();
         fetchStats();
         setupHealth();
         
-        findViewById(R.id.cvAdminAvatar).setOnClickListener(v -> {
+        findViewById(R.id.cvAdminTopAvatar).setOnClickListener(v -> {
             android.content.Intent intent = new android.content.Intent(this, AdminProfileActivity.class);
             startActivity(intent);
         });
@@ -76,6 +77,24 @@ public class AdminMainActivity extends AppCompatActivity {
         findViewById(R.id.btnViewAudit).setOnClickListener(v -> {
             startActivity(new Intent(this, AdminAuditActivity.class));
         });
+    }
+
+    private void loadAdminProfile() {
+        com.example.timsanbong.utils.SessionManager session = new com.example.timsanbong.utils.SessionManager(this);
+        String fullName = "Admin";
+        String json = session.getUserJson();
+        if (json != null) {
+            try {
+                org.json.JSONObject obj = new org.json.JSONObject(json);
+                fullName = obj.optString("fullName", "Admin");
+            } catch (org.json.JSONException ignored) {}
+        }
+
+        TextView tvTopInitial = findViewById(R.id.tvAdminTopInitial);
+        if (tvTopInitial != null) {
+            String initial = fullName.substring(0, 1).toUpperCase();
+            tvTopInitial.setText(initial);
+        }
     }
 
     private void fetchStats() {

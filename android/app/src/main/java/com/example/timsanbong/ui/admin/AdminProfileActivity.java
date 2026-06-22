@@ -26,10 +26,32 @@ public class AdminProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_profile);
 
+        loadAdminProfile();
         setupMenus();
 
         AdminNavBarManager navBarManager = new AdminNavBarManager(this, AdminNavBarManager.ITEM_PROFILE);
         navBarManager.setup();
+    }
+
+    private void loadAdminProfile() {
+        SessionManager session = new SessionManager(this);
+        String fullName = "Admin";
+        String json = session.getUserJson();
+        if (json != null) {
+            try {
+                org.json.JSONObject obj = new org.json.JSONObject(json);
+                fullName = obj.optString("fullName", "Admin");
+            } catch (org.json.JSONException ignored) {}
+        }
+
+        TextView tvName = findViewById(R.id.tvAdminFullName);
+        TextView tvTopInitial = findViewById(R.id.tvAdminTopInitial);
+        TextView tvBigInitial = findViewById(R.id.tvAdminBigInitial);
+
+        tvName.setText(fullName);
+        String initial = fullName.substring(0, 1).toUpperCase();
+        tvTopInitial.setText(initial);
+        tvBigInitial.setText(initial);
     }
 
     private void setupMenus() {

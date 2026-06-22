@@ -20,7 +20,7 @@
             android:paddingHorizontal="16dp">
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cvAdminAvatar"
+                android:id="@+id/cvAdminTopAvatar"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:clickable="true"
@@ -30,10 +30,11 @@
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp">
                 <TextView
+                    android:id="@+id/tvAdminTopInitial"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="PK"
+                    android:text="A"
                     android:textColor="@android:color/white"
                     android:textStyle="bold" />
             </com.google.android.material.card.MaterialCardView>
@@ -47,31 +48,6 @@
                 android:textColor="@color/text_heading"
                 android:textSize="20sp"
                 android:textStyle="bold" />
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_search"
-                app:tint="@color/text_heading"
-                android:contentDescription="Search" />
-
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp">
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_admin_notifications"
-                    app:tint="@color/text_heading"
-                    android:contentDescription="Notifications" />
-                <View
-                    android:layout_width="8dp"
-                    android:layout_height="8dp"
-                    android:layout_gravity="top|end"
-                    android:background="@drawable/shape_nav_dot"
-                    android:backgroundTint="@color/admin_alert_text" />
-            </FrameLayout>
 
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -181,6 +157,17 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
                             android:text="Đã khóa"
+                            android:textColor="@color/text_heading"
+                            app:cornerRadius="24dp"
+                            app:strokeColor="@color/border_gray"
+                            app:strokeWidth="1dp" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnFilterLowTrust"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="Uy tín thấp"
                             android:textColor="@color/text_heading"
                             app:cornerRadius="24dp"
                             app:strokeColor="@color/border_gray"

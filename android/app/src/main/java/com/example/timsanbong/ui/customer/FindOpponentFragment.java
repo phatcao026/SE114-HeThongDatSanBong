@@ -430,8 +430,8 @@ public class FindOpponentFragment extends Fragment {
         layout.addView(tvLabelType);
 
         android.widget.Spinner spinnerType = new android.widget.Spinner(requireContext());
-        String[] displayTypes = {"Tích cực (Khen ngợi)", "Chơi xấu / Thô lỗ", "Không đến (No Show)", "Hủy kèo muộn", "Khác"};
-        String[] backendValues = {"GOOD", "BAD_BEHAVIOR", "NO_SHOW", "LATE_CANCEL", "OTHER"};
+        String[] displayTypes = {"Tích cực (Khen ngợi)", "Chơi xấu / Thô lỗ", "Vắng mặt"};
+        String[] backendValues = {"GOOD", "BAD_BEHAVIOR", "NO_SHOW"};
 
         android.widget.ArrayAdapter<String> spinnerAdapter = new android.widget.ArrayAdapter<>(
                 requireContext(), android.R.layout.simple_spinner_dropdown_item, displayTypes);
