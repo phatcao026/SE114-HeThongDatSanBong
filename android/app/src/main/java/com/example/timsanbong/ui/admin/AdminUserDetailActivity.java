@@ -59,10 +59,6 @@ public class AdminUserDetailActivity extends AppCompatActivity {
                 lockUser();
             }
         });
-
-        findViewById(R.id.btnResetPassword).setOnClickListener(v -> {
-            Toast.makeText(this, "Tính năng Đặt lại mật khẩu đang chờ Backend hỗ trợ", Toast.LENGTH_LONG).show();
-        });
     }
 
     private void updateLockButtonStyle() {

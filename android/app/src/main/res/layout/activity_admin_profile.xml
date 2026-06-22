@@ -149,8 +149,6 @@
 
                     <include layout="@layout/item_profile_menu" android:id="@+id/menuPlayer" />
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border_gray" />
-                    <include layout="@layout/item_profile_menu" android:id="@+id/menuOwner" />
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border_gray" />
                     <include layout="@layout/item_profile_menu" android:id="@+id/menuAdmin" />
 
                 </LinearLayout>
