@@ -93,6 +93,24 @@ public class OwnerFieldViewModel extends AndroidViewModel {
         });
     }
 
+    public void uploadImage(okhttp3.MultipartBody.Part filePart, RepositoryCallback<String> callback) {
+        loading.setValue(true);
+        repository.uploadImage(getApplication(), filePart, new RepositoryCallback<>() {
+            @Override
+            public void onSuccess(String data) {
+                loading.setValue(false);
+                callback.onSuccess(data);
+            }
+
+            @Override
+            public void onError(String error) {
+                loading.setValue(false);
+                message.setValue(error);
+                callback.onError(error);
+            }
+        });
+    }
+
     public void createField(FieldCreateRequest request) {
         loading.setValue(true);
         repository.createField(getApplication(), request, fieldMutationCallback());

@@ -46,6 +46,7 @@ public class SupabaseStorageService {
 
         String uploadUrl = supabaseUrl + "/storage/v1/object/" + bucketName + "/" + uniqueFilename;
         String publicUrl = supabaseUrl + "/storage/v1/object/public/" + bucketName + "/" + uniqueFilename;
+        System.out.println("DEBUG_URL_GENERATED: " + publicUrl);
 
         byte[] fileBytes;
         try {

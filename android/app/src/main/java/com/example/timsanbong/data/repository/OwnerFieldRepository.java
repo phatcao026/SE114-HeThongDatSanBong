@@ -22,6 +22,24 @@ import retrofit2.Response;
 
 public class OwnerFieldRepository {
 
+    public void uploadImage(Context context, okhttp3.MultipartBody.Part filePart, RepositoryCallback<String> callback) {
+        ApiClient.getService(context).uploadImage(filePart).enqueue(new Callback<java.util.Map<String, String>>() {
+            @Override
+            public void onResponse(Call<java.util.Map<String, String>> call, Response<java.util.Map<String, String>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onSuccess(response.body().get("imageUrl"));
+                } else {
+                    callback.onError("Upload ảnh không thành công.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<java.util.Map<String, String>> call, Throwable t) {
+                callback.onError("Lỗi kết nối khi upload ảnh: " + t.getMessage());
+            }
+        });
+    }
+
     public void getOwnerFields(Context context, String date, RepositoryCallback<List<Field>> callback) {
         android.util.Log.d("API_DEBUG", "Calling getOwnerFields with date: " + date);
 
