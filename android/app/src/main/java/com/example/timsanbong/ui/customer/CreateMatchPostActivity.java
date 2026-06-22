@@ -115,12 +115,19 @@ public class CreateMatchPostActivity extends AppCompatActivity {
         tilNeededMembers.setVisibility(isFindMember ? View.VISIBLE : View.GONE);
         tilPositions.setVisibility(isFindMember ? View.VISIBLE : View.GONE);
         
-        // Always show date/time for BOTH types
+        // Always show date/time
         tilPlayDate.setVisibility(View.VISIBLE);
         tilTimeSlot.setVisibility(View.VISIBLE);
         
+        // If has field, user MUST select from their paid bookings
         tilBookingSelect.setVisibility(hasField ? View.VISIBLE : View.GONE);
         tilLocation.setVisibility(hasField ? View.VISIBLE : View.GONE);
+        
+        // Lock inputs if hasField is on, because they must come from the booking
+        etPlayDate.setEnabled(!hasField);
+        actvTimeSlot.setEnabled(!hasField);
+        etLocation.setEnabled(!hasField);
+
         tilBookingId.setVisibility(View.GONE);
     }
 
@@ -240,10 +247,13 @@ public class CreateMatchPostActivity extends AppCompatActivity {
             bookingsByDisplay.clear();
             List<String> displays = new ArrayList<>();
             for (com.example.timsanbong.data.model.Booking b : resource.data) {
-                if ("CANCELLED".equals(b.getStatus())) continue;
-                String d = String.format("%s (%s %s)", b.getFieldName(), b.getBookingDate(), b.getStartTime());
-                displays.add(d);
-                bookingsByDisplay.put(d, b);
+                String status = b.getStatus() != null ? b.getStatus().toUpperCase(Locale.US) : "";
+                // Only show bookings that are paid (deposit) or fully confirmed
+                if ("DEPOSIT_PAID".equals(status) || "CONFIRMED".equals(status)) {
+                    String d = String.format("%s (%s %s)", b.getFieldName(), b.getBookingDate(), b.getStartTime());
+                    displays.add(d);
+                    bookingsByDisplay.put(d, b);
+                }
             }
             actvBookingSelect.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, displays));
         });
@@ -279,10 +289,16 @@ public class CreateMatchPostActivity extends AppCompatActivity {
             Toast.makeText(this, "Vui lòng chọn ngày và khung giờ", Toast.LENGTH_SHORT).show();
             return;
         }
-        
-        if (hasField && location.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập địa điểm", Toast.LENGTH_SHORT).show();
-            return;
+
+        if (hasField) {
+            if (selectedBookingId == null) {
+                Toast.makeText(this, "Vui lòng chọn một đơn đặt sân đã thanh toán", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (location.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập địa điểm", Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
 
         String startTime = "";
