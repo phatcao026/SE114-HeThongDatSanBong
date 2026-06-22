@@ -130,14 +130,9 @@
             android:name=".ui.owner.OwnerMainActivity"
             android:exported="false"
             android:theme="@style/Theme.TimSanBong.NoActionBar" />
-        <!--ctivity
-            android:name=".ui.owner.OwnerFieldManagementActivity"
-            android:exported="false"
-            android:theme="@style/Theme.TimSanBong.NoActionBar" /-->
-        <!--activity
-            android:name=".ui.owner.OwnerBookingActivity"
-            android:exported="false"
-            android:theme="@style/Theme.TimSanBong.NoActionBar" /-->
+
+        <activity android:name=".ui.owner.OwnerNotificationActivity" />
+
 
         <!-- Admin Activities (from dev) -->
         <activity
