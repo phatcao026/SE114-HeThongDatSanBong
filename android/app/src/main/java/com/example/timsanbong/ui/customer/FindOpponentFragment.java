@@ -119,8 +119,15 @@ public class FindOpponentFragment extends Fragment {
         matchAdapter = new MatchAdapter(new ArrayList<>(), new MatchAdapter.OnMatchActionListener() {
             @Override
             public void onAccept(MatchPost match, int position) {
-                pendingAcceptMatchId = match.getId();
-                matchViewModel.createMatchRequest(match.getId(), "Tôi muốn bắt kèo này!");
+                new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Xác nhận bắt kèo")
+                        .setMessage("Bạn có chắc chắn muốn bắt kèo này không?")
+                        .setPositiveButton("Bắt kèo", (dialog, which) -> {
+                            pendingAcceptMatchId = match.getId();
+                            matchViewModel.createMatchRequest(match.getId(), "Tôi muốn bắt kèo này!");
+                        })
+                        .setNegativeButton("Hủy", null)
+                        .show();
             }
 
             @Override
@@ -194,12 +201,12 @@ public class FindOpponentFragment extends Fragment {
                     if (acceptedMatch != null) {
                         final MatchPost finalMatch = acceptedMatch;
                         new MaterialAlertDialogBuilder(requireContext())
-                                .setTitle("Xác nhận bắt kèo")
-                                .setMessage("Bạn có muốn chuyển đến trang nhắn tin với chủ kèo không?")
-                                .setPositiveButton("Có", (dialog, which) -> {
+                                .setTitle("Bắt kèo thành công")
+                                .setMessage("Bạn có muốn chuyển đến trang nhắn tin với chủ kèo để trao đổi thêm không?")
+                                .setPositiveButton("Nhắn tin ngay", (dialog, which) -> {
                                     openDirectConversation(finalMatch, true);
                                 })
-                                .setNegativeButton("Không", null)
+                                .setNegativeButton("Để sau", null)
                                 .show();
                     }
 

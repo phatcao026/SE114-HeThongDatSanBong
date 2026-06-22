@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="@dimen/spacing_3"
-            android:text="Kết quả tìm nhanh"
+            android:text="@string/quick_find_results_title"
             android:textColor="@color/text_primary"
             android:textSize="@dimen/text_heading3"
             android:textStyle="bold"

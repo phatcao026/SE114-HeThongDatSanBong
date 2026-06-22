@@ -58,6 +58,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/spacing_3"
+            android:layout_marginEnd="@dimen/spacing_2"
             android:orientation="vertical"
             app:layout_constraintStart_toEndOf="@id/layoutAvatar"
             app:layout_constraintEnd_toStartOf="@id/tvPostedTime"
@@ -71,8 +72,9 @@
 
                 <TextView
                     android:id="@+id/tvTeamName"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -92,6 +94,8 @@
                     android:paddingHorizontal="6dp"
                     android:paddingVertical="2dp"
                     android:background="@drawable/bg_badge_orange_solid"
+                    android:maxLines="1"
+                    android:ellipsize="none"
                     android:visibility="gone" />
             </LinearLayout>
 
@@ -322,7 +326,7 @@
                 android:layout_width="0dp"
                 android:layout_height="@dimen/button_height"
                 android:layout_weight="1"
-                android:text="Đánh giá"
+                android:text="@string/match_action_rate"
                 app:icon="@drawable/ic_star"
                 app:iconGravity="textStart"
                 app:cornerRadius="@dimen/radius_button"

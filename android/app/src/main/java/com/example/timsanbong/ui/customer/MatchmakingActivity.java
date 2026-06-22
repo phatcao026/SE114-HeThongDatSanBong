@@ -85,16 +85,12 @@ public class MatchmakingActivity extends AppCompatActivity {
             public void onAccept(MatchPost match, int position) {
                 new com.google.android.material.dialog.MaterialAlertDialogBuilder(MatchmakingActivity.this)
                         .setTitle("Xác nhận bắt kèo")
-                        .setMessage("Bạn có muốn chuyển đến trang nhắn tin với chủ kèo không?")
-                        .setPositiveButton("Có", (dialog, which) -> {
-                            pendingAcceptedMatch = match;
-                            matchViewModel.createMatchRequest(match.getId(), "");
-                            openDirectConversation(match);
-                        })
-                        .setNegativeButton("Không", (dialog, which) -> {
+                        .setMessage("Bạn có chắc chắn muốn bắt kèo này không?")
+                        .setPositiveButton("Bắt kèo", (dialog, which) -> {
                             pendingAcceptedMatch = match;
                             matchViewModel.createMatchRequest(match.getId(), "");
                         })
+                        .setNegativeButton("Hủy", null)
                         .show();
             }
 
@@ -163,6 +159,17 @@ public class MatchmakingActivity extends AppCompatActivity {
                     }
                     
                     matchAdapter.setLocalAcceptedIds(localAcceptedIds);
+                    
+                    final MatchPost finalMatch = pendingAcceptedMatch;
+                    new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                            .setTitle("Bắt kèo thành công")
+                            .setMessage("Bạn có muốn chuyển đến trang nhắn tin với chủ kèo để trao đổi thêm không?")
+                            .setPositiveButton("Nhắn tin ngay", (dialog, which) -> {
+                                openDirectConversation(finalMatch);
+                            })
+                            .setNegativeButton("Để sau", null)
+                            .show();
+
                     pendingAcceptedMatch = null;
                 }
                 matchAdapter.updateMatches(getFilteredList(currentTab));

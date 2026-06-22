@@ -104,14 +104,11 @@ public class MatchDetailActivity extends AppCompatActivity {
             if (match != null && !match.isAccepted()) {
                 new MaterialAlertDialogBuilder(this)
                         .setTitle("Xác nhận bắt kèo")
-                        .setMessage("Bạn có muốn chuyển đến trang nhắn tin với chủ kèo không?")
-                        .setPositiveButton("Có", (dialog, which) -> {
-                            matchViewModel.createMatchRequest(match.getId(), "");
-                            openDirectConversation();
-                        })
-                        .setNegativeButton("Không", (dialog, which) -> {
+                        .setMessage("Bạn có chắc chắn muốn bắt kèo này không?")
+                        .setPositiveButton("Bắt kèo", (dialog, which) -> {
                             matchViewModel.createMatchRequest(match.getId(), "");
                         })
+                        .setNegativeButton("Hủy", null)
                         .show();
             }
         });
@@ -133,6 +130,15 @@ public class MatchDetailActivity extends AppCompatActivity {
                 btnDetailAccept.setEnabled(false);
                 btnDetailAccept.setAlpha(0.5f);
                 Toast.makeText(this, "Đã gửi yêu cầu bắt kèo.", Toast.LENGTH_SHORT).show();
+
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle("Bắt kèo thành công")
+                        .setMessage("Bạn có muốn chuyển đến trang nhắn tin với chủ kèo để trao đổi thêm không?")
+                        .setPositiveButton("Nhắn tin ngay", (dialog, which) -> {
+                            openDirectConversation();
+                        })
+                        .setNegativeButton("Để sau", null)
+                        .show();
             } else if (resource.status == com.example.timsanbong.utils.Resource.Status.ERROR) {
                 Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
             }

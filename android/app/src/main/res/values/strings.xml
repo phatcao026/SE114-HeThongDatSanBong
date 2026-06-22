@@ -144,7 +144,8 @@
     <string name="action_confirm_cancel">Hủy đặt</string>
     <string name="action_view_bookings">Xem lịch sử đặt sân</string>
     <string name="action_create_post">Tạo kèo</string>
-    <string name="action_quick_find">Tìm nhanh</string>
+    <string name="action_quick_find">Tìm kiếm</string>
+    <string name="quick_find_results_title">Kết quả tìm kiếm</string>
     <string name="empty_matches_found">Không tìm thấy kèo nào</string>
 
     <!-- Matchmaking (Tìm đối thủ) -->
@@ -166,6 +167,7 @@
     <string name="match_updated">Cập nhật vừa xong</string>
     <string name="empty_matches">Không có kèo nào phù hợp.</string>
     <string name="match_label_members_slot">cầu thủ</string>
+    <string name="match_action_rate">Đánh giá</string>
 
     <!-- Match detail -->
     <string name="match_detail_title">Chi tiết kèo</string>
