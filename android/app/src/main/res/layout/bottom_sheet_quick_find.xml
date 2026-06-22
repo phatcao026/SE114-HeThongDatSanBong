@@ -76,47 +76,22 @@
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
-    <LinearLayout
+    <!-- Time Slot Selection -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilTimeSlot"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_4"
-        android:orientation="horizontal">
+        android:hint="Chọn khung giờ"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilTime"
-            android:layout_width="0dp"
+        <AutoCompleteTextView
+            android:id="@+id/actvTimeSlot"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="Giờ bắt đầu"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etTime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="false"
-                android:fontFamily="@font/be_vietnam_pro" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilTimeEnd"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="@dimen/spacing_3"
-            android:hint="Giờ kết thúc"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etTimeEnd"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="false"
-                android:fontFamily="@font/be_vietnam_pro" />
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
+            android:inputType="none"
+            android:fontFamily="@font/be_vietnam_pro" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilAgeRange"

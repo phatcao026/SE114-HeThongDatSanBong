@@ -31,4 +31,18 @@ public class Constants {
     
     // WebSockets
     public static final String WS_URL = "ws://10.0.2.2:8080/ws";
+
+    public static final String[] TIME_SLOTS = {
+            "06:00 - 07:30",
+            "07:30 - 09:00",
+            "09:00 - 10:30",
+            "10:30 - 12:00",
+            "13:00 - 14:30",
+            "14:30 - 16:00",
+            "16:00 - 17:30",
+            "17:30 - 19:00",
+            "19:00 - 20:30",
+            "20:30 - 22:00",
+            "22:30 - 00:00"
+    };
 }

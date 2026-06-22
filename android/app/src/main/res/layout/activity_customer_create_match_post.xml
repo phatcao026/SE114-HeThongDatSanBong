@@ -246,14 +246,14 @@
                     android:textColor="@color/text_primary" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Play Time Start -->
+            <!-- Time Slot Selection -->
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilPlayTime"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:id="@+id/tilTimeSlot"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_3"
-                android:hint="Giờ đá"
+                android:hint="Chọn khung giờ"
                 app:startIconDrawable="@drawable/ic_clock"
                 app:boxCornerRadiusBottomEnd="@dimen/radius_small"
                 app:boxCornerRadiusBottomStart="@dimen/radius_small"
@@ -261,36 +261,10 @@
                 app:boxCornerRadiusTopStart="@dimen/radius_small"
                 app:boxStrokeColor="@color/border">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etPlayTime"
+                <AutoCompleteTextView
+                    android:id="@+id/actvTimeSlot"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:focusable="false"
-                    android:inputType="none"
-                    android:textSize="@dimen/text_body_medium"
-                    android:textColor="@color/text_primary" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Play Time End (Only FIND_MEMBER) -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilEndTime"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_3"
-                android:hint="Giờ kết thúc"
-                app:startIconDrawable="@drawable/ic_clock"
-                app:boxCornerRadiusBottomEnd="@dimen/radius_small"
-                app:boxCornerRadiusBottomStart="@dimen/radius_small"
-                app:boxCornerRadiusTopEnd="@dimen/radius_small"
-                app:boxCornerRadiusTopStart="@dimen/radius_small"
-                app:boxStrokeColor="@color/border">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etEndTime"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:focusable="false"
                     android:inputType="none"
                     android:textSize="@dimen/text_body_medium"
                     android:textColor="@color/text_primary" />

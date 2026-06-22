@@ -1,7 +1,6 @@
 package com.example.timsanbong.ui.customer;
 
 import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -31,10 +30,10 @@ public class CreateMatchPostActivity extends AppCompatActivity {
 
     private android.widget.ImageView btnBack;
     private TextView tabFindOpponent, tabFindMember;
-    private AutoCompleteTextView actvTeam, actvBookingSelect, actvAgeRange, actvCostSharing;
+    private AutoCompleteTextView actvTeam, actvBookingSelect, actvAgeRange, actvCostSharing, actvTimeSlot;
     private TextView chipBeginner, chipIntermediate, chipAdvanced;
-    private TextInputLayout tilLocation, tilNeededMembers, tilPositions, tilPlayDate, tilPlayTime, tilEndTime, tilBookingId, tilBookingSelect;
-    private TextInputEditText etPlayDate, etPlayTime, etEndTime, etLocation, etDescription, etNeededMembers, etPositions, etBookingId;
+    private TextInputLayout tilLocation, tilNeededMembers, tilPositions, tilPlayDate, tilTimeSlot, tilBookingId, tilBookingSelect;
+    private TextInputEditText etPlayDate, etLocation, etDescription, etNeededMembers, etPositions, etBookingId;
     private androidx.appcompat.widget.SwitchCompat swHasField;
     private MaterialButton btnSubmit;
 
@@ -83,8 +82,7 @@ public class CreateMatchPostActivity extends AppCompatActivity {
         chipAdvanced = findViewById(R.id.chipAdvanced);
         
         tilPlayDate = findViewById(R.id.tilPlayDate);
-        tilPlayTime = findViewById(R.id.tilPlayTime);
-        tilEndTime = findViewById(R.id.tilEndTime);
+        tilTimeSlot = findViewById(R.id.tilTimeSlot);
         tilLocation = findViewById(R.id.tilLocation);
         tilNeededMembers = findViewById(R.id.tilNeededMembers);
         tilPositions = findViewById(R.id.tilPositions);
@@ -92,8 +90,7 @@ public class CreateMatchPostActivity extends AppCompatActivity {
         tilBookingSelect = findViewById(R.id.tilBookingSelect);
 
         etPlayDate = findViewById(R.id.etPlayDate);
-        etPlayTime = findViewById(R.id.etPlayTime);
-        etEndTime = findViewById(R.id.etEndTime);
+        actvTimeSlot = findViewById(R.id.actvTimeSlot);
         etLocation = findViewById(R.id.etLocation);
         etDescription = findViewById(R.id.etDescription);
         etNeededMembers = findViewById(R.id.etNeededMembers);
@@ -120,8 +117,7 @@ public class CreateMatchPostActivity extends AppCompatActivity {
         
         // Always show date/time for BOTH types
         tilPlayDate.setVisibility(View.VISIBLE);
-        tilPlayTime.setVisibility(View.VISIBLE);
-        tilEndTime.setVisibility(View.VISIBLE);
+        tilTimeSlot.setVisibility(View.VISIBLE);
         
         tilBookingSelect.setVisibility(hasField ? View.VISIBLE : View.GONE);
         tilLocation.setVisibility(hasField ? View.VISIBLE : View.GONE);
@@ -194,22 +190,9 @@ public class CreateMatchPostActivity extends AppCompatActivity {
             }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show();
         });
 
-        etPlayTime.setOnClickListener(v -> {
-            Calendar cal = Calendar.getInstance();
-            new TimePickerDialog(this, (view, hour, minute) -> {
-                String time = String.format(Locale.US, "%02d:%02d", hour, minute);
-                etPlayTime.setText(time);
-                // Pre-fill end time (90 mins later)
-                etEndTime.setText(buildEndTime(time));
-            }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show();
-        });
-
-        etEndTime.setOnClickListener(v -> {
-            Calendar cal = Calendar.getInstance();
-            new TimePickerDialog(this, (view, hour, minute) ->
-                    etEndTime.setText(String.format(Locale.US, "%02d:%02d", hour, minute)),
-                    cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show();
-        });
+        ArrayAdapter<String> slotAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, com.example.timsanbong.utils.Constants.TIME_SLOTS);
+        actvTimeSlot.setAdapter(slotAdapter);
     }
 
     private void setupStaticDropdowns() {
@@ -227,8 +210,9 @@ public class CreateMatchPostActivity extends AppCompatActivity {
                 etLocation.setText(b.getFieldName());
                 selectedDateIso = b.getBookingDate();
                 etPlayDate.setText(b.getBookingDate());
-                etPlayTime.setText(b.getStartTime().substring(0, 5));
-                etEndTime.setText(b.getEndTime().substring(0, 5));
+                String startTime = b.getStartTime().substring(0, 5);
+                String endTime = b.getEndTime().substring(0, 5);
+                actvTimeSlot.setText(startTime + " - " + endTime, false);
             }
         });
     }
@@ -286,20 +270,27 @@ public class CreateMatchPostActivity extends AppCompatActivity {
 
     private void validateAndSubmit() {
         String teamNameInput = actvTeam.getText().toString().trim();
-        String timeStart = etPlayTime.getText() != null ? etPlayTime.getText().toString().trim() : "";
-        String timeEnd = etEndTime.getText() != null ? etEndTime.getText().toString().trim() : "";
+        String timeSlot = actvTimeSlot.getText().toString().trim();
         String location = etLocation.getText() != null ? etLocation.getText().toString().trim() : "";
         boolean hasField = swHasField.isChecked();
 
         // Basic common validation
-        if (selectedDateIso.isEmpty() || timeStart.isEmpty()) {
-            Toast.makeText(this, "Vui lòng chọn ngày và giờ đá", Toast.LENGTH_SHORT).show();
+        if (selectedDateIso.isEmpty() || timeSlot.isEmpty()) {
+            Toast.makeText(this, "Vui lòng chọn ngày và khung giờ", Toast.LENGTH_SHORT).show();
             return;
         }
         
         if (hasField && location.isEmpty()) {
             Toast.makeText(this, "Vui lòng nhập địa điểm", Toast.LENGTH_SHORT).show();
             return;
+        }
+
+        String startTime = "";
+        String endTime = "";
+        if (timeSlot.contains(" - ")) {
+            String[] parts = timeSlot.split(" - ");
+            startTime = parts[0] + ":00";
+            endTime = parts[1] + ":00";
         }
 
         String description = etDescription.getText() != null ? etDescription.getText().toString().trim() : "";
@@ -330,9 +321,8 @@ public class CreateMatchPostActivity extends AppCompatActivity {
         
         // Essential match info for BOTH now (date, timeStart, timeEnd)
         request.setDate(selectedDateIso);
-        request.setTimeStart(timeStart + ":00");
-        String finalEndTime = timeEnd.isEmpty() ? buildEndTime(timeStart) : timeEnd;
-        request.setTimeEnd(finalEndTime + ":00");
+        request.setTimeStart(startTime);
+        request.setTimeEnd(endTime);
 
         if (MatchPost.TYPE_FIND_MEMBER.equals(selectedType)) {
             String needed = etNeededMembers.getText() != null ? etNeededMembers.getText().toString().trim() : "";
@@ -348,18 +338,5 @@ public class CreateMatchPostActivity extends AppCompatActivity {
         if (!costSharing.isEmpty()) request.setCostSharing(costSharing);
 
         matchViewModel.createMatchPost(request);
-    }
-
-    private String buildEndTime(String timeStart) {
-        String[] parts = timeStart.split(":");
-        if (parts.length != 2) {
-            return timeStart;
-        }
-        int hour = Integer.parseInt(parts[0]);
-        int minute = Integer.parseInt(parts[1]);
-        minute += 90;
-        hour = (hour + minute / 60) % 24;
-        minute = minute % 60;
-        return String.format(Locale.US, "%02d:%02d", hour, minute);
     }
 }

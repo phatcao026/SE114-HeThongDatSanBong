@@ -1,7 +1,6 @@
 package com.example.timsanbong.ui.customer;
 
 import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -26,11 +25,9 @@ import java.util.Locale;
 
 public class QuickFindBottomSheetFragment extends BottomSheetDialogFragment {
 
-    private TextInputEditText etDate, etTime, etTimeEnd;
-    private AutoCompleteTextView etTeamName, actvPostType, actvSkillLevel, actvHasField, actvAgeRange, actvCostSharing;
+    private TextInputEditText etDate;
+    private AutoCompleteTextView etTeamName, actvPostType, actvSkillLevel, actvHasField, actvAgeRange, actvCostSharing, actvTimeSlot;
     private String selectedDateIso = "";
-    private String selectedTimeStart = "";
-    private String selectedTimeEnd = "";
     private TeamRepository teamRepository = new TeamRepository();
 
     @Nullable
@@ -45,8 +42,7 @@ public class QuickFindBottomSheetFragment extends BottomSheetDialogFragment {
 
         etTeamName = view.findViewById(R.id.etTeamName);
         etDate = view.findViewById(R.id.etDate);
-        etTime = view.findViewById(R.id.etTime);
-        etTimeEnd = view.findViewById(R.id.etTimeEnd);
+        actvTimeSlot = view.findViewById(R.id.actvTimeSlot);
         actvPostType = view.findViewById(R.id.actvPostType);
         actvSkillLevel = view.findViewById(R.id.actvSkillLevel);
         actvHasField = view.findViewById(R.id.actvHasField);
@@ -58,8 +54,6 @@ public class QuickFindBottomSheetFragment extends BottomSheetDialogFragment {
         setupDropdowns();
 
         etDate.setOnClickListener(v -> showDatePicker());
-        etTime.setOnClickListener(v -> showTimePicker(true));
-        etTimeEnd.setOnClickListener(v -> showTimePicker(false));
 
         btnSearch.setOnClickListener(v -> {
             String teamName = etTeamName.getText() != null ? etTeamName.getText().toString().trim() : "";
@@ -84,6 +78,15 @@ public class QuickFindBottomSheetFragment extends BottomSheetDialogFragment {
 
             String costSharing = actvCostSharing.getText().toString().trim();
             if ("Tất cả".equals(costSharing)) costSharing = "";
+
+            String timeSlot = actvTimeSlot.getText().toString().trim();
+            String selectedTimeStart = "";
+            String selectedTimeEnd = "";
+            if (timeSlot.contains(" - ")) {
+                String[] parts = timeSlot.split(" - ");
+                selectedTimeStart = parts[0] + ":00";
+                selectedTimeEnd = parts[1] + ":00";
+            }
 
             Intent intent = new Intent(getContext(), QuickFindResultsActivity.class);
             intent.putExtra("teamName", teamName);
@@ -116,13 +119,17 @@ public class QuickFindBottomSheetFragment extends BottomSheetDialogFragment {
 
         String[] costSharingOptions = {"Tất cả", "Chia đều (50-50)", "Đội thua trả", "Chủ kèo mời"};
         actvCostSharing.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, costSharingOptions));
+
+        ArrayAdapter<String> slotAdapter = new ArrayAdapter<>(requireContext(),
+                android.R.layout.simple_dropdown_item_1line, com.example.timsanbong.utils.Constants.TIME_SLOTS);
+        actvTimeSlot.setAdapter(slotAdapter);
     }
 
     private void setupTeamAutoComplete() {
         teamRepository.getMyTeams(getContext(), new com.example.timsanbong.utils.RepositoryCallback<List<TeamResponse>>() {
             @Override
             public void onSuccess(List<TeamResponse> data) {
-                if (data != null && !data.isEmpty()) {
+                if (data != null && !data.isEmpty() && isAdded()) {
                     List<String> teamNames = new ArrayList<>();
                     for (TeamResponse team : data) {
                         teamNames.add(team.getName());
@@ -142,23 +149,9 @@ public class QuickFindBottomSheetFragment extends BottomSheetDialogFragment {
 
     private void showDatePicker() {
         Calendar cal = Calendar.getInstance();
-        new DatePickerDialog(getContext(), (view, year, month, dayOfMonth) -> {
+        new DatePickerDialog(requireContext(), (view, year, month, dayOfMonth) -> {
             selectedDateIso = String.format(Locale.US, "%d-%02d-%02d", year, month + 1, dayOfMonth);
             etDate.setText(selectedDateIso);
         }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show();
-    }
-
-    private void showTimePicker(boolean isStart) {
-        Calendar cal = Calendar.getInstance();
-        new TimePickerDialog(getContext(), (view, hourOfDay, minute) -> {
-            String time = String.format(Locale.US, "%02d:%02d:00", hourOfDay, minute);
-            if (isStart) {
-                selectedTimeStart = time;
-                etTime.setText(String.format(Locale.US, "%02d:%02d", hourOfDay, minute));
-            } else {
-                selectedTimeEnd = time;
-                etTimeEnd.setText(String.format(Locale.US, "%02d:%02d", hourOfDay, minute));
-            }
-        }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show();
     }
 }
