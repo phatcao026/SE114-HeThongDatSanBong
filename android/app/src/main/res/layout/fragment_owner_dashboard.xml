@@ -77,46 +77,38 @@
         </LinearLayout>
 
         <FrameLayout
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:clickable="true"
-            android:background="@drawable/bg_btn_outline_gray"
-            android:focusable="true">
+            android:layout_width="@dimen/spacing_40"
+            android:layout_height="@dimen/spacing_40">
 
-            <LinearLayout
-                android:id="@+id/btnNotificationBell"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnNotifications"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center">
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/background_primary"
+                app:cardCornerRadius="@dimen/radius_pill"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
 
                 <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:src="@drawable/ic_admin_notifications"
-                    app:tint="@color/blue_500" />
-            </LinearLayout>
+                    android:layout_width="@dimen/spacing_20"
+                    android:layout_height="@dimen/spacing_20"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/cd_notifications"
+                    android:src="@drawable/ic_bell"
+                    app:tint="@color/primary" />
+            </com.google.android.material.card.MaterialCardView>
 
-            <TextView
-                android:id="@+id/tvNotificationBadge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <View
+                android:id="@+id/viewNotificationDot"
+                android:layout_width="7dp"
+                android:layout_height="7dp"
                 android:layout_gravity="top|end"
                 android:layout_marginTop="2dp"
                 android:layout_marginEnd="2dp"
-                android:background="@drawable/bg_notification_badge"
-                android:gravity="center"
-                android:minWidth="14dp"
-                android:minHeight="14dp"
-                android:paddingHorizontal="4dp"
-                android:text="5"
-                android:textColor="@android:color/white"
-                android:textSize="10sp"
-                android:textAlignment="center"
-                android:textStyle="bold"
+                android:background="@drawable/bg_dot_orange"
                 android:visibility="gone" />
-
         </FrameLayout>
 
         <LinearLayout

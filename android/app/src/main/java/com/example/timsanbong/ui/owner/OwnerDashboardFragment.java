@@ -19,7 +19,9 @@ import com.example.timsanbong.R;
 import com.example.timsanbong.data.model.Booking;
 import com.example.timsanbong.data.model.Field;
 import com.example.timsanbong.data.model.TimeSlotResponse;
+import com.example.timsanbong.ui.customer.NotificationViewModel;
 import com.example.timsanbong.utils.SessionManager;
+import com.google.android.material.button.MaterialButton;
 
 import org.json.JSONObject;
 
@@ -38,6 +40,7 @@ public class OwnerDashboardFragment extends Fragment {
 
     private OwnerFieldViewModel fieldViewModel;
     private OwnerBookingViewModel bookingViewModel;
+    private NotificationViewModel notificationViewModel;
     private RecentBookingAdapter bookingAdapter;
     private final List<Field> currentFields = new ArrayList<>();
     private final List<Booking> currentBookings = new ArrayList<>();
@@ -51,7 +54,8 @@ public class OwnerDashboardFragment extends Fragment {
     private TextView tvStatFieldsValue;
     private TextView tvStatCompletedValue;
     private TextView tvStatCompletedChange;
-    private TextView tvNotificationBadge;
+    private com.google.android.material.card.MaterialCardView btnNotifications;
+    private View viewNotificationDot;
     private View recentBookingsEmptyState;
 
     // 2. Fragment KHÔNG dùng setContentView trong onCreate. Thay vào đó dùng onCreateView để nạp layout XML
@@ -59,6 +63,24 @@ public class OwnerDashboardFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_owner_dashboard, container, false);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        if(notificationViewModel != null) {
+            notificationViewModel.loadUnreadCount();
+        }
+
+        // Khi Fragment được hiển thị lại, tải lại dữ liệu để cập nhật thông tin mới nhất
+        if (fieldViewModel != null && bookingViewModel != null) {
+            Calendar cal = Calendar.getInstance();
+            String today = String.format(Locale.US, "%04d-%02d-%02d",
+                    cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));
+            fieldViewModel.loadFields(today);
+            bookingViewModel.loadBookings();
+        }
     }
 
     // 3. Toàn bộ logic ánh xạ View và khởi tạo dữ liệu sẽ được đưa vào onViewCreated sau khi giao diện đã sẵn sàng
@@ -69,17 +91,17 @@ public class OwnerDashboardFragment extends Fragment {
         // Khởi tạo ViewModel gắn với Fragment này
         fieldViewModel = new ViewModelProvider(this).get(OwnerFieldViewModel.class);
         bookingViewModel = new ViewModelProvider(this).get(OwnerBookingViewModel.class);
+        notificationViewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
+
 
         // Truyền biến 'view' vào để ánh xạ các thành phần giao diện con
         bindViews(view);
         setupActions(view);
         setupRecentBookings(view);
         setupObservers();
+        setupNotificationObservers();
 
-        /* LƯU Ý QUAN TRỌNG:
-           Bỏ dòng: new OwnerNavBarManager(this, OwnerNavBarManager.ITEM_DASHBOARD).setup();
-           Vì hiện tại thanh điều hướng Bottom Nav đã được quản lý cố định tập trung tại OwnerMainActivity rồi!
-        */
+        com.example.timsanbong.utils.PushNotificationManager.prepareForAuthenticatedUser(requireActivity());
 
         bindSessionUser();
         
@@ -101,7 +123,8 @@ public class OwnerDashboardFragment extends Fragment {
         tvRevenueChange = view.findViewById(R.id.tvRevenueChange);
         tvStatPendingValue = view.findViewById(R.id.tvStatPendingValue);
         tvStatFieldsValue = view.findViewById(R.id.tvStatFieldsValue);
-       tvNotificationBadge = view.findViewById(R.id.tvNotificationBadge);
+        btnNotifications = view.findViewById(R.id.btnNotifications);
+        viewNotificationDot = view.findViewById(R.id.viewNotificationDot);
         recentBookingsEmptyState = view.findViewById(R.id.tvOwnerEmptyRecentBookings);
     }
 
@@ -127,14 +150,6 @@ public class OwnerDashboardFragment extends Fragment {
             }
         });
 
-        view.findViewById(R.id.btnNotificationBell).setOnClickListener(v -> {
-            // Open NotificationsActivity
-            try {
-                startActivity(new Intent(requireContext(), com.example.timsanbong.ui.customer.NotificationsActivity.class));
-            } catch (Exception ex) {
-                showMessage("Không thể mở thông báo");
-            }
-        });
 
         // Logout button: confirm then clear session and navigate to LoginActivity
         view.findViewById(R.id.btnLogout).setOnClickListener(v -> {
@@ -151,6 +166,9 @@ public class OwnerDashboardFragment extends Fragment {
                     .setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss())
                     .show();
         });
+
+        btnNotifications.setOnClickListener(v -> {startActivity(new Intent(requireContext(), OwnerNotificationActivity.class));});
+
     }
 
     private void setupRecentBookings(View view) {
@@ -211,6 +229,16 @@ public class OwnerDashboardFragment extends Fragment {
         bookingViewModel.getMessage().observe(getViewLifecycleOwner(), this::showMessage);
     }
 
+    private void setupNotificationObservers() {
+        notificationViewModel.unreadCountState.observe(getViewLifecycleOwner(), resource -> {
+            if (resource != null && resource.status == com.example.timsanbong.utils.Resource.Status.SUCCESS
+                    && resource.data != null) {
+                int count = resource.data;
+                viewNotificationDot.setVisibility(count > 0 ? View.VISIBLE : View.GONE);
+            }
+        });
+    }
+
     // Trong file OwnerDashboardFragment.java, cập nhật hàm renderStats:
     private void renderStats() {
         int totalFields = currentFields.size();
@@ -246,8 +274,6 @@ public class OwnerDashboardFragment extends Fragment {
         tvStatPendingValue.setText(String.valueOf(waitingDeposit));
         tvStatFieldsValue.setText(String.valueOf(totalFields));
 
-        // Ẩn badge thông báo nếu không dùng
-        tvNotificationBadge.setVisibility(View.GONE);
     }
 
 

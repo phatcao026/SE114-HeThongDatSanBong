@@ -91,4 +91,41 @@ public class NotificationViewModel extends AndroidViewModel {
             }
         });
     }
+
+    public void loadNotifications() {
+             _notificationsState.setValue(Resource.loading(null));
+
+             notificationRepository.getNotifications(getApplication(), new RepositoryCallback<List<AppNotification>>() {
+             @Override
+             public void onSuccess(List<AppNotification> data) {
+                             _notificationsState.postValue(Resource.success(data));
+                         }
+
+             @Override
+             public void onError(String message) {
+                 _notificationsState.postValue(Resource.error(message, null));
+                         }
+             });
+    }
+
+    public void markNotificationRead(long id) {
+        _markReadState.setValue(Resource.loading(null));
+        notificationRepository.markNotificationRead(getApplication(), id, new RepositoryCallback<Void>() {
+
+        @Override
+        public void onSuccess(Void data) {
+            _markReadState.postValue(Resource.success(null));
+            // Sau khi đánh dấu đọc xong, nên tải lại danh sách
+            loadNotifications();
+            loadUnreadCount();
+        }
+
+        @Override
+        public void onError(String message) {
+            _markReadState.postValue(Resource.error(message, null));
+        }
+        });
+    }
+
+
 }
