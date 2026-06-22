@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://tapchicongthuong.vn/images/22/8/22/logo-truong-dai-hoc-cong-nghe-thong-tin.jpg" alt="UIT Logo" width="400">
+  <img src="https://cd.uit.edu.vn/sites/vi/files/banner_uit.png" alt="UIT Logo" width="400">
 </p>
 
 <h1 align="center">HỆ THỐNG ĐẶT SÂN BÓNG</h1>
