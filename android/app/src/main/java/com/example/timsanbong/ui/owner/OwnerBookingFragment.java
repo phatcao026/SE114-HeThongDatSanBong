@@ -436,7 +436,7 @@ public class OwnerBookingFragment extends Fragment {
 
     private void openFilterDialog() {
         // Multi-select statuses + field name input
-        final String[] statusOptions = new String[]{"PENDING", "DEPOSIT_PAID", "CONFIRMED", "COMPLETED", "CANCELLED"};
+        final String[] statusOptions = new String[]{"Chờ duyệt", "Đã thanh toán cọc", "Đã xác nhận", "Hoàn thành", "Đã hủy"};
         final boolean[] checked = new boolean[statusOptions.length];
         for (int i = 0; i < statusOptions.length; i++) {
             checked[i] = filterStatuses.contains(statusOptions[i]);
