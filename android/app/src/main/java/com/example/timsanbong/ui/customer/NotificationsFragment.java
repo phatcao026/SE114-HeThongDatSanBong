@@ -80,11 +80,7 @@ public class NotificationsFragment extends Fragment {
     }
 
     private void setupListeners(View view) {
-        view.findViewById(R.id.ivNotifBack).setOnClickListener(v -> {
-            if (getActivity() instanceof CustomerMainActivity) {
-                ((CustomerMainActivity) getActivity()).switchToTab(NavBarManager.ITEM_HOME);
-            }
-        });
+        view.findViewById(R.id.ivNotifBack).setOnClickListener(v -> requireActivity().finish());
         view.findViewById(R.id.ivMarkAllRead).setOnClickListener(v ->
                 notificationViewModel.markAllAsRead());
     }

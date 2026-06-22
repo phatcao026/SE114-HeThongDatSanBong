@@ -117,7 +117,7 @@ public class CustomerHomeFragment extends Fragment {
     }
 
     private void setupListeners() {
-        btnNotifications.setOnClickListener(v -> openMessages());
+        btnNotifications.setOnClickListener(v -> openNotifications());
         tvAvatar.setOnClickListener(v -> openProfile());
         btnSearchNearby.setOnClickListener(v -> openFindPitch());
 
@@ -291,6 +291,11 @@ public class CustomerHomeFragment extends Fragment {
         if (getActivity() instanceof CustomerMainActivity) {
             ((CustomerMainActivity) getActivity()).switchToTab(com.example.timsanbong.utils.NavBarManager.ITEM_PROFILE);
         }
+    }
+
+    private void openNotifications() {
+        Intent intent = new Intent(requireContext(), NotificationsActivity.class);
+        startActivity(intent);
     }
 
     private void openMessages() {
