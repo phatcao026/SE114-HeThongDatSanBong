@@ -35,6 +35,7 @@ import com.example.timsanbong.data.model.FieldUpdateRequest;
 import com.example.timsanbong.data.model.TimeSlotCreateRequest;
 import com.example.timsanbong.data.model.TimeSlotResponse;
 import com.example.timsanbong.data.model.TimeSlotUpdateRequest;
+import com.example.timsanbong.utils.RepositoryCallback;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -306,16 +307,21 @@ public class OwnerFieldsFragment extends Fragment {
         dialog.findViewById(R.id.btnChangePhoto).setOnClickListener(v -> editFieldImagePickerLauncher.launch("image/*"));
         
         // Pre-fill image if exists
-        if (field.getImageUrl() != null && !field.getImageUrl().isEmpty() && !field.getImageUrl().equals("null")) {
+        String imageUrl = field.getImageUrl();
+        if (imageUrl != null && !imageUrl.isEmpty() && !imageUrl.equals("null") && !imageUrl.startsWith("content://")) {
             editFieldImagePreviewContainer.setVisibility(View.VISIBLE);
             editFieldNoImageContainer.setVisibility(View.GONE);
             editFieldImagePreview.setVisibility(View.VISIBLE);
-            Glide.with(this).load(field.getImageUrl()).into(editFieldImagePreview);
+            Glide.with(this)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.bg_pitch_cover_square)
+                    .error(R.drawable.bg_pitch_cover_square)
+                    .centerCrop()
+                    .into(editFieldImagePreview);
         } else {
             editFieldNoImageContainer.setVisibility(View.VISIBLE);
             editFieldImagePreviewContainer.setVisibility(View.GONE);
             // Even if no image, user should be able to click the container to pick an image
-            // Assuming containerEditImagePicker is the ID of the container
             dialog.findViewById(R.id.containerEditImagePicker).setOnClickListener(v -> editFieldImagePickerLauncher.launch("image/*"));
         }
 
@@ -381,10 +387,21 @@ public class OwnerFieldsFragment extends Fragment {
         dialog.findViewById(R.id.btnSubmitEditField).setOnClickListener(v -> {
             String name = etName.getText().toString().trim();
             if (name.isEmpty()) return;
-            // Use new image URI if selected, otherwise fallback to existing
-            String imageUrl = (editFieldImageUri != null) ? editFieldImageUri.toString() : field.getImageUrl();
-            viewModel.updateField(field.getId(), new FieldUpdateRequest(name, fieldType[0], field.getAddress(), etDescription.getText().toString(), imageUrl, status[0]));
-            dialog.dismiss();
+            
+            if (editFieldImageUri != null) {
+                okhttp3.MultipartBody.Part filePart = com.example.timsanbong.utils.FileUtils.uriToMultipartBodyPart(requireContext(), editFieldImageUri, "file");
+                viewModel.uploadImage(filePart, new RepositoryCallback<>() {
+                    @Override public void onSuccess(String imageUrl) {
+                        android.util.Log.d("DEBUG_URL_ANDROID", "URL nhận từ server: " + imageUrl);
+                        viewModel.updateField(field.getId(), new FieldUpdateRequest(name, fieldType[0], field.getAddress(), etDescription.getText().toString(), imageUrl, status[0]));
+                        dialog.dismiss();
+                    }
+                    @Override public void onError(String error) { Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show(); }
+                });
+            } else {
+                viewModel.updateField(field.getId(), new FieldUpdateRequest(name, fieldType[0], field.getAddress(), etDescription.getText().toString(), field.getImageUrl(), status[0]));
+                dialog.dismiss();
+            }
         });
         dialog.findViewById(R.id.btnDeleteFieldFromEdit).setOnClickListener(v -> { confirmDeleteField(field); dialog.dismiss(); });
         dialog.findViewById(R.id.btnCloseEditField).setOnClickListener(v -> dialog.dismiss());
@@ -442,9 +459,20 @@ public class OwnerFieldsFragment extends Fragment {
                 dialog.findViewById(R.id.tvFieldNameError).setVisibility(View.VISIBLE);
                 return;
             }
-            // Note: Image upload logic needs to be implemented. For now, passing image URL as empty.
-            viewModel.createField(new FieldCreateRequest(name, fieldType[0], "", etDescription.getText().toString(), "", status[0]));
-            dialog.dismiss();
+            
+            if (createFieldImageUri != null) {
+                okhttp3.MultipartBody.Part filePart = com.example.timsanbong.utils.FileUtils.uriToMultipartBodyPart(requireContext(), createFieldImageUri, "file");
+                viewModel.uploadImage(filePart, new RepositoryCallback<>() {
+                    @Override public void onSuccess(String imageUrl) {
+                        viewModel.createField(new FieldCreateRequest(name, fieldType[0], "", etDescription.getText().toString(), imageUrl, status[0]));
+                        dialog.dismiss();
+                    }
+                    @Override public void onError(String error) { Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show(); }
+                });
+            } else {
+                viewModel.createField(new FieldCreateRequest(name, fieldType[0], "", etDescription.getText().toString(), "", status[0]));
+                dialog.dismiss();
+            }
         });
         dialog.findViewById(R.id.btnCancelCreateField).setOnClickListener(v -> dialog.dismiss());
         dialog.findViewById(R.id.btnCloseCreateField).setOnClickListener(v -> dialog.dismiss());

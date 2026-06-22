@@ -10,6 +10,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -188,6 +189,11 @@ public interface ApiService {
 
     @GET("reviews/field/{fieldId}")
     Call<List<FieldReviewResponse>> getFieldReviews(@Path("fieldId") long fieldId);
+
+    // Upload
+    @Multipart
+    @POST("upload/image")
+    Call<Map<String, String>> uploadImage(@retrofit2.http.Part okhttp3.MultipartBody.Part file);
 
     // Owner fields
     @GET("fields/mine")
