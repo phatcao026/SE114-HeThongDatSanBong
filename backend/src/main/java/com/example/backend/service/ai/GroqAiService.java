@@ -76,7 +76,7 @@ public class GroqAiService {
                     .map(f -> String.format("%s (Sân %s)", f.getName(), f.getType().name()))
                     .collect(Collectors.joining("; "));
 
-            String systemContext = "Bạn là trợ lý ảo hỗ trợ khách hàng của Ứng dụng TimSanBong. " +
+            String systemContext = "Bạn là trợ lý ảo hỗ trợ khách hàng của Hệ thống Quản lý Sân bóng PitchSyn. " +
                     "Nhiệm vụ của bạn là giải đáp thắc mắc dựa trên các thông tin sau. TUYỆT ĐỐI KHÔNG BỊA ĐẶT THÊM SÂN HOẶC ĐỊA CHỈ KHÁC: " +
                     "- Danh sách sân thực tế lấy từ Database: " + realFieldData + ". " +
                     "- Công thức Trust Score (thang 0-100): Trust Score = (0.40 x TransactionScore) + (0.30 x RatingScore) + (0.20 x CancellationScore) + (0.10 x ActivityScore). " +
@@ -90,7 +90,7 @@ public class GroqAiService {
                     "- Khung giờ hoạt động: Từ 06:00 đến 23:30 hàng ngày. " +
                     "- Chính sách hủy sân: Hủy trước 24 giờ được hoàn 100% tiền cọc. Hủy trước 12 giờ hoàn 50%. Hủy sát giờ không được hoàn tiền. " +
                     "- Dịch vụ đi kèm: Miễn phí trà đá, nước và áo bíp. " +
-                    "- Lưu ý: Để xem lịch trống chi tiết hoặc đặt sân, hãy hướng dẫn khách truy cập mục Tìm Sân trên ứng dụng. " +
+                    "- Lưu ý: Để xem lịch trống chi tiết hoặc đặt sân, hãy hướng dẫn khách truy cập mục Tìm Sân trên website. " +
                     "Yêu cầu giao tiếp: Trả lời ngắn gọn, lịch sự, chuyên nghiệp.";
 
             ObjectNode requestBodyNode = objectMapper.createObjectNode();
@@ -159,25 +159,21 @@ public class GroqAiService {
             String priorityInstruction;
             if (postType == Enums.PostType.FIND_MEMBER) {
                 priorityInstruction = 
-                    "Nhiệm vụ: Phân tích danh sách đối thủ và chọn ra đúng 5 bài đăng tuyển cầu lẻ phù hợp nhất.\n" +
-                    "QUY TẮC LỌC BẮT BUỘC:\n" +
-                    "1. Nếu hostDate khác 'Tự do', BẮT BUỘC chỉ chọn các bài có cùng ngày '" + (hostDate != null ? hostDate : "Tự do") + "'.\n" +
-                    "2. Nếu hostSkillLevel khác 'Tự do', ƯU TIÊN các bài có cùng trình độ hoặc lệch tối đa 1 cấp.\n" +
+                    "Nhiệm vụ: Phân tích danh sách đối thủ và chọn ra đúng 5 bài đăng tuyển cầu lẻ phù hợp nhất với vị trí thi đấu và thời gian của cầu lẻ này.\n" +
                     "QUY TẮC ƯU TIÊN khi xét duyệt (từ cao xuống thấp):\n" +
-                    "1. THỜI GIAN thi đấu (Ưu tiên trùng hoặc lệch ít nhất về Giờ bắt đầu và Giờ kết thúc).\n" +
-                    "2. VỊ TRÍ thi đấu (Khớp giữa vị trí sở trường của cầu lẻ '" + (hostPosition != null ? hostPosition : "Bất kỳ") + "' với danh sách các vị trí cần tuyển 'targetPositions').\n" +
-                    "3. ĐỘ UY TÍN (Càng cao càng tốt).\n" +
-                    "4. CÁC TIÊU CHÍ KHÁC (Chi phí 'costSharing', lối đá 'playStyleNote').";
+                    "1. THỜI GIAN thi đấu (Ưu tiên trùng hoặc lệch ít nhất về Ngày, Giờ bắt đầu và Giờ kết thúc).\n" +
+                    "2. VỊ TRÍ thi đấu (Khớp giữa vị trí sở trường của cầu lẻ '" + (hostPosition != null ? hostPosition : "Bất kỳ") + "' với danh sách các vị trí cần tuyển 'targetPositions' của bài đăng).\n" +
+                    "3. ĐỘ UY TÍN (Điểm trust score của chủ bài đăng, càng cao càng tốt).\n" +
+                    "4. TRÌNH ĐỘ YÊU CẦU (Khớp trình độ 'skillLevel', lệch tối đa 1 cấp).\n" +
+                    "5. CÁC TIÊU CHÍ KHÁC (Chi phí đóng góp 'costSharing', lối đá 'playStyleNote', độ tuổi 'ageRange').";
             } else {
                 priorityInstruction = 
-                    "Nhiệm vụ: Phân tích danh sách đối thủ và chọn ra đúng 5 bài đăng tìm đối thủ phù hợp nhất.\n" +
-                    "QUY TẮC LỌC BẮT BUỘC:\n" +
-                    "1. Nếu hostDate khác 'Tự do', BẮT BUỘC chỉ chọn các bài có cùng ngày '" + (hostDate != null ? hostDate : "Tự do") + "'.\n" +
-                    "2. Nếu hostSkillLevel khác 'Tự do', ƯU TIÊN các bài có cùng trình độ hoặc lệch tối đa 1 cấp.\n" +
+                    "Nhiệm vụ: Phân tích danh sách đối thủ và chọn ra đúng 5 bài đăng tìm đối thủ phù hợp nhất với đội chủ nhà.\n" +
                     "QUY TẮC ƯU TIÊN khi xét duyệt (từ cao xuống thấp):\n" +
-                    "1. THỜI GIAN thi đấu (Ưu tiên trùng hoặc lệch ít nhất về Giờ bắt đầu và Giờ kết thúc).\n" +
-                    "2. ĐỘ UY TÍN (Ưu tiên tương đồng hoặc cao hơn chủ nhà).\n" +
-                    "3. CÁC TIÊU CHÍ KHÁC (Lối đá 'playStyleNote', tình trạng sân 'hasField').";
+                    "1. THỜI GIAN thi đấu (Ưu tiên trùng hoặc lệch ít nhất về Ngày, Giờ bắt đầu và Giờ kết thúc).\n" +
+                    "2. ĐỘ UY TÍN (Điểm trust score của đối thủ, ưu tiên tương đồng hoặc cao hơn chủ nhà).\n" +
+                    "3. TRÌNH ĐỘ YÊU CẦU (Khớp trình độ 'skillLevel', lệch tối đa 1 cấp).\n" +
+                    "4. CÁC TIÊU CHÍ KHÁC (Lối đá 'playStyleNote', độ tuổi 'ageRange', tình trạng Sân bóng - có sân hay chưa 'hasField').";
             }
 
             String prompt = String.format(

@@ -5,9 +5,29 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="12dp"
-    android:background="#F5F7F9">
+    android:background="@drawable/bg_stat_card">
+    <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:padding="16dp"
+             android:gravity="center_vertical"
+             android:background="#2ecc71">
+             <ImageView
+                 android:layout_width="40dp"
+                 android:layout_height="40dp"
+                 android:src="@drawable/ic_chatbot"
+                 app:tint="@null"
+                 android:backgroundTint="@null"/>
+             <TextView
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="Chat Bot Timsanbong"
+                 android:textColor="#FFFFFF"
+                 android:textStyle="bold"
+                 android:layout_marginStart="12dp"/>
+         </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
+<androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvChatMessages"
         android:layout_width="match_parent"
         android:layout_height="400dp"
