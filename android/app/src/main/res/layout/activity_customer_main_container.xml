@@ -17,7 +17,7 @@
         android:layout_above="@id/customerBottomNavLayout"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:src="@android:drawable/stat_notify_chat"
+        android:src="@drawable/ic_chatbot"
         android:backgroundTint="@color/primary"
         android:contentDescription="Chat Bot"/>
     <include

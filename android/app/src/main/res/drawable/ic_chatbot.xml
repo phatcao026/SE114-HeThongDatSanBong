@@ -1,0 +1,46 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="128dp"
+    android:height="128dp"
+    android:viewportWidth="128"
+    android:viewportHeight="128">
+
+
+    <!-- Headset arc -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="8"
+        android:fillColor="#00000000"
+        android:pathData="M20,54V46c0,-18 20,-32 44,-32s44,14 44,32v8"/>
+
+    <!-- Earpads -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M4,58a12,12 0,0 1,12,-12h8v36h-8a12,12 0,0 1,-12,-12z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M124,58a12,12 0,0 0,-12,-12h-8v36h8a12,12 0,0 0,12,-12z"/>
+
+    <!-- Main robot head -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="8"
+        android:pathData="M32,36h64a12,12 0,0 1,12 12v48a12,12 0,0 1,-12 12H64l-8,8v-8H32a12,12 0,0 1,-12,-12V48a12,12 0,0 1,12,-12z"/>
+
+
+    <!-- Eyes -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50,62m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0"/>
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M78,62m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0"/>
+
+    <!-- Smile -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M54,84c6,8 14,8 20,0"/>
+</vector>

@@ -42,4 +42,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     // 2. Đếm số lượng hóa đơn thành công
     @Query("SELECT COUNT(b) FROM Booking b WHERE b.status = 'COMPLETED'")
     long countSuccessfulBookings();
+
+    List<Booking> findByBookingDateAndStatusNot(LocalDate bookingDate, Enums.BookingStatus status);
 }
