@@ -186,9 +186,15 @@ Nhấn nút **Run** (biểu tượng hình tam giác màu xanh) trên thanh côn
 <a id="tai-khoan"></a>
 ## 👤 Danh Sách Tài Khoản Mẫu (Test Accounts)
 
-Sau khi hệ thống khởi chạy, bạn có thể đăng ký tài khoản trực tiếp qua ứng dụng hoặc sử dụng các tài khoản đã được nạp qua dữ liệu mẫu (nếu có).
+Sau khi hệ thống khởi chạy, các tài khoản dưới đây sẽ tự động được nạp vào Database (thông qua Database Seeder khi `app.seed.enabled=true`). Bạn có thể sử dụng các tài khoản này để đăng nhập và kiểm thử các vai trò khác nhau trên ứng dụng di động:
 
-- **Admin/Chủ sân:** (Tài khoản mẫu nếu có)
-- **Khách hàng (User):** (Tài khoản mẫu nếu có)
+| Vai trò | Email đăng nhập | Mật khẩu mặc định | Biến cấu hình tương ứng trong `.env` |
+| :--- | :--- | :--- | :--- |
+| **Admin** | `admin@example.com` | `123456` | `APP_SEED_ADMIN_EMAIL` / `APP_SEED_ADMIN_PASSWORD` |
+| **Chủ sân (Owner)** | `owner@example.com` | `123456` | `APP_SEED_OWNER_EMAIL` / `APP_SEED_OWNER_PASSWORD` |
+| **Người chơi (Player)** | `player@example.com` | `123456` | `APP_SEED_PLAYER_EMAIL` / `APP_SEED_PLAYER_PASSWORD` |
+| **Đối thủ ghép sân (Opponent)** | `opponent@example.com` | `123456` | `APP_SEED_OPPONENT_EMAIL` / `APP_SEED_OPPONENT_PASSWORD` |
+
+*Lưu ý: Các giá trị này có thể thay đổi bằng cách cập nhật các biến môi trường tương ứng trong file `.env` của bạn.*
 
 Chúc bạn trải nghiệm và phát triển dự án tốt! 🚀
