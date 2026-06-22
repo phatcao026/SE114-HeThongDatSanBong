@@ -59,6 +59,13 @@ public class OwnerFieldsFragment extends Fragment {
     private LinearLayout createFieldNoImageContainer;
     private FrameLayout createFieldImagePreviewContainer;
     private ImageView createFieldImagePreview;
+    
+    private ActivityResultLauncher<String> editFieldImagePickerLauncher;
+    private Uri editFieldImageUri;
+    private LinearLayout editFieldNoImageContainer;
+    private FrameLayout editFieldImagePreviewContainer;
+    private ImageView editFieldImagePreview;
+    
     private String searchQuery = "";
     private FilterMode filterMode = FilterMode.ALL;
 
@@ -87,6 +94,16 @@ public class OwnerFieldsFragment extends Fragment {
                     if (createFieldNoImageContainer != null) createFieldNoImageContainer.setVisibility(View.GONE);
                     if (createFieldImagePreviewContainer != null) createFieldImagePreviewContainer.setVisibility(View.VISIBLE);
                     if (createFieldImagePreview != null) Glide.with(this).load(uri).into(createFieldImagePreview);
+                });
+
+        editFieldImagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri == null) return;
+                    editFieldImageUri = uri;
+                    if (editFieldNoImageContainer != null) editFieldNoImageContainer.setVisibility(View.GONE);
+                    if (editFieldImagePreviewContainer != null) editFieldImagePreviewContainer.setVisibility(View.VISIBLE);
+                    if (editFieldImagePreview != null) Glide.with(this).load(uri).into(editFieldImagePreview);
                 });
 
         bindViews(view);
@@ -279,29 +296,158 @@ public class OwnerFieldsFragment extends Fragment {
     private void showFieldForm(Field field) {
         if (field == null) { showCreateFieldForm(); return; }
         Dialog dialog = createDialog(R.layout.dialog_owner_edit_field);
+        
+        // Initialize image picker views
+        editFieldNoImageContainer = dialog.findViewById(R.id.llEditNoImage);
+        editFieldImagePreviewContainer = dialog.findViewById(R.id.frameEditImagePreview);
+        editFieldImagePreview = dialog.findViewById(R.id.ivEditFieldImagePreview);
+        editFieldImageUri = null; // Ensure it's reset
+        
+        dialog.findViewById(R.id.btnChangePhoto).setOnClickListener(v -> editFieldImagePickerLauncher.launch("image/*"));
+        
+        // Pre-fill image if exists
+        if (field.getImageUrl() != null && !field.getImageUrl().isEmpty() && !field.getImageUrl().equals("null")) {
+            editFieldImagePreviewContainer.setVisibility(View.VISIBLE);
+            editFieldNoImageContainer.setVisibility(View.GONE);
+            editFieldImagePreview.setVisibility(View.VISIBLE);
+            Glide.with(this).load(field.getImageUrl()).into(editFieldImagePreview);
+        } else {
+            editFieldNoImageContainer.setVisibility(View.VISIBLE);
+            editFieldImagePreviewContainer.setVisibility(View.GONE);
+            // Even if no image, user should be able to click the container to pick an image
+            // Assuming containerEditImagePicker is the ID of the container
+            dialog.findViewById(R.id.containerEditImagePicker).setOnClickListener(v -> editFieldImagePickerLauncher.launch("image/*"));
+        }
+
         EditText etName = dialog.findViewById(R.id.etEditFieldName);
+        EditText etDescription = dialog.findViewById(R.id.etEditDescription);
         etName.setText(field.getName());
+        etDescription.setText(field.getDescription());
+        ((TextView) dialog.findViewById(R.id.tvEditingFieldName)).setText(field.getName());
+        
+        // Handle field type selection
+        final String[] fieldType = {field.getType()};
+        View chip5 = dialog.findViewById(R.id.chipEditTypeSan5);
+        View chip7 = dialog.findViewById(R.id.chipEditTypeSan7);
+        
+        if ("FIVE_A_SIDE".equalsIgnoreCase(fieldType[0])) chip5.setBackgroundResource(R.drawable.bg_type_chip_active);
+        else chip7.setBackgroundResource(R.drawable.bg_type_chip_active);
+        
+        chip5.setOnClickListener(v -> {
+            fieldType[0] = "FIVE_A_SIDE";
+            v.setBackgroundResource(R.drawable.bg_type_chip_active);
+            chip7.setBackgroundResource(R.drawable.bg_type_chip_inactive);
+        });
+        chip7.setOnClickListener(v -> {
+            fieldType[0] = "SEVEN_A_SIDE";
+            v.setBackgroundResource(R.drawable.bg_type_chip_active);
+            chip5.setBackgroundResource(R.drawable.bg_type_chip_inactive);
+        });
+
+        // Handle status selection
+        final String[] status = {field.getStatus()};
+        View rbAvailable = dialog.findViewById(R.id.rbEditStatusAvailable);
+        View rbMaintenance = dialog.findViewById(R.id.rbEditStatusMaintenance);
+        TextView ivCheckAvailable = dialog.findViewById(R.id.ivEditCheckAvailable);
+        TextView ivCheckMaintenance = dialog.findViewById(R.id.ivEditCheckMaintenance);
+
+        if ("MAINTENANCE".equalsIgnoreCase(status[0])) {
+            rbMaintenance.setBackgroundResource(R.drawable.bg_status_radio_active);
+            ivCheckMaintenance.setVisibility(View.VISIBLE);
+            rbAvailable.setBackgroundResource(R.drawable.bg_status_radio_inactive);
+            ivCheckAvailable.setVisibility(View.GONE);
+        } else {
+            rbAvailable.setBackgroundResource(R.drawable.bg_status_radio_active);
+            ivCheckAvailable.setVisibility(View.VISIBLE);
+            rbMaintenance.setBackgroundResource(R.drawable.bg_status_radio_inactive);
+            ivCheckMaintenance.setVisibility(View.GONE);
+        }
+
+        rbAvailable.setOnClickListener(v -> {
+            status[0] = "AVAILABLE";
+            v.setBackgroundResource(R.drawable.bg_status_radio_active);
+            ivCheckAvailable.setVisibility(View.VISIBLE);
+            rbMaintenance.setBackgroundResource(R.drawable.bg_status_radio_inactive);
+            ivCheckMaintenance.setVisibility(View.GONE);
+        });
+        rbMaintenance.setOnClickListener(v -> {
+            status[0] = "MAINTENANCE";
+            v.setBackgroundResource(R.drawable.bg_status_radio_active);
+            ivCheckMaintenance.setVisibility(View.VISIBLE);
+            rbAvailable.setBackgroundResource(R.drawable.bg_status_radio_inactive);
+            ivCheckAvailable.setVisibility(View.GONE);
+        });
         
         dialog.findViewById(R.id.btnSubmitEditField).setOnClickListener(v -> {
             String name = etName.getText().toString().trim();
             if (name.isEmpty()) return;
-            viewModel.updateField(field.getId(), new FieldUpdateRequest(name, field.getType(), field.getAddress(), field.getDescription(), field.getImageUrl(), field.getStatus()));
+            // Use new image URI if selected, otherwise fallback to existing
+            String imageUrl = (editFieldImageUri != null) ? editFieldImageUri.toString() : field.getImageUrl();
+            viewModel.updateField(field.getId(), new FieldUpdateRequest(name, fieldType[0], field.getAddress(), etDescription.getText().toString(), imageUrl, status[0]));
             dialog.dismiss();
         });
+        dialog.findViewById(R.id.btnDeleteFieldFromEdit).setOnClickListener(v -> { confirmDeleteField(field); dialog.dismiss(); });
         dialog.findViewById(R.id.btnCloseEditField).setOnClickListener(v -> dialog.dismiss());
+        dialog.findViewById(R.id.btnCancelEditField).setOnClickListener(v -> dialog.dismiss());
         dialog.show();
     }
 
     private void showCreateFieldForm() {
         Dialog dialog = createDialog(R.layout.dialog_owner_create_field);
+        
+        // Initialize image picker views
+        createFieldNoImageContainer = dialog.findViewById(R.id.llNoImage);
+        createFieldImagePreviewContainer = dialog.findViewById(R.id.frameImagePreview);
+        createFieldImagePreview = dialog.findViewById(R.id.ivFieldImagePreview);
+        createFieldImageUri = null;
+        
+        dialog.findViewById(R.id.containerImagePicker).setOnClickListener(v -> createFieldImagePickerLauncher.launch("image/*"));
+
         EditText etName = dialog.findViewById(R.id.etFieldName);
+        EditText etDescription = dialog.findViewById(R.id.etDescription);
+        
+        // Handle field type selection
+        final String[] fieldType = {"FIVE_A_SIDE"};
+        dialog.findViewById(R.id.chipTypeSan5).setOnClickListener(v -> {
+            fieldType[0] = "FIVE_A_SIDE";
+            v.setBackgroundResource(R.drawable.bg_type_chip_active);
+            dialog.findViewById(R.id.chipTypeSan7).setBackgroundResource(R.drawable.bg_type_chip_inactive);
+        });
+        dialog.findViewById(R.id.chipTypeSan7).setOnClickListener(v -> {
+            fieldType[0] = "SEVEN_A_SIDE";
+            v.setBackgroundResource(R.drawable.bg_type_chip_active);
+            dialog.findViewById(R.id.chipTypeSan5).setBackgroundResource(R.drawable.bg_type_chip_inactive);
+        });
+
+        // Handle status selection
+        final String[] status = {"AVAILABLE"};
+        dialog.findViewById(R.id.rbStatusAvailable).setOnClickListener(v -> {
+            status[0] = "AVAILABLE";
+            v.setBackgroundResource(R.drawable.bg_status_radio_active);
+            dialog.findViewById(R.id.ivCheckAvailable).setVisibility(View.VISIBLE);
+            dialog.findViewById(R.id.rbStatusMaintenance).setBackgroundResource(R.drawable.bg_status_radio_inactive);
+            dialog.findViewById(R.id.ivCheckMaintenance).setVisibility(View.GONE);
+        });
+        dialog.findViewById(R.id.rbStatusMaintenance).setOnClickListener(v -> {
+            status[0] = "MAINTENANCE";
+            v.setBackgroundResource(R.drawable.bg_status_radio_active);
+            dialog.findViewById(R.id.ivCheckMaintenance).setVisibility(View.VISIBLE);
+            dialog.findViewById(R.id.rbStatusAvailable).setBackgroundResource(R.drawable.bg_status_radio_inactive);
+            dialog.findViewById(R.id.ivCheckAvailable).setVisibility(View.GONE);
+        });
+
         dialog.findViewById(R.id.btnSubmitCreateField).setOnClickListener(v -> {
             String name = etName.getText().toString().trim();
-            if (name.isEmpty()) return;
-            viewModel.createField(new FieldCreateRequest(name, "FIVE_A_SIDE", "", "", "", "AVAILABLE"));
+            if (name.isEmpty()) {
+                dialog.findViewById(R.id.tvFieldNameError).setVisibility(View.VISIBLE);
+                return;
+            }
+            // Note: Image upload logic needs to be implemented. For now, passing image URL as empty.
+            viewModel.createField(new FieldCreateRequest(name, fieldType[0], "", etDescription.getText().toString(), "", status[0]));
             dialog.dismiss();
         });
         dialog.findViewById(R.id.btnCancelCreateField).setOnClickListener(v -> dialog.dismiss());
+        dialog.findViewById(R.id.btnCloseCreateField).setOnClickListener(v -> dialog.dismiss());
         dialog.show();
     }
 
