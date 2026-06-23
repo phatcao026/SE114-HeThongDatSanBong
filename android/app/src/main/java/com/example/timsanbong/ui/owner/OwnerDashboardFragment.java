@@ -271,7 +271,7 @@ public class OwnerDashboardFragment extends Fragment {
         tvRevenueChange.setText(completed + " thành công · " + needAction + " cần xử lý");
 
         // Cập nhật 2 card còn lại
-        tvStatPendingValue.setText(String.valueOf(waitingDeposit));
+        tvStatPendingValue.setText(String.valueOf(needAction));
         tvStatFieldsValue.setText(String.valueOf(totalFields));
 
     }

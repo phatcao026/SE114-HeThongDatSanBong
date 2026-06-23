@@ -4,12 +4,14 @@ import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.timsanbong.R;
 import com.example.timsanbong.data.model.Field;
 import com.google.android.material.button.MaterialButton;
@@ -60,6 +62,7 @@ public class OwnerFieldAdapter extends RecyclerView.Adapter<OwnerFieldAdapter.Ow
 
     class OwnerFieldViewHolder extends RecyclerView.ViewHolder {
         private final TextView tvFieldName, tvFieldTypeBadge, tvFieldCapacity, tvFieldRating, tvStatusLabel;
+        private final ImageView ivFieldImage;
         private final View llFieldRating;
         private final MaterialButton btnEditField, btnDeleteField, btnManageSlots;
 
@@ -69,6 +72,7 @@ public class OwnerFieldAdapter extends RecyclerView.Adapter<OwnerFieldAdapter.Ow
             tvFieldTypeBadge = itemView.findViewById(R.id.tvFieldTypeBadge);
             tvFieldCapacity = itemView.findViewById(R.id.tvFieldCapacity);
             tvFieldRating = itemView.findViewById(R.id.tvFieldRating);
+            ivFieldImage = itemView.findViewById(R.id.ivFieldImage);
             llFieldRating = itemView.findViewById(R.id.llFieldRating);
             tvStatusLabel = itemView.findViewById(R.id.tvStatusLabel);
             btnEditField = itemView.findViewById(R.id.btnEditField);
@@ -80,6 +84,13 @@ public class OwnerFieldAdapter extends RecyclerView.Adapter<OwnerFieldAdapter.Ow
             tvFieldName.setText(field.getName());
             tvFieldTypeBadge.setText(field.getTypeLabel());
             if (tvFieldCapacity != null) tvFieldCapacity.setText(field.getFieldType());
+
+            Glide.with(itemView.getContext())
+                    .load(field.getImageUrl())
+                    .placeholder(R.drawable.bg_pitch_cover)
+                    .error(R.drawable.bg_pitch_cover)
+                    .centerCrop()
+                    .into(ivFieldImage);
 
             Double rating = field.getAverageRating();
             if (llFieldRating != null) {
