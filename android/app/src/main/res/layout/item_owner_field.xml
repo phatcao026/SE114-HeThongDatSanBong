@@ -24,6 +24,14 @@
             android:layout_height="6dp"
             android:background="@color/emerald_500" />
 
+        <ImageView
+            android:id="@+id/ivFieldImage"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/bg_pitch_cover"
+            android:contentDescription="@string/app_name" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
